@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Graph View Screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Animation for gentle floating effect on nodes */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float-slow {
+            animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-medium {
+            animation: float 5s ease-in-out infinite;
+            animation-delay: 1s;
+        }
+        .animate-float-fast {
+            animation: float 4s ease-in-out infinite;
+            animation-delay: 2s;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] dark:text-white font-display overflow-hidden">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-4 pt-4 pb-2 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm z-20 border-b border-gray-100 dark:border-gray-800">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[#111318] dark:text-white" style="font-size: 24px;">filter_list</span>
+</button>
+<h2 class="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Graph View</h2>
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[#111318] dark:text-white" style="font-size: 24px;">center_focus_strong</span>
+</button>
+</header>
+<!-- Main Graph Canvas Area -->
+<main class="relative flex-grow w-full h-full overflow-hidden bg-background-light dark:bg-background-dark cursor-grab active:cursor-grabbing">
+<!-- Grid Pattern Background -->
+<div class="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05]" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;">
+</div>
+<!-- SVG Lines (Edges) -->
+<!-- Using a viewbox that matches percentage positioning roughly -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+<!-- Lines connecting to center (50% 45%) -->
+<!-- Top Left -->
+<line class="stroke-gray-300 dark:stroke-gray-700" stroke-width="1.5" x1="50%" x2="25%" y1="45%" y2="25%"></line>
+<!-- Top Right -->
+<line class="stroke-gray-300 dark:stroke-gray-700" stroke-width="1.5" x1="50%" x2="75%" y1="45%" y2="20%"></line>
+<!-- Bottom Left -->
+<line class="stroke-gray-300 dark:stroke-gray-700" stroke-width="1.5" x1="50%" x2="20%" y1="45%" y2="65%"></line>
+<!-- Bottom Right -->
+<line class="stroke-gray-300 dark:stroke-gray-700" stroke-width="1.5" x1="50%" x2="80%" y1="45%" y2="60%"></line>
+<!-- Far Top -->
+<line class="stroke-gray-300 dark:stroke-gray-700" stroke-width="1.5" x1="50%" x2="50%" y1="45%" y2="15%"></line>
+<!-- Secondary Connections -->
+<line class="stroke-gray-200 dark:stroke-gray-800" stroke-width="1" x1="25%" x2="50%" y1="25%" y2="15%"></line>
+<line class="stroke-gray-200 dark:stroke-gray-800" stroke-width="1" x1="20%" x2="25%" y1="65%" y2="85%"></line>
+</svg>
+<!-- Nodes -->
+<!-- Positioning is absolute based on percentages to simulate the graph layout -->
+<!-- Central Node (Active) -->
+<div class="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-slow">
+<div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary shadow-[0_0_20px_rgba(19,91,236,0.4)] ring-4 ring-white dark:ring-background-dark cursor-pointer transition-transform hover:scale-110">
+<span class="material-symbols-outlined text-white" style="font-size: 32px;">hub</span>
+</div>
+<span class="text-sm font-semibold text-[#111318] dark:text-white bg-white/80 dark:bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-md">Project Alpha</span>
+</div>
+<!-- Peripheral Node: Top Left -->
+<div class="absolute top-[25%] left-[25%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-medium">
+<div class="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-gray-400" style="font-size: 20px;">lightbulb</span>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Ideas</span>
+</div>
+<!-- Peripheral Node: Top Right -->
+<div class="absolute top-[20%] left-[75%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-fast">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-gray-400" style="font-size: 24px;">article</span>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Research</span>
+</div>
+<!-- Peripheral Node: Bottom Left -->
+<div class="absolute top-[65%] left-[20%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-slow">
+<div class="flex h-12 w-12 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-gray-400" style="font-size: 24px;">schedule</span>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Planning</span>
+</div>
+<!-- Peripheral Node: Far Bottom Left (Leaf) -->
+<div class="absolute top-[85%] left-[25%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-medium">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer">
+<span class="material-symbols-outlined text-gray-300" style="font-size: 16px;">check_circle</span>
+</div>
+</div>
+<!-- Peripheral Node: Bottom Right -->
+<div class="absolute top-[60%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-fast">
+<div class="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-gray-400" style="font-size: 20px;">image</span>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Assets</span>
+</div>
+<!-- Peripheral Node: Top Center -->
+<div class="absolute top-[15%] left-[50%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-2 animate-float-slow">
+<div class="flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-gray-800 shadow-md border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+<span class="material-symbols-outlined text-gray-400" style="font-size: 18px;">folder</span>
+</div>
+<span class="text-xs font-medium text-gray-500 dark:text-gray-400">Archive</span>
+</div>
+<!-- Floating Preview Card (Selected Node Details) -->
+<div class="absolute bottom-6 left-4 right-20 z-20">
+<div class="flex items-center gap-4 rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-3 shadow-lg border border-gray-100 dark:border-gray-700">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">hub</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<p class="text-[#111318] dark:text-white text-sm font-bold leading-tight truncate">Project Alpha</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs font-normal leading-normal truncate">12 linked notes • Last edited 2h ago</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (FAB) -->
+<div class="absolute bottom-[calc(80px+1rem)] right-4 z-30">
+<button class="flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-xl shadow-primary/30 transition-transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined" style="font-size: 28px;">add</span>
+</button>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="flex gap-2 border-t border-[#f0f2f4] dark:border-gray-800 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg px-4 pb-6 pt-2 z-40">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#616f89] dark:text-gray-400 hover:text-primary transition-colors" href="#">
+<div class="flex h-7 items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 24px; font-variation-settings: 'FILL' 0;">description</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Notes</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<div class="flex h-7 items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 24px; font-variation-settings: 'FILL' 1;">bubble_chart</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Graph</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#616f89] dark:text-gray-400 hover:text-primary transition-colors" href="#">
+<div class="flex h-7 items-center justify-center">
+<span class="material-symbols-outlined" style="font-size: 24px; font-variation-settings: 'FILL' 0;">settings</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Settings</p>
+</a>
+</nav>
+</div>
+</body></html>

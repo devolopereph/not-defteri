@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Note Editor - Light Theme</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-white text-slate-900 font-display selection:bg-primary/20 selection:text-primary">
+<div class="relative flex h-full min-h-screen w-full flex-col bg-white overflow-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-20 flex items-center justify-between bg-white/90 px-4 py-2 pt-12 backdrop-blur-md transition-all sm:pt-4">
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[28px]">chevron_left</span>
+</button>
+<div class="flex items-center gap-2">
+<button class="flex h-10 items-center justify-center rounded-full px-4 text-sm font-bold text-primary hover:bg-primary/5 active:scale-95 transition-all">
+                    Done
+                </button>
+<button class="flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[24px]">more_horiz</span>
+</button>
+</div>
+</header>
+<!-- Main Editor Area -->
+<main class="flex-grow flex flex-col overflow-y-auto px-6 pb-24">
+<!-- Date / Meta -->
+<div class="mt-2 flex items-center gap-2 text-xs font-medium text-slate-400">
+<span>September 24, 2023 at 10:42 AM</span>
+<span>•</span>
+<span>428 words</span>
+</div>
+<!-- Title Input -->
+<div class="mt-6 mb-2">
+<input class="w-full border-none bg-transparent p-0 text-3xl font-bold leading-tight text-slate-900 placeholder-slate-300 focus:ring-0" placeholder="Title" type="text" value="Project Beta Ideas"/>
+</div>
+<!-- Body Text -->
+<div class="space-y-4">
+<p class="text-lg leading-relaxed text-slate-700">
+                    Here are the key objectives for the upcoming sprint. We need to focus on stability and user flow refinements before the major feature drop.
+                </p>
+<!-- Checklist Section -->
+<div class="py-2">
+<label class="group flex cursor-pointer items-start gap-3 py-2">
+<input class="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary/20 transition-all checked:bg-primary checked:border-primary" type="checkbox"/>
+<span class="text-lg leading-relaxed text-slate-700 decoration-slate-400 group-has-[:checked]:text-slate-400 group-has-[:checked]:line-through transition-colors">
+                            Finalize user flow diagrams
+                        </span>
+</label>
+<label class="group flex cursor-pointer items-start gap-3 py-2">
+<input checked="" class="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary/20 transition-all checked:bg-primary checked:border-primary" type="checkbox"/>
+<span class="text-lg leading-relaxed text-slate-700 decoration-slate-400 group-has-[:checked]:text-slate-400 group-has-[:checked]:line-through transition-colors">
+                            Update API documentation
+                        </span>
+</label>
+<label class="group flex cursor-pointer items-start gap-3 py-2">
+<input class="mt-1 h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary/20 transition-all checked:bg-primary checked:border-primary" type="checkbox"/>
+<span class="text-lg leading-relaxed text-slate-700 decoration-slate-400 group-has-[:checked]:text-slate-400 group-has-[:checked]:line-through transition-colors">
+                            Review sprint backlog
+                        </span>
+</label>
+</div>
+<p class="text-lg leading-relaxed text-slate-700">
+                    We also discussed the visual direction for the new dashboard. Below is a quick sketch from the whiteboard session:
+                </p>
+<!-- Image Block -->
+<div class="relative my-4 overflow-hidden rounded-xl border border-slate-100 shadow-sm">
+<img alt="Whiteboard sketch of dashboard user interface layout" class="w-full object-cover aspect-[4/3]" data-alt="Whiteboard sketch of dashboard user interface layout" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCss0Clhiho5wYlNid_q7y_j5-l2EmF45DVP4y3M88E2fc6ZVtlKl7ml1uj_tNEIno2hSrtxbsFHbw8hmkkJY7-YQWfzWJsyy-PICLfztwoyc3FFr1IVNiuDtvRiD1Eno_mynKq25Hfi57e-rjLjTSKgMN86KlsYIv8HUgXKw_mq8-MB9ro_T58BBPxfSOnok1lAmk1InPBclgBY1c_xfojQewtqzc2oa9J7sMBUjf2hnDoJyVOuaJS0Ao-gHmizM0N_EV9appwfvs"/>
+<div class="absolute bottom-2 right-2 rounded-lg bg-black/50 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                        Sketch_v1.jpg
+                    </div>
+</div>
+<p class="text-lg leading-relaxed text-slate-700">
+                    Next steps include reviewing the user feedback from the alpha group. Let's schedule a sync for Tuesday.
+                </p>
+<!-- Cursor simulation at end of text -->
+<div class="h-6 w-0.5 animate-pulse bg-primary inline-block align-middle ml-0.5"></div>
+</div>
+<!-- Spacer for scroll -->
+<div class="h-24"></div>
+</main>
+<!-- Formatting Toolbar -->
+<div class="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-100 bg-white/95 backdrop-blur px-4 pb-8 pt-2">
+<!-- Suggestion Strip (Optional context) -->
+<div class="mb-2 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 active:bg-slate-200">
+                    @ Mention
+                </button>
+<button class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 active:bg-slate-200">
+                    # Tag
+                </button>
+<button class="whitespace-nowrap rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 active:bg-slate-200">
+                    / Command
+                </button>
+</div>
+<!-- Main Toolbar -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1">
+<button class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[22px]">format_bold</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[22px]">format_italic</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[22px]">format_underlined</span>
+</button>
+<div class="mx-1 h-6 w-px bg-slate-200"></div>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors">
+<span class="material-symbols-outlined text-[22px]">check_box</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[22px]">format_list_bulleted</span>
+</button>
+</div>
+<div class="flex items-center gap-1">
+<button class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[22px]">add_photo_alternate</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 transition-colors">
+<span class="material-symbols-outlined text-[22px]">mic</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

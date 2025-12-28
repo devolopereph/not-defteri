@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings Screen</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1C2533",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar hiding for cleaner mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111318] dark:text-white antialiased selection:bg-primary/30">
+<div class="relative flex h-full min-h-screen w-full flex-col pb-24 max-w-md mx-auto shadow-2xl overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Large Title Header -->
+<header class="px-5 pt-12 pb-2">
+<h1 class="text-[#111318] dark:text-white tracking-tight text-[34px] font-bold leading-tight text-left">Settings</h1>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto no-scrollbar">
+<!-- Appearance Section -->
+<div class="mt-4">
+<h3 class="text-slate-500 dark:text-slate-400 text-[13px] font-semibold leading-tight tracking-wider px-5 pb-2 pt-2 uppercase ml-1">Appearance</h3>
+<div class="mx-4 overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-transparent dark:border-gray-800">
+<!-- Dark Mode Toggle -->
+<div class="flex items-center gap-4 px-4 min-h-[56px] justify-between group active:bg-gray-50 dark:active:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary dark:text-blue-400 flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 size-8">
+<span class="material-symbols-outlined text-[20px]">dark_mode</span>
+</div>
+<p class="text-[#111318] dark:text-white text-[17px] font-normal leading-normal flex-1 truncate">Dark Mode</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-[#e9e9ea] dark:bg-gray-600 p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+<div class="h-[27px] w-[27px] rounded-full bg-white shadow-sm transition-all"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+<p class="px-6 pt-2 text-[13px] text-slate-400 dark:text-slate-500 leading-normal">
+                    Adjust the appearance to reduce eye strain.
+                </p>
+</div>
+<!-- General Section -->
+<div class="mt-8">
+<h3 class="text-slate-500 dark:text-slate-400 text-[13px] font-semibold leading-tight tracking-wider px-5 pb-2 pt-2 uppercase ml-1">General</h3>
+<div class="mx-4 overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-transparent dark:border-gray-800">
+<!-- Sync -->
+<div class="relative">
+<div class="flex items-center gap-4 px-4 min-h-[56px] justify-between cursor-pointer active:bg-gray-50 dark:active:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary dark:text-blue-400 flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 size-8">
+<span class="material-symbols-outlined text-[20px]">cloud_sync</span>
+</div>
+<p class="text-[#111318] dark:text-white text-[17px] font-normal leading-normal flex-1 truncate">Sync</p>
+</div>
+<div class="shrink-0 text-gray-400 dark:text-gray-500 flex items-center">
+<span class="text-[15px] mr-1 text-gray-400">On</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Separator -->
+<div class="absolute bottom-0 left-[60px] right-0 h-[1px] bg-gray-100 dark:bg-gray-700"></div>
+</div>
+<!-- Privacy -->
+<div class="relative">
+<div class="flex items-center gap-4 px-4 min-h-[56px] justify-between cursor-pointer active:bg-gray-50 dark:active:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-primary dark:text-blue-400 flex items-center justify-center rounded-lg bg-primary/10 dark:bg-primary/20 shrink-0 size-8">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<p class="text-[#111318] dark:text-white text-[17px] font-normal leading-normal flex-1 truncate">Privacy &amp; Security</p>
+</div>
+<div class="shrink-0 text-gray-400 dark:text-gray-500 flex items-center">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- About Section -->
+<div class="mt-8">
+<h3 class="text-slate-500 dark:text-slate-400 text-[13px] font-semibold leading-tight tracking-wider px-5 pb-2 pt-2 uppercase ml-1">About</h3>
+<div class="mx-4 overflow-hidden rounded-xl bg-surface-light dark:bg-surface-dark shadow-[0_1px_2px_rgba(0,0,0,0.05)] border border-transparent dark:border-gray-800">
+<!-- Version -->
+<div class="relative">
+<div class="flex items-center gap-4 px-4 min-h-[56px] justify-between cursor-default">
+<div class="flex items-center gap-4">
+<div class="text-gray-500 dark:text-gray-400 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 shrink-0 size-8">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</div>
+<p class="text-[#111318] dark:text-white text-[17px] font-normal leading-normal flex-1 truncate">Version</p>
+</div>
+<div class="shrink-0">
+<p class="text-gray-500 dark:text-gray-400 text-[17px]">1.0.0</p>
+</div>
+</div>
+<!-- Separator -->
+<div class="absolute bottom-0 left-[60px] right-0 h-[1px] bg-gray-100 dark:bg-gray-700"></div>
+</div>
+<!-- Send Feedback -->
+<div class="relative">
+<div class="flex items-center gap-4 px-4 min-h-[56px] justify-between cursor-pointer active:bg-gray-50 dark:active:bg-white/5 transition-colors">
+<div class="flex items-center gap-4">
+<div class="text-gray-500 dark:text-gray-400 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 shrink-0 size-8">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<p class="text-[#111318] dark:text-white text-[17px] font-normal leading-normal flex-1 truncate">Send Feedback</p>
+</div>
+<div class="shrink-0 text-gray-400 dark:text-gray-500 flex items-center">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom spacing for scroll -->
+<div class="h-10"></div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 w-full bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 pb-5 pt-2 px-2 z-10">
+<div class="flex justify-around items-center h-14">
+<!-- Notes Tab -->
+<button class="flex flex-col items-center justify-center w-full gap-1 group">
+<div class="text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors">
+<span class="material-symbols-outlined text-[26px]">description</span>
+</div>
+<span class="text-[10px] font-medium text-gray-500 dark:text-gray-400">Notes</span>
+</button>
+<!-- Graph Tab -->
+<button class="flex flex-col items-center justify-center w-full gap-1 group">
+<div class="text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors">
+<span class="material-symbols-outlined text-[26px]">hub</span>
+</div>
+<span class="text-[10px] font-medium text-gray-500 dark:text-gray-400">Graph</span>
+</button>
+<!-- Settings Tab (Active) -->
+<button class="flex flex-col items-center justify-center w-full gap-1 group">
+<div class="text-primary dark:text-blue-500 transition-colors">
+<span class="material-symbols-outlined text-[26px] fill-current">settings</span>
+</div>
+<span class="text-[10px] font-medium text-primary dark:text-blue-500">Settings</span>
+</button>
+</div>
+</nav>
+</div>
+</body></html>

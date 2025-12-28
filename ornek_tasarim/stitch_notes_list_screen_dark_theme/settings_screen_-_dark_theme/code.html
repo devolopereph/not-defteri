@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings Screen</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#000000", /* Modified to pure black for iOS OLED feel */
+                        "card-dark": "#1C1C1E", /* iOS Grouped Cell Color */
+                        "separator-dark": "#38383A",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hiding for cleaner mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display min-h-screen flex flex-col antialiased selection:bg-primary/30 selection:text-primary">
+<!-- Content Wrapper -->
+<div class="flex-1 flex flex-col w-full max-w-md mx-auto relative pb-24 overflow-y-auto no-scrollbar">
+<!-- Header -->
+<header class="pt-14 pb-4 px-5 flex items-center justify-between sticky top-0 z-20 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<h1 class="text-3xl font-bold tracking-tight">Settings</h1>
+</header>
+<!-- Profile Section -->
+<section class="px-5 mb-8">
+<div class="flex items-center gap-4 bg-white dark:bg-card-dark p-4 rounded-xl shadow-sm border border-slate-200 dark:border-none">
+<div class="relative">
+<img alt="Profile portrait of a young woman with a calm expression" class="w-16 h-16 rounded-full object-cover border-2 border-slate-100 dark:border-slate-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYtFNi_3pdUU5GLQ9j0L18SsADLK-UCHh0wVePUN3CybOA7SSmE4DbnStxuy0Ec6zsVoZ135I76xeG1s5pQTL4xKq56Q2rN1W6BBP5colSumEqMc_bVOv3eCSTqCb6J5Kw4vYlR19r1qTIifCXn8Chn1L9l3b6jxqs--Sr2pYA0rPmKwaH1Nqe4arA4lxGXm1-Oh1e16Uf4KQEh5ZfgZOnyUeX0m09fL-rzMo1xfU2eUmbuKi2iERMDcKpQ1Cfgr4JcNZa0YbxgQ4"/>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white dark:border-card-dark rounded-full"></div>
+</div>
+<div class="flex-1">
+<h2 class="text-lg font-semibold leading-tight">Sarah Miller</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Syncing...</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">qr_code_2</span>
+</button>
+</div>
+</section>
+<!-- Section: Appearance -->
+<section class="px-5 mb-6">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-4">Appearance</h3>
+<div class="bg-white dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-none">
+<!-- Item: Dark Mode -->
+<div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-separator-dark last:border-0 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-[20px]">dark_mode</span>
+</div>
+<span class="text-base font-normal">Dark Mode</span>
+</div>
+<!-- Switch Component -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-[50px] h-[30px] bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[26px] after:w-[26px] after:transition-all peer-checked:bg-primary shadow-inner"></div>
+</label>
+</div>
+<!-- Item: App Icon -->
+<div class="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-[20px]">smartphone</span>
+</div>
+<span class="text-base font-normal">App Icon</span>
+</div>
+<div class="flex items-center gap-2 text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-300">
+<span class="text-sm">Default</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: General -->
+<section class="px-5 mb-6">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-4">General</h3>
+<div class="bg-white dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-none">
+<!-- Item: Notifications -->
+<div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-separator-dark hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-red-500 flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</div>
+<span class="text-base font-normal">Notifications</span>
+</div>
+<div class="text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Item: Security -->
+<div class="flex items-center justify-between p-4 border-b border-slate-100 dark:border-separator-dark hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<span class="text-base font-normal">Privacy &amp; Security</span>
+</div>
+<div class="text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+<!-- Item: Export -->
+<div class="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-[20px]">ios_share</span>
+</div>
+<span class="text-base font-normal">Export Notes</span>
+</div>
+<div class="text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: App Info -->
+<section class="px-5 mb-8">
+<h3 class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 ml-4">App Info</h3>
+<div class="bg-white dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-none mb-4">
+<!-- Item: Help -->
+<div class="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-slate-500 flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined text-[20px]">support</span>
+</div>
+<span class="text-base font-normal">Help &amp; Support</span>
+</div>
+<div class="text-slate-400 group-hover:text-slate-500 dark:group-hover:text-slate-300">
+<span class="material-symbols-outlined text-[20px] font-bold">open_in_new</span>
+</div>
+</div>
+</div>
+<!-- Sign Out Button -->
+<button class="w-full bg-white dark:bg-card-dark text-red-500 p-4 rounded-xl font-medium shadow-sm border border-slate-200 dark:border-none hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+                Sign Out
+            </button>
+<!-- Version -->
+<div class="mt-6 text-center">
+<p class="text-xs text-slate-400 dark:text-slate-600">NoteApp v1.0.2 (Build 450)</p>
+</div>
+</section>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2 z-50 border-t border-slate-200 dark:border-white/5 bg-white/80 dark:bg-[#121212]/90 backdrop-blur-xl pb-safe">
+<div class="flex justify-around items-center h-16 px-2">
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[26px] group-hover:-translate-y-0.5 transition-transform duration-200">description</span>
+<span class="text-[10px] font-medium">Notes</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[26px] group-hover:-translate-y-0.5 transition-transform duration-200">insights</span>
+<span class="text-[10px] font-medium">Graph</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full gap-1 text-primary relative" href="#">
+<span class="material-symbols-outlined text-[26px] fill-current font-variation-settings-fill">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+<!-- Active Indicator Glow -->
+<div class="absolute top-1 w-8 h-8 bg-primary/20 blur-xl rounded-full -z-10"></div>
+</a>
+</div>
+</nav>
+<!-- Custom Style for Fill Icon Variation -->
+<style>
+        .font-variation-settings-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Safe area padding for iPhones without home button */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+    </style>
+</body></html>
