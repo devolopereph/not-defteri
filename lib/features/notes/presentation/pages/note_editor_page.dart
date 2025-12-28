@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:image_picker/image_picker.dart';
@@ -104,6 +105,13 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     _hasChanges = false;
   }
 
+  /// Mobil cihazda mı çalışıyor?
+  bool get _isMobile {
+    return !kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.android);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeCubit>().isDark;
@@ -184,8 +192,12 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
 
             const Divider(height: 1),
 
-            // Editor
-            Expanded(child: _buildEditor(isDark)),
+            // Editor with toolbar
+            Expanded(
+              child: _isMobile
+                  ? _buildMobileEditor(isDark)
+                  : _buildDesktopEditor(isDark),
+            ),
           ],
         ),
       ),
@@ -259,10 +271,70 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     );
   }
 
-  Widget _buildEditor(bool isDark) {
+  /// Masaüstü için floating toolbar'lı editör
+  Widget _buildDesktopEditor(bool isDark) {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
 
-    // AppFlowy Editor tema ayarları
+    return FloatingToolbar(
+      editorState: _editorState,
+      editorScrollController: _scrollController,
+      textDirection: TextDirection.ltr,
+      style: FloatingToolbarStyle(
+        backgroundColor: isDark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface,
+        toolbarActiveColor: AppColors.primary,
+      ),
+      items: [
+        paragraphItem,
+        ...headingItems,
+        ...markdownFormatItems,
+        quoteItem,
+        bulletedListItem,
+        numberedListItem,
+        linkItem,
+        buildTextColorItem(),
+        buildHighlightColorItem(),
+      ],
+      child: _buildEditorContent(isDark, textColor),
+    );
+  }
+
+  /// Mobil için alt toolbar'lı editör
+  Widget _buildMobileEditor(bool isDark) {
+    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
+
+    return Column(
+      children: [
+        // Editör içeriği
+        Expanded(child: _buildEditorContent(isDark, textColor)),
+
+        // Mobil toolbar
+        MobileToolbar(
+          editorState: _editorState,
+          toolbarItems: [
+            textDecorationMobileToolbarItem,
+            buildTextAndBackgroundColorMobileToolbarItem(),
+            headingMobileToolbarItem,
+            todoListMobileToolbarItem,
+            listMobileToolbarItem,
+            linkMobileToolbarItem,
+            quoteMobileToolbarItem,
+            codeMobileToolbarItem,
+          ],
+          backgroundColor: isDark
+              ? AppColors.darkSurface
+              : AppColors.lightSurface,
+          foregroundColor: isDark ? AppColors.darkText : AppColors.lightText,
+          tabbarSelectedBackgroundColor: AppColors.primary,
+          tabbarSelectedForegroundColor: Colors.white,
+        ),
+      ],
+    );
+  }
+
+  /// Editör içeriği
+  Widget _buildEditorContent(bool isDark, Color textColor) {
     final editorStyle = EditorStyle(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       cursorColor: AppColors.primary,
@@ -270,6 +342,39 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       dragHandleColor: AppColors.primary,
       textStyleConfiguration: TextStyleConfiguration(
         text: TextStyle(fontSize: 16, color: textColor, height: 1.6),
+        bold: TextStyle(
+          fontSize: 16,
+          color: textColor,
+          fontWeight: FontWeight.bold,
+        ),
+        italic: TextStyle(
+          fontSize: 16,
+          color: textColor,
+          fontStyle: FontStyle.italic,
+        ),
+        underline: TextStyle(
+          fontSize: 16,
+          color: textColor,
+          decoration: TextDecoration.underline,
+        ),
+        strikethrough: TextStyle(
+          fontSize: 16,
+          color: textColor,
+          decoration: TextDecoration.lineThrough,
+        ),
+        href: TextStyle(
+          fontSize: 16,
+          color: AppColors.primary,
+          decoration: TextDecoration.underline,
+        ),
+        code: TextStyle(
+          fontSize: 14,
+          color: isDark ? AppColors.accent : AppColors.primaryDark,
+          fontFamily: 'monospace',
+          backgroundColor: isDark
+              ? AppColors.darkSurface
+              : AppColors.lightBorder,
+        ),
       ),
       textSpanDecorator: (context, node, index, text, textSpan, previousSpan) {
         return textSpan;
