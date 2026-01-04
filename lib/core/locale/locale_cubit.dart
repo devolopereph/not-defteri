@@ -20,13 +20,23 @@ class LocaleCubit extends Cubit<LocaleState> {
     Locale('tr'), // Turkish
   ];
 
-  /// Kayıtlı dil tercihini yükle
+  /// Kayıtlı dil tercihini yükle, yoksa sistem dilini kullan
   void _loadLocale() {
     final localeCode = _prefs.getString(_localeKey);
     if (localeCode != null) {
       final locale = Locale(localeCode);
-      if (supportedLocales.contains(locale)) {
+      if (supportedLocales.any((l) => l.languageCode == locale.languageCode)) {
         emit(LocaleState(locale: locale));
+      }
+    } else {
+      // Kayıtlı dil yok, sistem dilini kontrol et
+      final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      final isSupported = supportedLocales.any(
+        (l) => l.languageCode == systemLocale.languageCode,
+      );
+
+      if (isSupported) {
+        emit(LocaleState(locale: Locale(systemLocale.languageCode)));
       }
     }
   }
