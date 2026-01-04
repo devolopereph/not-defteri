@@ -37,15 +37,16 @@ class NoteCard extends StatelessWidget {
             border: Border.all(
               color: note.isPinned
                   ? AppColors.primary.withAlpha(100)
-                  : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
+                  : (isDark ? Colors.transparent : AppColors.lightBorder),
               width: note.isPinned ? 2 : 1,
             ),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(isDark ? 20 : 10),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withAlpha(5),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
             ],
           ),
           child: Padding(
@@ -66,70 +67,82 @@ class NoteCard extends StatelessWidget {
       children: [
         // Pin ikonu ve başlık
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (note.isPinned) ...[
-              Icon(CupertinoIcons.pin_fill, size: 14, color: AppColors.primary),
-              const SizedBox(width: 4),
-            ],
             Expanded(
               child: Text(
                 note.title.isNotEmpty ? note.title : 'Başlıksız not',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
-                maxLines: 1,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (note.isPinned) ...[
+              const SizedBox(width: 4),
+              Icon(CupertinoIcons.pin_fill, size: 14, color: AppColors.primary),
+            ],
           ],
         ),
+        const SizedBox(height: 8),
         if (preview.isNotEmpty) ...[
-          const SizedBox(height: 8),
           Expanded(
             child: Text(
               preview,
-              style: Theme.of(context).textTheme.bodySmall,
-              maxLines: 4,
-              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
+                height: 1.4,
+              ),
+              maxLines: 8,
+              overflow: TextOverflow.fade,
             ),
           ),
         ] else
           const Spacer(),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         // Alt bilgi
         Row(
           children: [
-            Icon(
-              CupertinoIcons.clock,
-              size: 12,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
-            const SizedBox(width: 4),
-            Expanded(
-              child: Text(
-                _formatDate(note.updatedAt),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontSize: 10,
-                  color: isDark
-                      ? AppColors.darkTextSecondary
-                      : AppColors.lightTextSecondary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            Text(
+              _formatDate(note.updatedAt),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontSize: 11,
+                color: isDark
+                    ? AppColors.darkTextSecondary.withAlpha(150)
+                    : AppColors.lightTextSecondary.withAlpha(150),
               ),
             ),
+            const Spacer(),
             if (note.images.isNotEmpty) ...[
-              Icon(CupertinoIcons.photo, size: 12, color: AppColors.primary),
-              const SizedBox(width: 2),
-              Text(
-                '${note.images.length}',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withAlpha(20),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.photo,
+                      size: 10,
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${note.images.length}',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -147,23 +160,41 @@ class NoteCard extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Pin ikonu
-            if (note.isPinned) ...[
-              Icon(CupertinoIcons.pin_fill, size: 16, color: AppColors.primary),
-              const SizedBox(width: 8),
-            ],
             // Başlık ve önizleme
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    note.title.isNotEmpty ? note.title : 'Başlıksız not',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (note.isPinned) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withAlpha(20),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            CupertinoIcons.pin_fill,
+                            size: 12,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   if (preview.isNotEmpty) ...[
                     const SizedBox(height: 6),
@@ -173,8 +204,9 @@ class NoteCard extends StatelessWidget {
                         color: isDark
                             ? AppColors.darkTextSecondary
                             : AppColors.lightTextSecondary,
+                        height: 1.5,
                       ),
-                      maxLines: 3,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -182,33 +214,40 @@ class NoteCard extends StatelessWidget {
               ),
             ),
 
-            // Görsel göstergesi
+            // Görsel göstergesi (Large thumbnail if list view?)
+            // Keeping it simple for now to match requested "clean" style
             if (note.images.isNotEmpty) ...[
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha(30),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.primary.withAlpha(10),
+                  borderRadius: BorderRadius.circular(12),
+                  image: note.images.isNotEmpty
+                      ? null // TODO: Add actual image preview here if path is valid
+                      : null,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      CupertinoIcons.photo,
-                      size: 16,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${note.images.length}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                // Placeholder for now, simplified
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CupertinoIcons.photo,
+                        size: 20,
                         color: AppColors.primary,
                       ),
-                    ),
-                  ],
+                      Text(
+                        '${note.images.length}',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -220,30 +259,32 @@ class NoteCard extends StatelessWidget {
         // Alt bilgi
         Row(
           children: [
-            Icon(
-              CupertinoIcons.clock,
-              size: 14,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
-            const SizedBox(width: 6),
             Text(
               _formatDate(note.updatedAt),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: isDark
-                    ? AppColors.darkTextSecondary
-                    : AppColors.lightTextSecondary,
+                    ? AppColors.darkTextSecondary.withAlpha(150)
+                    : AppColors.lightTextSecondary.withAlpha(150),
+                fontSize: 12,
               ),
             ),
-            const Spacer(),
-            Icon(
-              CupertinoIcons.chevron_right,
-              size: 16,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
+            if (note.folderId != null) ...[
+              // Assuming we can't get folder name easily here without passing it, leaving placeholder logic or simplicity
+              const SizedBox(width: 8),
+              Container(
+                width: 4,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Since Note entity only has folderId, we can't show folder name easily in card without join or passed data.
+              // Keeping it simple.
+            ],
           ],
         ),
       ],
@@ -254,12 +295,13 @@ class NoteCard extends StatelessWidget {
     final now = DateTime.now();
     final difference = now.difference(date);
 
+    // Daha modern tarih formatı
     if (difference.inMinutes < 1) {
-      return 'Şimdi';
+      return 'Az önce';
     } else if (difference.inHours < 1) {
-      return '${difference.inMinutes} dakika önce';
+      return '${difference.inMinutes}d önce';
     } else if (difference.inDays < 1) {
-      return '${difference.inHours} saat önce';
+      return '${difference.inHours}sa önce';
     } else if (difference.inDays < 7) {
       return '${difference.inDays} gün önce';
     } else {

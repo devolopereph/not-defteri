@@ -60,46 +60,8 @@ class _NotesListPageState extends State<NotesListPage> {
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? _buildSearchField(isDark)
-            : const Text('Notlarım'),
-        actions: [
-          // Grid/List toggle butonu
-          IconButton(
-            icon: Icon(
-              _isGridView
-                  ? CupertinoIcons.list_bullet
-                  : CupertinoIcons.square_grid_2x2,
-            ),
-            tooltip: _isGridView ? 'Liste Görünümü' : 'Izgara Görünümü',
-            onPressed: () {
-              setState(() {
-                _isGridView = !_isGridView;
-              });
-              _saveViewMode(_isGridView);
-            },
-          ),
-          // Arama butonu
-          IconButton(
-            icon: Icon(
-              _isSearching ? CupertinoIcons.xmark : CupertinoIcons.search,
-            ),
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-                if (!_isSearching) {
-                  _searchController.clear();
-                  context.read<NotesBloc>().add(const RefreshNotes());
-                }
-              });
-            },
-          ),
-        ],
-      ),
       body: BlocConsumer<NotesBloc, NotesState>(
         listener: (context, state) {
-          // Yeni not eklendiyse düzenleme sayfasına git
           if (state is NotesLoaded && state.lastAddedNoteId != null) {
             final note = state.notes.firstWhere(
               (n) => n.id == state.lastAddedNoteId,
@@ -109,70 +71,130 @@ class _NotesListPageState extends State<NotesListPage> {
           }
         },
         builder: (context, state) {
-          if (state is NotesLoading) {
-            return const Center(child: CupertinoActivityIndicator());
-          }
-
-          if (state is NotesError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    CupertinoIcons.exclamationmark_circle,
-                    size: 64,
-                    color: AppColors.error.withAlpha(150),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Bir hata oluştu',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    state.message,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton.icon(
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar.medium(
+                expandedHeight: 120,
+                floating: true,
+                pinned: true,
+                backgroundColor: isDark
+                    ? AppColors.darkBackground
+                    : AppColors.lightBackground,
+                surfaceTintColor: Colors.transparent,
+                title: _isSearching
+                    ? _buildSearchField(isDark)
+                    : const Text(
+                        'Notlarım',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                actions: [
+                  IconButton(
+                    icon: Icon(
+                      _isGridView
+                          ? CupertinoIcons.list_bullet
+                          : CupertinoIcons.square_grid_2x2,
+                    ),
+                    tooltip: _isGridView ? 'Liste Görünümü' : 'Izgara Görünümü',
                     onPressed: () {
-                      context.read<NotesBloc>().add(const LoadNotes());
+                      setState(() {
+                        _isGridView = !_isGridView;
+                      });
+                      _saveViewMode(_isGridView);
                     },
-                    icon: const Icon(CupertinoIcons.refresh),
-                    label: const Text('Tekrar Dene'),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _isSearching
+                          ? CupertinoIcons.xmark
+                          : CupertinoIcons.search,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = !_isSearching;
+                        if (!_isSearching) {
+                          _searchController.clear();
+                          context.read<NotesBloc>().add(const RefreshNotes());
+                        }
+                      });
+                    },
                   ),
                 ],
               ),
-            );
-          }
 
-          if (state is NotesLoaded) {
-            if (state.notes.isEmpty) {
-              return EmptyState(
-                icon: CupertinoIcons.doc_text,
-                title:
-                    state.searchQuery != null && state.searchQuery!.isNotEmpty
-                    ? 'Sonuç bulunamadı'
-                    : 'Henüz not yok',
-                subtitle:
-                    state.searchQuery != null && state.searchQuery!.isNotEmpty
-                    ? '"${state.searchQuery}" için sonuç bulunamadı'
-                    : 'İlk notunuzu oluşturmak için + butonuna tıklayın',
-              );
-            }
+              if (state is NotesLoading)
+                const SliverFillRemaining(
+                  child: Center(child: CupertinoActivityIndicator()),
+                )
+              else if (state is NotesError)
+                SliverFillRemaining(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CupertinoIcons.exclamationmark_circle,
+                          size: 64,
+                          color: AppColors.error.withAlpha(150),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Bir hata oluştu',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          state.message,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            context.read<NotesBloc>().add(const LoadNotes());
+                          },
+                          icon: const Icon(CupertinoIcons.refresh),
+                          label: const Text('Tekrar Dene'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (state is NotesLoaded)
+                if (state.notes.isEmpty)
+                  SliverFillRemaining(
+                    child: EmptyState(
+                      icon: CupertinoIcons.doc_text,
+                      title:
+                          state.searchQuery != null &&
+                              state.searchQuery!.isNotEmpty
+                          ? 'Sonuç bulunamadı'
+                          : 'Henüz not yok',
+                      subtitle:
+                          state.searchQuery != null &&
+                              state.searchQuery!.isNotEmpty
+                          ? '"${state.searchQuery}" için sonuç bulunamadı'
+                          : 'İlk notunuzu oluşturmak için + butonuna tıklayın',
+                    ),
+                  )
+                else
+                  CupertinoSliverRefreshControl(
+                    onRefresh: () async {
+                      context.read<NotesBloc>().add(const RefreshNotes());
+                    },
+                  ),
 
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<NotesBloc>().add(const RefreshNotes());
-              },
-              child: _isGridView
-                  ? _buildGridView(state.notes)
-                  : _buildListView(state.notes),
-            );
-          }
-
-          return const SizedBox.shrink();
+              if (state is NotesLoaded && state.notes.isNotEmpty)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  sliver: _isGridView
+                      ? _buildSliverGrid(state.notes)
+                      : _buildSliverList(state.notes),
+                ),
+            ],
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -184,12 +206,10 @@ class _NotesListPageState extends State<NotesListPage> {
     );
   }
 
-  /// Liste görünümü
-  Widget _buildListView(List<Note> notes) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: notes.length,
-      itemBuilder: (context, index) {
+  /// Liste görünümü (Sliver)
+  Widget _buildSliverList(List<Note> notes) {
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
         final note = notes[index];
         return NoteCard(
           note: note,
@@ -197,22 +217,20 @@ class _NotesListPageState extends State<NotesListPage> {
           onLongPress: () => _showNoteOptionsSheet(context, note),
           isGridView: false,
         );
-      },
+      }, childCount: notes.length),
     );
   }
 
-  /// Izgara görünümü
-  Widget _buildGridView(List<Note> notes) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
+  /// Izgara görünümü (Sliver)
+  Widget _buildSliverGrid(List<Note> notes) {
+    return SliverGrid(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
         childAspectRatio: 0.85,
       ),
-      itemCount: notes.length,
-      itemBuilder: (context, index) {
+      delegate: SliverChildBuilderDelegate((context, index) {
         final note = notes[index];
         return NoteCard(
           note: note,
@@ -220,7 +238,7 @@ class _NotesListPageState extends State<NotesListPage> {
           onLongPress: () => _showNoteOptionsSheet(context, note),
           isGridView: true,
         );
-      },
+      }, childCount: notes.length),
     );
   }
 

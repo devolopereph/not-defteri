@@ -237,49 +237,117 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   Widget build(BuildContext context) {
     final isDark = context.watch<ThemeCubit>().isDark;
 
+    // Header widget containing Title, Date/Metadata, and Images
+    final headerWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Başlık alanı
+        _buildTitleSection(isDark),
+
+        // Tarih ve Metadata
+        if (!_isEditing)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+            child: Row(
+              children: [
+                Text(
+                  _formatDate(widget.note.updatedAt),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                  ),
+                ),
+                if (widget.note.folderId != null) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    CupertinoIcons.folder,
+                    size: 12,
+                    color: isDark
+                        ? AppColors.darkTextSecondary
+                        : AppColors.lightTextSecondary,
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+        // Görsel ekleri göster
+        if (_images.isNotEmpty) _buildImagesSection(isDark),
+
+        const SizedBox(height: 8),
+      ],
+    );
+
     return PopScope(
-      canPop: !_isEditing, // Düzenleme modunda pop engellenir
+      canPop: !_isEditing,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && _isEditing) {
-          // Düzenleme modundayken geri tuşuna basıldı, salt okunur moda dön
           _saveAndExitEditMode();
         } else if (didPop) {
           _saveNote();
         }
       },
       child: Scaffold(
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : AppColors.lightSurface,
         appBar: AppBar(
+          backgroundColor: isDark
+              ? AppColors.darkBackground
+              : AppColors.lightSurface,
+          elevation: 0,
+          scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: const Icon(CupertinoIcons.back),
+            icon: Icon(
+              CupertinoIcons.back,
+              color: isDark ? AppColors.darkText : AppColors.lightText,
+            ),
             onPressed: () {
               if (_isEditing) {
-                // Düzenleme modundayken salt okunur moda dön
                 _saveAndExitEditMode();
               } else {
-                // Salt okunur modda sayfayı kapat
                 _saveNote();
                 Navigator.of(context).pop();
               }
             },
           ),
-          title: Text(_isEditing ? 'Not Düzenle' : 'Not Detayları'),
           actions: [
             if (_isEditing) ...[
               IconButton(
-                icon: const Icon(CupertinoIcons.photo),
+                icon: Icon(
+                  CupertinoIcons.photo,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
+                ),
                 tooltip: 'Fotoğraf Ekle',
                 onPressed: _pickImage,
               ),
-              IconButton(
-                icon: const Icon(CupertinoIcons.checkmark),
-                tooltip: 'Kaydet',
-                onPressed: _saveAndExitEditMode,
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: TextButton(
+                  onPressed: _saveAndExitEditMode,
+                  child: const Text(
+                    'Bitti',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
             ] else ...[
-              // Arama butonu
               IconButton(
                 icon: Icon(
                   _isSearching ? CupertinoIcons.xmark : CupertinoIcons.search,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
                 ),
                 tooltip: _isSearching ? 'Aramayı Kapat' : 'Not İçinde Ara',
                 onPressed: _toggleSearch,
@@ -294,29 +362,22 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         ),
         body: Column(
           children: [
-            // Arama çubuğu
             if (_isSearching) _buildSearchBar(isDark),
-
-            // Başlık alanı
-            _buildTitleSection(isDark),
-
-            // Görsel ekleri göster
-            if (_images.isNotEmpty) _buildImagesSection(isDark),
-
-            const Divider(height: 1),
-
-            // Editor with toolbar
             Expanded(
               child: _isEditing
                   ? (_isMobile
-                        ? _buildMobileEditor(isDark)
-                        : _buildDesktopEditor(isDark))
-                  : _buildReadOnlyContent(isDark),
+                        ? _buildMobileEditor(isDark, headerWidget)
+                        : _buildDesktopEditor(isDark, headerWidget))
+                  : _buildReadOnlyContent(isDark, headerWidget),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   /// Arama çubuğu
@@ -388,19 +449,20 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     if (_isEditing) {
       // Düzenleme modunda TextField
       return Container(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
         child: TextField(
           controller: _titleController,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isDark ? AppColors.darkText : AppColors.lightText,
+          ),
           decoration: InputDecoration(
             hintText: 'Başlık',
-            hintStyle: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            hintStyle: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
+                  ? AppColors.darkTextSecondary.withAlpha(100)
+                  : AppColors.lightTextSecondary.withAlpha(100),
             ),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
@@ -409,6 +471,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
             contentPadding: EdgeInsets.zero,
           ),
           maxLines: null,
+          textInputAction: TextInputAction.next,
         ),
       );
     } else {
@@ -417,20 +480,16 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         onTap: _enterEditMode,
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
           child:
               highlightedTitle ??
               Text(
                 _titleController.text.isNotEmpty
                     ? _titleController.text
                     : 'Başlıksız not',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: _titleController.text.isEmpty
-                      ? (isDark
-                            ? AppColors.darkTextSecondary
-                            : AppColors.lightTextSecondary)
-                      : null,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
                 ),
               ),
         ),
@@ -497,11 +556,11 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   /// Salt okunur içerik görünümü
-  Widget _buildReadOnlyContent(bool isDark) {
+  Widget _buildReadOnlyContent(bool isDark, Widget? header) {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
 
     final editorStyle = EditorStyle(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       cursorColor: AppColors.primary,
       selectionColor: AppColors.primary.withAlpha(60),
       dragHandleColor: AppColors.primary,
@@ -554,7 +613,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
           editorState: _editorState,
           editorScrollController: _scrollController,
           editorStyle: editorStyle,
-          header: const SizedBox(height: 8),
+          header: header ?? const SizedBox(height: 8),
           footer: const SizedBox(height: 100),
         ),
       ),
@@ -631,7 +690,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         itemCount: _images.length,
         itemBuilder: (context, index) {
           final imagePath = _images[index];
@@ -695,7 +754,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   /// Masaüstü için floating toolbar'lı editör
-  Widget _buildDesktopEditor(bool isDark) {
+  Widget _buildDesktopEditor(bool isDark, Widget? header) {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
 
     return FloatingToolbar(
@@ -719,18 +778,18 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         buildTextColorItem(),
         buildHighlightColorItem(),
       ],
-      child: _buildEditorContent(isDark, textColor),
+      child: _buildEditorContent(isDark, textColor, header),
     );
   }
 
   /// Mobil için alt toolbar'lı editör
-  Widget _buildMobileEditor(bool isDark) {
+  Widget _buildMobileEditor(bool isDark, Widget? header) {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
 
     return Column(
       children: [
         // Editör içeriği
-        Expanded(child: _buildEditorContent(isDark, textColor)),
+        Expanded(child: _buildEditorContent(isDark, textColor, header)),
 
         // Mobil toolbar - Her zaman açık tema kullan
         Theme(
@@ -768,9 +827,9 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   /// Editör içeriği
-  Widget _buildEditorContent(bool isDark, Color textColor) {
+  Widget _buildEditorContent(bool isDark, Color textColor, Widget? header) {
     final editorStyle = EditorStyle(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       cursorColor: AppColors.primary,
       selectionColor: AppColors.primary.withAlpha(60),
       dragHandleColor: AppColors.primary,
@@ -819,7 +878,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       editorState: _editorState,
       editorScrollController: _scrollController,
       editorStyle: editorStyle,
-      header: const SizedBox(height: 8),
+      header: header ?? const SizedBox(height: 8),
       footer: const SizedBox(height: 100),
     );
   }
