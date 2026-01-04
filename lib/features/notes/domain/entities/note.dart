@@ -209,6 +209,7 @@ class Note extends Equatable {
 
   /// Recursive olarak metin çıkar
   static void _extractText(Map<dynamic, dynamic> node, StringBuffer buffer) {
+    // Check direct delta
     if (node.containsKey('delta')) {
       final delta = node['delta'] as List?;
       if (delta != null) {
@@ -220,6 +221,23 @@ class Note extends Equatable {
         buffer.write(' ');
       }
     }
+
+    // Check data['delta'] (AppFlowy Editor structure)
+    if (node.containsKey('data')) {
+      final data = node['data'];
+      if (data is Map && data.containsKey('delta')) {
+        final delta = data['delta'] as List?;
+        if (delta != null) {
+          for (final op in delta) {
+            if (op is Map && op.containsKey('insert')) {
+              buffer.write(op['insert']);
+            }
+          }
+          buffer.write(' ');
+        }
+      }
+    }
+
     if (node.containsKey('children')) {
       final children = node['children'] as List?;
       if (children != null) {

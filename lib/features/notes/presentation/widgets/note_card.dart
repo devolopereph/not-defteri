@@ -169,8 +169,12 @@ class NoteCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       preview,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      maxLines: 2,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                      ),
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
