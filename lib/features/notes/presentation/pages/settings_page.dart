@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import 'trash_page.dart';
 import 'about_page.dart';
+import 'language_page.dart';
 
 /// Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
@@ -12,16 +14,17 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
     final themeCubit = context.read<ThemeCubit>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Ayarlar')),
+      appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // Tema ayarları bölümü
-          _buildSectionTitle(context, 'Görünüm'),
+          _buildSectionTitle(context, l10n.appearance),
           const SizedBox(height: 12),
           _buildSettingsCard(
             context,
@@ -31,13 +34,33 @@ class SettingsPage extends StatelessWidget {
                 context,
                 icon: CupertinoIcons.moon_fill,
                 iconColor: AppColors.primary,
-                title: 'Karanlık Tema',
-                subtitle: 'Karanlık tema kullan',
+                title: l10n.darkTheme,
+                subtitle: l10n.useDarkTheme,
                 trailing: CupertinoSwitch(
                   value: isDark,
                   activeTrackColor: AppColors.primary,
                   onChanged: (_) => themeCubit.toggleTheme(),
                 ),
+              ),
+              _buildDivider(isDark),
+              _buildSettingsItem(
+                context,
+                icon: CupertinoIcons.globe,
+                iconColor: AppColors.accent,
+                title: l10n.language,
+                subtitle: l10n.changeLanguage,
+                trailing: const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const LanguagePage(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -45,7 +68,7 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Veri yönetimi bölümü
-          _buildSectionTitle(context, 'Veri Yönetimi'),
+          _buildSectionTitle(context, l10n.dataManagement),
           const SizedBox(height: 12),
           _buildSettingsCard(
             context,
@@ -55,8 +78,8 @@ class SettingsPage extends StatelessWidget {
                 context,
                 icon: CupertinoIcons.trash,
                 iconColor: AppColors.error,
-                title: 'Çöp Kutusu',
-                subtitle: 'Silinen notları görüntüle',
+                title: l10n.trash,
+                subtitle: l10n.viewDeletedNotes,
                 trailing: const Icon(
                   CupertinoIcons.chevron_right,
                   size: 20,
@@ -74,7 +97,7 @@ class SettingsPage extends StatelessWidget {
           const SizedBox(height: 24),
 
           // Diğer bölümü
-          _buildSectionTitle(context, 'Diğer'),
+          _buildSectionTitle(context, l10n.other),
           const SizedBox(height: 12),
           _buildSettingsCard(
             context,
@@ -84,8 +107,8 @@ class SettingsPage extends StatelessWidget {
                 context,
                 icon: CupertinoIcons.info_circle_fill,
                 iconColor: AppColors.info,
-                title: 'Hakkında',
-                subtitle: 'Uygulama bilgileri',
+                title: l10n.about,
+                subtitle: l10n.appInfo,
                 trailing: const Icon(
                   CupertinoIcons.chevron_right,
                   size: 20,
@@ -130,6 +153,14 @@ class SettingsPage extends StatelessWidget {
         ),
       ),
       child: Column(children: children),
+    );
+  }
+
+  Widget _buildDivider(bool isDark) {
+    return Divider(
+      height: 1,
+      indent: 72,
+      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
     );
   }
 

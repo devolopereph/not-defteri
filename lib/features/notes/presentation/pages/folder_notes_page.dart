@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,6 +60,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
     final folderColor = Color(widget.folder.color);
 
@@ -73,18 +75,18 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
               child: Text(
                 widget.folder.name.isNotEmpty
                     ? widget.folder.name
-                    : 'İsimsiz klasör',
+                    : l10n.untitledFolder,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
       ),
-      body: _buildBody(isDark),
+      body: _buildBody(isDark, l10n),
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody(bool isDark, AppLocalizations l10n) {
     if (_isLoading) {
       return const Center(child: CupertinoActivityIndicator());
     }
@@ -101,7 +103,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Bir hata oluştu',
+              l10n.errorOccurred,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
@@ -114,7 +116,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
             ElevatedButton.icon(
               onPressed: _loadNotes,
               icon: const Icon(CupertinoIcons.refresh),
-              label: const Text('Tekrar Dene'),
+              label: Text(l10n.tryAgain),
             ),
           ],
         ),
@@ -124,8 +126,8 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
     if (_notes.isEmpty) {
       return EmptyState(
         icon: CupertinoIcons.doc_text,
-        title: 'Bu klasörde not yok',
-        subtitle: 'Notları bu klasöre eklemek için not kartına uzun basın',
+        title: l10n.noNotesInFolder,
+        subtitle: l10n.longPressToAdd,
       );
     }
 
@@ -156,6 +158,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
   }
 
   void _showNoteOptionsSheet(Note note) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
 
     showModalBottomSheet(
@@ -186,7 +189,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                    note.title.isNotEmpty ? note.title : l10n.untitledNote,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -202,7 +205,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
                     CupertinoIcons.folder_badge_minus,
                     color: AppColors.warning,
                   ),
-                  title: const Text('Klasörden Çıkar'),
+                  title: Text(l10n.removeFromFolder),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     context.read<NotesBloc>().add(
@@ -220,7 +223,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
                         : CupertinoIcons.pin,
                     color: AppColors.primary,
                   ),
-                  title: Text(note.isPinned ? 'Sabitlemeyi Kaldır' : 'Sabitle'),
+                  title: Text(note.isPinned ? l10n.unpin : l10n.pin),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     context.read<NotesBloc>().add(
@@ -233,7 +236,10 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
                 // Sil
                 ListTile(
                   leading: Icon(CupertinoIcons.trash, color: AppColors.error),
-                  title: Text('Sil', style: TextStyle(color: AppColors.error)),
+                  title: Text(
+                    l10n.delete,
+                    style: TextStyle(color: AppColors.error),
+                  ),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _showDeleteConfirmDialog(note);
@@ -248,23 +254,25 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
   }
 
   void _showDeleteConfirmDialog(Note note) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Notu Sil'),
+        title: Text(l10n.deleteNote),
         content: Text(
           note.title.isNotEmpty
-              ? '"${note.title}" notunu silmek istediğinize emin misiniz?\n\nNot çöp kutusuna taşınacak.'
-              : 'Bu notu silmek istediğinize emin misiniz?\n\nNot çöp kutusuna taşınacak.',
+              ? l10n.deleteNoteConfirm(note.title)
+              : l10n.deleteNoteConfirmUntitled,
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Sil'),
+            child: Text(l10n.delete),
             onPressed: () {
               context.read<NotesBloc>().add(MoveNoteToTrash(note.id));
               Navigator.of(dialogContext).pop();

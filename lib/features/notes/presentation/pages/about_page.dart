@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -37,11 +38,12 @@ class _AboutPageState extends State<AboutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hakkında'),
+        title: Text(l10n.about),
         leading: IconButton(
           icon: const Icon(CupertinoIcons.back),
           onPressed: () => Navigator.of(context).pop(),
@@ -82,7 +84,7 @@ class _AboutPageState extends State<AboutPage> {
 
               // Uygulama adı
               Text(
-                _appName.isNotEmpty ? _appName : 'Stitch Notes',
+                _appName.isNotEmpty ? _appName : l10n.appTitle,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -108,8 +110,10 @@ class _AboutPageState extends State<AboutPage> {
                 ),
                 child: Text(
                   _version.isNotEmpty
-                      ? 'Sürüm $_version${_buildNumber.isNotEmpty ? ' ($_buildNumber)' : ''}'
-                      : 'Sürüm yükleniyor...',
+                      ? (_buildNumber.isNotEmpty
+                            ? l10n.versionWithBuild(_version, _buildNumber)
+                            : l10n.version(_version))
+                      : l10n.loadingVersion,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: isDark
                         ? AppColors.darkTextSecondary
@@ -121,7 +125,7 @@ class _AboutPageState extends State<AboutPage> {
 
               // Alt bilgi
               Text(
-                'Zengin metin destekli not uygulaması',
+                l10n.richTextNotesApp,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: isDark
                       ? AppColors.darkTextSecondary

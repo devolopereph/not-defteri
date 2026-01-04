@@ -60,11 +60,12 @@ class _FolderEditorPageState extends State<FolderEditorPage> {
   }
 
   void _saveFolder() {
+    final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lütfen klasör adı girin'),
+        SnackBar(
+          content: Text(l10n.pleaseEnterFolderName),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -84,16 +85,17 @@ class _FolderEditorPageState extends State<FolderEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Klasörü Düzenle' : 'Yeni Klasör'),
+        title: Text(_isEditing ? l10n.editFolder : l10n.newFolder),
         actions: [
           TextButton(
             onPressed: _saveFolder,
             child: Text(
-              'Kaydet',
+              l10n.save,
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w600,
@@ -131,7 +133,7 @@ class _FolderEditorPageState extends State<FolderEditorPage> {
 
             // Klasör adı
             Text(
-              'Klasör Adı',
+              l10n.folderName,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDark
@@ -145,7 +147,7 @@ class _FolderEditorPageState extends State<FolderEditorPage> {
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                hintText: 'Klasör adını girin',
+                hintText: l10n.enterFolderName,
                 filled: true,
                 fillColor: isDark
                     ? AppColors.darkSurface
@@ -181,7 +183,7 @@ class _FolderEditorPageState extends State<FolderEditorPage> {
 
             // Renk seçimi
             Text(
-              'Renk Seçin',
+              l10n.selectColor,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: isDark
@@ -247,4 +249,8 @@ class _FolderEditorPageState extends State<FolderEditorPage> {
       },
     );
   }
+}
+
+extension on _FolderEditorPageState {
+  get AppLocalizations => null;
 }

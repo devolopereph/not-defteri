@@ -1,8 +1,11 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
+import 'core/locale/locale_cubit.dart';
 import 'features/notes/data/datasources/note_local_data_source.dart';
 import 'features/notes/data/datasources/folder_local_data_source.dart';
 import 'features/notes/data/repositories/note_repository_impl.dart';
@@ -58,6 +61,8 @@ class MyApp extends StatelessWidget {
         providers: [
           // Tema yönetimi
           BlocProvider(create: (_) => ThemeCubit(prefs)),
+          // Dil yönetimi
+          BlocProvider(create: (_) => LocaleCubit(prefs)),
           // Not yönetimi
           BlocProvider(
             create: (_) => NotesBloc(noteRepository)..add(const LoadNotes()),
@@ -70,13 +75,26 @@ class MyApp extends StatelessWidget {
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, themeState) {
-            return MaterialApp(
-              title: 'Stitch Notes',
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.lightTheme,
-              darkTheme: AppTheme.darkTheme,
-              themeMode: themeState.themeMode,
-              home: const HomeScreen(),
+            return BlocBuilder<LocaleCubit, LocaleState>(
+              builder: (context, localeState) {
+                return MaterialApp(
+                  onGenerateTitle: (context) =>
+                      AppLocalizations.of(context)!.appTitle,
+                  debugShowCheckedModeBanner: false,
+                  theme: AppTheme.lightTheme,
+                  darkTheme: AppTheme.darkTheme,
+                  themeMode: themeState.themeMode,
+                  locale: localeState.locale,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  home: const HomeScreen(),
+                );
+              },
             );
           },
         ),

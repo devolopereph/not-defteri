@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,13 +37,14 @@ class _FoldersPageState extends State<FoldersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
       appBar: AppBar(
         title: _isSearching
-            ? _buildSearchField(isDark)
-            : const Text('Klasörler'),
+            ? _buildSearchField(isDark, l10n)
+            : Text(l10n.folders),
         actions: [
           // Arama butonu
           IconButton(
@@ -86,7 +88,7 @@ class _FoldersPageState extends State<FoldersPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Bir hata oluştu',
+                      l10n.errorOccurred,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -101,7 +103,7 @@ class _FoldersPageState extends State<FoldersPage> {
                         context.read<FoldersBloc>().add(const LoadFolders());
                       },
                       icon: const Icon(CupertinoIcons.refresh),
-                      label: const Text('Tekrar Dene'),
+                      label: Text(l10n.tryAgain),
                     ),
                   ],
                 ),
@@ -114,12 +116,12 @@ class _FoldersPageState extends State<FoldersPage> {
                   icon: CupertinoIcons.folder,
                   title:
                       state.searchQuery != null && state.searchQuery!.isNotEmpty
-                      ? 'Sonuç bulunamadı'
-                      : 'Henüz klasör yok',
+                      ? l10n.noResults
+                      : l10n.noFoldersYet,
                   subtitle:
                       state.searchQuery != null && state.searchQuery!.isNotEmpty
-                      ? '"${state.searchQuery}" için sonuç bulunamadı'
-                      : 'İlk klasörünüzü oluşturmak için + butonuna tıklayın',
+                      ? l10n.noResultsFor(state.searchQuery!)
+                      : l10n.tapToCreateFolder,
                 );
               }
 
@@ -156,12 +158,12 @@ class _FoldersPageState extends State<FoldersPage> {
     );
   }
 
-  Widget _buildSearchField(bool isDark) {
+  Widget _buildSearchField(bool isDark, AppLocalizations l10n) {
     return TextField(
       controller: _searchController,
       autofocus: true,
       decoration: InputDecoration(
-        hintText: 'Klasör ara...',
+        hintText: l10n.searchFolders,
         border: InputBorder.none,
         hintStyle: TextStyle(
           color: isDark
@@ -186,6 +188,7 @@ class _FoldersPageState extends State<FoldersPage> {
 
   /// Klasör seçenekleri bottom sheet
   void _showFolderOptionsSheet(BuildContext context, Folder folder) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
 
     showModalBottomSheet(
@@ -236,7 +239,7 @@ class _FoldersPageState extends State<FoldersPage> {
                         child: Text(
                           folder.name.isNotEmpty
                               ? folder.name
-                              : 'İsimsiz klasör',
+                              : l10n.untitledFolder,
                           style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                           maxLines: 1,
@@ -254,7 +257,7 @@ class _FoldersPageState extends State<FoldersPage> {
                     CupertinoIcons.pencil,
                     color: AppColors.primary,
                   ),
-                  title: const Text('Düzenle'),
+                  title: Text(l10n.edit),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _showEditFolderDialog(context, folder);
@@ -264,7 +267,10 @@ class _FoldersPageState extends State<FoldersPage> {
                 // Sil
                 ListTile(
                   leading: Icon(CupertinoIcons.trash, color: AppColors.error),
-                  title: Text('Sil', style: TextStyle(color: AppColors.error)),
+                  title: Text(
+                    l10n.delete,
+                    style: TextStyle(color: AppColors.error),
+                  ),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _showDeleteConfirmDialog(context, folder);
@@ -293,6 +299,7 @@ class _FoldersPageState extends State<FoldersPage> {
 
   /// Klasör düzenle dialog
   void _showEditFolderDialog(BuildContext context, Folder folder) {
+    final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: folder.name);
     int selectedColor = folder.color;
 
@@ -300,24 +307,24 @@ class _FoldersPageState extends State<FoldersPage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Klasörü Düzenle'),
+          title: Text(l10n.editFolder),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Klasör adı',
-                  hintText: 'Klasör adını girin',
+                decoration: InputDecoration(
+                  labelText: l10n.folderName,
+                  hintText: l10n.enterFolderName,
                 ),
                 autofocus: true,
               ),
               const SizedBox(height: 20),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Renk seçin:',
-                  style: TextStyle(fontWeight: FontWeight.w500),
+                  '${l10n.selectColor}:',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
               ),
               const SizedBox(height: 12),
@@ -367,7 +374,7 @@ class _FoldersPageState extends State<FoldersPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('İptal'),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -383,7 +390,7 @@ class _FoldersPageState extends State<FoldersPage> {
                   Navigator.of(dialogContext).pop();
                 }
               },
-              child: const Text('Kaydet'),
+              child: Text(l10n.save),
             ),
           ],
         ),
@@ -393,23 +400,25 @@ class _FoldersPageState extends State<FoldersPage> {
 
   /// Silme onay dialogu
   void _showDeleteConfirmDialog(BuildContext context, Folder folder) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Klasörü Sil'),
+        title: Text(l10n.deleteFolder),
         content: Text(
           folder.name.isNotEmpty
-              ? '"${folder.name}" klasörünü silmek istediğinize emin misiniz?\n\nKlasördeki notlar silinmeyecek, sadece klasör kaldırılacak.'
-              : 'Bu klasörü silmek istediğinize emin misiniz?\n\nKlasördeki notlar silinmeyecek, sadece klasör kaldırılacak.',
+              ? l10n.deleteFolderConfirm(folder.name)
+              : l10n.deleteFolderConfirmUntitled,
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Sil'),
+            child: Text(l10n.delete),
             onPressed: () {
               context.read<FoldersBloc>().add(DeleteFolder(folder.id));
               Navigator.of(dialogContext).pop();
@@ -451,6 +460,7 @@ class _FolderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
     final folderColor = Color(folder.color);
 
@@ -499,7 +509,9 @@ class _FolderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        folder.name.isNotEmpty ? folder.name : 'İsimsiz klasör',
+                        folder.name.isNotEmpty
+                            ? folder.name
+                            : l10n.untitledFolder,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w600),
                         maxLines: 1,
@@ -507,7 +519,7 @@ class _FolderCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$noteCount not',
+                        l10n.noteCount(noteCount),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isDark
                               ? AppColors.darkTextSecondary

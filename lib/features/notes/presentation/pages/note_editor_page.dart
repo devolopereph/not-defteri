@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:intl/intl.dart' hide TextDirection;
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
@@ -130,14 +132,6 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     setState(() {
       _isEditing = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Not kaydedildi'),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 
   /// Arama modunu aç/kapa
@@ -235,6 +229,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     // Header widget containing Title, Date/Metadata, and Images
@@ -242,7 +237,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Başlık alanı
-        _buildTitleSection(isDark),
+        _buildTitleSection(isDark, l10n),
 
         // Tarih ve Metadata
         if (!_isEditing)
@@ -330,16 +325,16 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
                   CupertinoIcons.photo,
                   color: isDark ? AppColors.darkText : AppColors.lightText,
                 ),
-                tooltip: 'Fotoğraf Ekle',
+                tooltip: l10n.addPhoto,
                 onPressed: _pickImage,
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: TextButton(
                   onPressed: _saveAndExitEditMode,
-                  child: const Text(
-                    'Bitti',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Text(
+                    l10n.done,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -349,12 +344,14 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
                   _isSearching ? CupertinoIcons.xmark : CupertinoIcons.search,
                   color: isDark ? AppColors.darkText : AppColors.lightText,
                 ),
-                tooltip: _isSearching ? 'Aramayı Kapat' : 'Not İçinde Ara',
+                tooltip: _isSearching
+                    ? l10n.closeSearch
+                    : l10n.searchInNoteTooltip,
                 onPressed: _toggleSearch,
               ),
               IconButton(
                 icon: const Icon(CupertinoIcons.pencil),
-                tooltip: 'Düzenle',
+                tooltip: l10n.edit,
                 onPressed: _enterEditMode,
               ),
             ],
@@ -362,7 +359,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         ),
         body: Column(
           children: [
-            if (_isSearching) _buildSearchBar(isDark),
+            if (_isSearching) _buildSearchBar(isDark, l10n),
             Expanded(
               child: _isEditing
                   ? (_isMobile
@@ -377,11 +374,11 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}.${date.month}.${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    return DateFormat('dd.MM.yyyy HH:mm').format(date);
   }
 
   /// Arama çubuğu
-  Widget _buildSearchBar(bool isDark) {
+  Widget _buildSearchBar(bool isDark, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -399,7 +396,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
               controller: _searchController,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: 'Not içinde ara...',
+                hintText: l10n.searchInNote,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                   borderSide: BorderSide.none,
@@ -443,7 +440,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   /// Başlık bölümü
-  Widget _buildTitleSection(bool isDark) {
+  Widget _buildTitleSection(bool isDark, AppLocalizations l10n) {
     final highlightedTitle = _getHighlightedTitle(isDark);
 
     if (_isEditing) {
@@ -457,7 +454,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
             color: isDark ? AppColors.darkText : AppColors.lightText,
           ),
           decoration: InputDecoration(
-            hintText: 'Başlık',
+            hintText: l10n.title,
             hintStyle: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: isDark
@@ -486,7 +483,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
               Text(
                 _titleController.text.isNotEmpty
                     ? _titleController.text
-                    : 'Başlıksız not',
+                    : l10n.untitledNote,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: isDark ? AppColors.darkText : AppColors.lightText,
@@ -791,35 +788,38 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         // Editör içeriği
         Expanded(child: _buildEditorContent(isDark, textColor, header)),
 
-        // Mobil toolbar - Her zaman açık tema kullan
-        Theme(
-          data: ThemeData.light().copyWith(
-            iconTheme: const IconThemeData(color: Colors.black),
-            textTheme: ThemeData.light().textTheme.apply(
-              bodyColor: Colors.black,
-              displayColor: Colors.black,
+        // Mobil toolbar - SafeArea ile sarılmış, Android 15/16 yön tuşları çakışmasını önler
+        SafeArea(
+          top: false,
+          child: Theme(
+            data: ThemeData.light().copyWith(
+              iconTheme: const IconThemeData(color: Colors.black),
+              textTheme: ThemeData.light().textTheme.apply(
+                bodyColor: Colors.black,
+                displayColor: Colors.black,
+              ),
             ),
-          ),
-          child: MobileToolbar(
-            editorState: _editorState,
-            toolbarItems: [
-              textDecorationMobileToolbarItem,
-              buildTextAndBackgroundColorMobileToolbarItem(),
-              headingMobileToolbarItem,
-              todoListMobileToolbarItem,
-              listMobileToolbarItem,
-              linkMobileToolbarItem,
-              quoteMobileToolbarItem,
-              codeMobileToolbarItem,
-            ],
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            outlineColor: Colors.black54,
-            itemOutlineColor: Colors.black54,
-            primaryColor: AppColors.primary,
-            onPrimaryColor: Colors.white,
-            tabbarSelectedBackgroundColor: AppColors.primary,
-            tabbarSelectedForegroundColor: Colors.white,
+            child: MobileToolbar(
+              editorState: _editorState,
+              toolbarItems: [
+                textDecorationMobileToolbarItem,
+                buildTextAndBackgroundColorMobileToolbarItem(),
+                headingMobileToolbarItem,
+                todoListMobileToolbarItem,
+                listMobileToolbarItem,
+                linkMobileToolbarItem,
+                quoteMobileToolbarItem,
+                codeMobileToolbarItem,
+              ],
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+              outlineColor: Colors.black54,
+              itemOutlineColor: Colors.black54,
+              primaryColor: AppColors.primary,
+              onPrimaryColor: Colors.white,
+              tabbarSelectedBackgroundColor: AppColors.primary,
+              tabbarSelectedForegroundColor: Colors.white,
+            ),
           ),
         ),
       ],
@@ -884,6 +884,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   Future<void> _pickImage() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -916,7 +917,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Görsel eklenirken hata oluştu: $e'),
+            content: Text(l10n.imageError(e.toString())),
             backgroundColor: AppColors.error,
           ),
         );

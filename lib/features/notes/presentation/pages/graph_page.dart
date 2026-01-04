@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,15 +44,16 @@ class _GraphPageState extends State<GraphPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Graf Görünümü'),
+        title: Text(l10n.graphView),
         actions: [
           IconButton(
             icon: const Icon(CupertinoIcons.arrow_counterclockwise),
-            tooltip: 'Sıfırla',
+            tooltip: l10n.reset,
             onPressed: () {
               _transformationController.value = Matrix4.identity();
             },
@@ -81,12 +83,12 @@ class _GraphPageState extends State<GraphPage>
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'Henüz not yok',
+                      l10n.noNotesYet,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Not ekleyerek graf görünümünü kullanın',
+                      l10n.addNoteToUseGraph,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
@@ -125,6 +127,7 @@ class _GraphPageState extends State<GraphPage>
     List<Note> notes,
     bool isDark,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height - 200;
     final centerX = width / 2;
@@ -164,6 +167,7 @@ class _GraphPageState extends State<GraphPage>
             note: note,
             color: AppColors.nodeColors[i % AppColors.nodeColors.length],
             isDark: isDark,
+            emptyNoteLabel: l10n.emptyNote,
             onTap: () => _navigateToEditor(context, note),
           ),
         ),
@@ -185,12 +189,14 @@ class _GraphNode extends StatelessWidget {
   final Note note;
   final Color color;
   final bool isDark;
+  final String emptyNoteLabel;
   final VoidCallback onTap;
 
   const _GraphNode({
     required this.note,
     required this.color,
     required this.isDark,
+    required this.emptyNoteLabel,
     required this.onTap,
   });
 
@@ -224,7 +230,7 @@ class _GraphNode extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text(
-                note.title.isEmpty ? 'Boş not' : note.title,
+                note.title.isEmpty ? emptyNoteLabel : note.title,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,

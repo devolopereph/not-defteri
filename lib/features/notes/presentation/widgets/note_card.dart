@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +23,7 @@ class NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
     final preview = note.contentPreview;
 
@@ -52,8 +54,8 @@ class NoteCard extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: isGridView
-                ? _buildGridContent(context, isDark, preview)
-                : _buildListContent(context, isDark, preview),
+                ? _buildGridContent(context, isDark, preview, l10n)
+                : _buildListContent(context, isDark, preview, l10n),
           ),
         ),
       ),
@@ -61,7 +63,12 @@ class NoteCard extends StatelessWidget {
   }
 
   /// Grid görünümü için içerik
-  Widget _buildGridContent(BuildContext context, bool isDark, String preview) {
+  Widget _buildGridContent(
+    BuildContext context,
+    bool isDark,
+    String preview,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -71,7 +78,7 @@ class NoteCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                note.title.isNotEmpty ? note.title : l10n.untitledNote,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -109,7 +116,7 @@ class NoteCard extends StatelessWidget {
         Row(
           children: [
             Text(
-              _formatDate(note.updatedAt),
+              _formatDate(note.updatedAt, l10n),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 11,
                 color: isDark
@@ -153,7 +160,12 @@ class NoteCard extends StatelessWidget {
   }
 
   /// Liste görünümü için içerik
-  Widget _buildListContent(BuildContext context, bool isDark, String preview) {
+  Widget _buildListContent(
+    BuildContext context,
+    bool isDark,
+    String preview,
+    AppLocalizations l10n,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -169,7 +181,9 @@ class NoteCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                          note.title.isNotEmpty
+                              ? note.title
+                              : l10n.untitledNote,
                           style: Theme.of(context).textTheme.titleLarge
                               ?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -214,8 +228,7 @@ class NoteCard extends StatelessWidget {
               ),
             ),
 
-            // Görsel göstergesi (Large thumbnail if list view?)
-            // Keeping it simple for now to match requested "clean" style
+            // Görsel göstergesi
             if (note.images.isNotEmpty) ...[
               const SizedBox(width: 16),
               Container(
@@ -228,7 +241,6 @@ class NoteCard extends StatelessWidget {
                       ? null // TODO: Add actual image preview here if path is valid
                       : null,
                 ),
-                // Placeholder for now, simplified
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -260,7 +272,7 @@ class NoteCard extends StatelessWidget {
         Row(
           children: [
             Text(
-              _formatDate(note.updatedAt),
+              _formatDate(note.updatedAt, l10n),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: isDark
                     ? AppColors.darkTextSecondary.withAlpha(150)
@@ -269,7 +281,6 @@ class NoteCard extends StatelessWidget {
               ),
             ),
             if (note.folderId != null) ...[
-              // Assuming we can't get folder name easily here without passing it, leaving placeholder logic or simplicity
               const SizedBox(width: 8),
               Container(
                 width: 4,
@@ -282,8 +293,6 @@ class NoteCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              // Since Note entity only has folderId, we can't show folder name easily in card without join or passed data.
-              // Keeping it simple.
             ],
           ],
         ),
@@ -291,19 +300,18 @@ class NoteCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, AppLocalizations l10n) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
-    // Daha modern tarih formatı
     if (difference.inMinutes < 1) {
-      return 'Az önce';
+      return l10n.justNow;
     } else if (difference.inHours < 1) {
-      return '${difference.inMinutes}d önce';
+      return l10n.minutesAgo(difference.inMinutes);
     } else if (difference.inDays < 1) {
-      return '${difference.inHours}sa önce';
+      return l10n.hoursAgo(difference.inHours);
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} gün önce';
+      return l10n.daysAgo(difference.inDays);
     } else {
       return '${date.day}.${date.month}.${date.year}';
     }

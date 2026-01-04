@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,6 +58,7 @@ class _NotesListPageState extends State<NotesListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
@@ -82,10 +84,10 @@ class _NotesListPageState extends State<NotesListPage> {
                     : AppColors.lightBackground,
                 surfaceTintColor: Colors.transparent,
                 title: _isSearching
-                    ? _buildSearchField(isDark)
-                    : const Text(
-                        'Notlarım',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                    ? _buildSearchField(isDark, l10n)
+                    : Text(
+                        l10n.myNotes,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                 actions: [
                   IconButton(
@@ -94,7 +96,7 @@ class _NotesListPageState extends State<NotesListPage> {
                           ? CupertinoIcons.list_bullet
                           : CupertinoIcons.square_grid_2x2,
                     ),
-                    tooltip: _isGridView ? 'Liste Görünümü' : 'Izgara Görünümü',
+                    tooltip: _isGridView ? l10n.listView : l10n.gridView,
                     onPressed: () {
                       setState(() {
                         _isGridView = !_isGridView;
@@ -138,7 +140,7 @@ class _NotesListPageState extends State<NotesListPage> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Bir hata oluştu',
+                          l10n.errorOccurred,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 8),
@@ -153,7 +155,7 @@ class _NotesListPageState extends State<NotesListPage> {
                             context.read<NotesBloc>().add(const LoadNotes());
                           },
                           icon: const Icon(CupertinoIcons.refresh),
-                          label: const Text('Tekrar Dene'),
+                          label: Text(l10n.tryAgain),
                         ),
                       ],
                     ),
@@ -167,13 +169,13 @@ class _NotesListPageState extends State<NotesListPage> {
                       title:
                           state.searchQuery != null &&
                               state.searchQuery!.isNotEmpty
-                          ? 'Sonuç bulunamadı'
-                          : 'Henüz not yok',
+                          ? l10n.noResults
+                          : l10n.noNotesYet,
                       subtitle:
                           state.searchQuery != null &&
                               state.searchQuery!.isNotEmpty
-                          ? '"${state.searchQuery}" için sonuç bulunamadı'
-                          : 'İlk notunuzu oluşturmak için + butonuna tıklayın',
+                          ? l10n.noResultsFor(state.searchQuery!)
+                          : l10n.tapToCreate,
                     ),
                   )
                 else
@@ -242,12 +244,12 @@ class _NotesListPageState extends State<NotesListPage> {
     );
   }
 
-  Widget _buildSearchField(bool isDark) {
+  Widget _buildSearchField(bool isDark, AppLocalizations l10n) {
     return TextField(
       controller: _searchController,
       autofocus: true,
       decoration: InputDecoration(
-        hintText: 'Not ara...',
+        hintText: l10n.searchNotes,
         border: InputBorder.none,
         hintStyle: TextStyle(
           color: isDark
@@ -272,6 +274,7 @@ class _NotesListPageState extends State<NotesListPage> {
 
   /// Not seçenekleri bottom sheet
   void _showNoteOptionsSheet(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
 
     showModalBottomSheet(
@@ -304,7 +307,7 @@ class _NotesListPageState extends State<NotesListPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                    note.title.isNotEmpty ? note.title : l10n.untitledNote,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -317,7 +320,7 @@ class _NotesListPageState extends State<NotesListPage> {
                 // Klasöre Taşı
                 ListTile(
                   leading: Icon(CupertinoIcons.folder, color: AppColors.accent),
-                  title: const Text('Klasöre Taşı'),
+                  title: Text(l10n.moveToFolder),
                   trailing: note.folderId != null
                       ? Container(
                           padding: const EdgeInsets.symmetric(
@@ -329,7 +332,7 @@ class _NotesListPageState extends State<NotesListPage> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'Klasörde',
+                            l10n.inFolder,
                             style: TextStyle(
                               fontSize: 12,
                               color: AppColors.primary,
@@ -351,7 +354,7 @@ class _NotesListPageState extends State<NotesListPage> {
                         : CupertinoIcons.pin,
                     color: AppColors.primary,
                   ),
-                  title: Text(note.isPinned ? 'Sabitlemeyi Kaldır' : 'Sabitle'),
+                  title: Text(note.isPinned ? l10n.unpin : l10n.pin),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     context.read<NotesBloc>().add(
@@ -363,7 +366,10 @@ class _NotesListPageState extends State<NotesListPage> {
                 // Sil
                 ListTile(
                   leading: Icon(CupertinoIcons.trash, color: AppColors.error),
-                  title: Text('Sil', style: TextStyle(color: AppColors.error)),
+                  title: Text(
+                    l10n.delete,
+                    style: TextStyle(color: AppColors.error),
+                  ),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _showDeleteConfirmDialog(context, note);
@@ -379,6 +385,7 @@ class _NotesListPageState extends State<NotesListPage> {
 
   /// Klasör seçim sheet
   void _showFolderSelectionSheet(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
 
     showModalBottomSheet(
@@ -419,7 +426,7 @@ class _NotesListPageState extends State<NotesListPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        'Klasör Seçin',
+                        l10n.selectFolder,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w600),
                       ),
@@ -433,7 +440,7 @@ class _NotesListPageState extends State<NotesListPage> {
                           CupertinoIcons.folder_badge_minus,
                           color: AppColors.warning,
                         ),
-                        title: const Text('Klasörden Çıkar'),
+                        title: Text(l10n.removeFromFolder),
                         onTap: () {
                           Navigator.pop(sheetContext);
                           context.read<NotesBloc>().add(
@@ -457,7 +464,7 @@ class _NotesListPageState extends State<NotesListPage> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              'Henüz klasör yok',
+                              l10n.noFoldersYetCreateInSettings,
                               style: TextStyle(
                                 color: isDark
                                     ? AppColors.darkTextSecondary
@@ -466,7 +473,7 @@ class _NotesListPageState extends State<NotesListPage> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Ayarlar sekmesinden klasör oluşturabilirsiniz',
+                              l10n.createFolderInSettings,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: isDark
@@ -505,7 +512,7 @@ class _NotesListPageState extends State<NotesListPage> {
                               title: Text(
                                 folder.name.isNotEmpty
                                     ? folder.name
-                                    : 'İsimsiz klasör',
+                                    : l10n.untitledFolder,
                               ),
                               trailing: isSelected
                                   ? Icon(
@@ -535,23 +542,25 @@ class _NotesListPageState extends State<NotesListPage> {
 
   /// Silme onay dialogu
   void _showDeleteConfirmDialog(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Notu Sil'),
+        title: Text(l10n.deleteNote),
         content: Text(
           note.title.isNotEmpty
-              ? '"${note.title}" notunu silmek istediğinize emin misiniz?\n\nNot çöp kutusuna taşınacak.'
-              : 'Bu notu silmek istediğinize emin misiniz?\n\nNot çöp kutusuna taşınacak.',
+              ? l10n.deleteNoteConfirm(note.title)
+              : l10n.deleteNoteConfirmUntitled,
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Sil'),
+            child: Text(l10n.delete),
             onPressed: () {
               context.read<NotesBloc>().add(MoveNoteToTrash(note.id));
               Navigator.of(dialogContext).pop();

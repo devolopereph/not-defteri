@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +26,7 @@ class _TrashPageState extends State<TrashPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return PopScope(
@@ -36,7 +38,7 @@ class _TrashPageState extends State<TrashPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Çöp Kutusu'),
+          title: Text(l10n.trash),
           leading: IconButton(
             icon: const Icon(CupertinoIcons.back),
             onPressed: () {
@@ -50,7 +52,7 @@ class _TrashPageState extends State<TrashPage> {
                 if (state is TrashLoaded && state.deletedNotes.isNotEmpty) {
                   return IconButton(
                     icon: const Icon(CupertinoIcons.trash),
-                    tooltip: 'Çöp Kutusunu Boşalt',
+                    tooltip: l10n.emptyTrash,
                     onPressed: () => _showEmptyTrashDialog(context),
                   );
                 }
@@ -77,7 +79,7 @@ class _TrashPageState extends State<TrashPage> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Bir hata oluştu',
+                      l10n.errorOccurred,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -92,7 +94,7 @@ class _TrashPageState extends State<TrashPage> {
                         context.read<NotesBloc>().add(const LoadDeletedNotes());
                       },
                       icon: const Icon(CupertinoIcons.refresh),
-                      label: const Text('Tekrar Dene'),
+                      label: Text(l10n.tryAgain),
                     ),
                   ],
                 ),
@@ -101,10 +103,10 @@ class _TrashPageState extends State<TrashPage> {
 
             if (state is TrashLoaded) {
               if (state.deletedNotes.isEmpty) {
-                return const EmptyState(
+                return EmptyState(
                   icon: CupertinoIcons.trash,
-                  title: 'Çöp kutusu boş',
-                  subtitle: 'Silinen notlar burada görünecek',
+                  title: l10n.trashEmpty,
+                  subtitle: l10n.deletedNotesAppear,
                 );
               }
 
@@ -126,6 +128,7 @@ class _TrashPageState extends State<TrashPage> {
   }
 
   Widget _buildTrashNoteCard(BuildContext context, Note note, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     final preview = note.contentPreview;
 
     return Padding(
@@ -162,7 +165,7 @@ class _TrashPageState extends State<TrashPage> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                        note.title.isNotEmpty ? note.title : l10n.untitledNote,
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w600),
                         maxLines: 1,
@@ -192,7 +195,7 @@ class _TrashPageState extends State<TrashPage> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _formatDeletedDate(note.deletedAt),
+                      _formatDeletedDate(note.deletedAt, l10n),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: isDark
                             ? AppColors.darkTextSecondary
@@ -209,27 +212,28 @@ class _TrashPageState extends State<TrashPage> {
     );
   }
 
-  String _formatDeletedDate(DateTime? date) {
-    if (date == null) return 'Bilinmeyen tarih';
+  String _formatDeletedDate(DateTime? date, AppLocalizations l10n) {
+    if (date == null) return l10n.unknownDate;
 
     final now = DateTime.now();
     final difference = now.difference(date);
 
     if (difference.inMinutes < 1) {
-      return 'Az önce silindi';
+      return l10n.deletedJustNow;
     } else if (difference.inHours < 1) {
-      return '${difference.inMinutes} dakika önce silindi';
+      return l10n.deletedMinutesAgo(difference.inMinutes);
     } else if (difference.inDays < 1) {
-      return '${difference.inHours} saat önce silindi';
+      return l10n.deletedHoursAgo(difference.inHours);
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} gün önce silindi';
+      return l10n.deletedDaysAgo(difference.inDays);
     } else {
-      return '${date.day}.${date.month}.${date.year} tarihinde silindi';
+      return l10n.deletedOnDate('${date.day}.${date.month}.${date.year}');
     }
   }
 
   /// Not seçenekleri bottom sheet
   void _showNoteOptionsSheet(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
 
     showModalBottomSheet(
@@ -262,7 +266,7 @@ class _TrashPageState extends State<TrashPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    note.title.isNotEmpty ? note.title : 'Başlıksız not',
+                    note.title.isNotEmpty ? note.title : l10n.untitledNote,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -278,7 +282,7 @@ class _TrashPageState extends State<TrashPage> {
                     CupertinoIcons.arrow_counterclockwise,
                     color: AppColors.success,
                   ),
-                  title: const Text('Geri Getir'),
+                  title: Text(l10n.restore),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     context.read<NotesBloc>().add(
@@ -286,7 +290,7 @@ class _TrashPageState extends State<TrashPage> {
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text('Not geri getirildi'),
+                        content: Text(l10n.noteRestored),
                         backgroundColor: AppColors.success,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
@@ -301,7 +305,7 @@ class _TrashPageState extends State<TrashPage> {
                 ListTile(
                   leading: Icon(CupertinoIcons.delete, color: AppColors.error),
                   title: Text(
-                    'Kalıcı Olarak Sil',
+                    l10n.deletePermanently,
                     style: TextStyle(color: AppColors.error),
                   ),
                   onTap: () {
@@ -319,23 +323,25 @@ class _TrashPageState extends State<TrashPage> {
 
   /// Kalıcı silme onay dialogu
   void _showPermanentDeleteDialog(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Kalıcı Olarak Sil'),
+        title: Text(l10n.deletePermanently),
         content: Text(
           note.title.isNotEmpty
-              ? '"${note.title}" notunu kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.'
-              : 'Bu notu kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.',
+              ? l10n.deletePermanentlyConfirm(note.title)
+              : l10n.deletePermanentlyConfirmUntitled,
         ),
         actions: [
           CupertinoDialogAction(
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Sil'),
+            child: Text(l10n.delete),
             onPressed: () {
               context.read<NotesBloc>().add(DeleteNote(note.id));
               Navigator.of(dialogContext).pop();
@@ -348,21 +354,21 @@ class _TrashPageState extends State<TrashPage> {
 
   /// Çöp kutusunu boşaltma dialogu
   void _showEmptyTrashDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     showCupertinoDialog(
       context: context,
       builder: (dialogContext) => CupertinoAlertDialog(
-        title: const Text('Çöp Kutusunu Boşalt'),
-        content: const Text(
-          'Çöp kutusundaki tüm notları kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.',
-        ),
+        title: Text(l10n.emptyTrash),
+        content: Text(l10n.emptyTrashConfirm),
         actions: [
           CupertinoDialogAction(
-            child: const Text('İptal'),
+            child: Text(l10n.cancel),
             onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            child: const Text('Boşalt'),
+            child: Text(l10n.emptyTrash),
             onPressed: () {
               context.read<NotesBloc>().add(const EmptyTrash());
               Navigator.of(dialogContext).pop();

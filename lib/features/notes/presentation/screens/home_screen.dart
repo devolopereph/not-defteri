@@ -1,3 +1,4 @@
+import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
     final surfaceColor = isDark
         ? AppColors.darkSurface
@@ -62,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
               color: isDark
                   ? AppColors.darkTextSecondary
                   : AppColors.lightTextSecondary,
-              tabs: const [
-                GButton(icon: CupertinoIcons.doc_text, text: 'Notlar'),
-                GButton(icon: CupertinoIcons.folder, text: 'Klasörler'),
-                GButton(icon: CupertinoIcons.graph_circle, text: 'Graf'),
-                GButton(icon: CupertinoIcons.settings, text: 'Ayarlar'),
+              tabs: [
+                GButton(icon: CupertinoIcons.doc_text, text: l10n.notes),
+                GButton(icon: CupertinoIcons.folder, text: l10n.folders),
+                GButton(icon: CupertinoIcons.graph_circle, text: l10n.graph),
+                GButton(icon: CupertinoIcons.settings, text: l10n.settings),
               ],
               selectedIndex: _selectedIndex,
               onTabChange: (index) {
