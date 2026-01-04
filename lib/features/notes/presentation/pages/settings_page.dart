@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
+import 'trash_page.dart';
+import 'about_page.dart';
 
 /// Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
@@ -42,8 +44,37 @@ class SettingsPage extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Hakkında bölümü
-          _buildSectionTitle(context, 'Hakkında'),
+          // Veri yönetimi bölümü
+          _buildSectionTitle(context, 'Veri Yönetimi'),
+          const SizedBox(height: 12),
+          _buildSettingsCard(
+            context,
+            isDark,
+            children: [
+              _buildSettingsItem(
+                context,
+                icon: CupertinoIcons.trash,
+                iconColor: AppColors.error,
+                title: 'Çöp Kutusu',
+                subtitle: 'Silinen notları görüntüle',
+                trailing: const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (context) => const TrashPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+
+          // Diğer bölümü
+          _buildSectionTitle(context, 'Diğer'),
           const SizedBox(height: 12),
           _buildSettingsCard(
             context,
@@ -53,26 +84,21 @@ class SettingsPage extends StatelessWidget {
                 context,
                 icon: CupertinoIcons.info_circle_fill,
                 iconColor: AppColors.info,
-                title: 'Sürüm',
-                subtitle: '1.0.0',
-              ),
-              _buildDivider(isDark),
-              _buildSettingsItem(
-                context,
-                icon: CupertinoIcons.heart_fill,
-                iconColor: AppColors.accent,
-                title: 'Stitch Notes',
-                subtitle: 'Zengin metin destekli not uygulaması',
+                title: 'Hakkında',
+                subtitle: 'Uygulama bilgileri',
+                trailing: const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(builder: (context) => const AboutPage()),
+                  );
+                },
               ),
             ],
           ),
-
-          const SizedBox(height: 24),
-
-          // İpuçları bölümü
-          _buildSectionTitle(context, 'İpuçları'),
-          const SizedBox(height: 12),
-          _buildTipsCard(context, isDark),
         ],
       ),
     );
@@ -114,102 +140,39 @@ class SettingsPage extends StatelessWidget {
     required String title,
     required String subtitle,
     Widget? trailing,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: iconColor.withAlpha(30),
-              borderRadius: BorderRadius.circular(10),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: iconColor.withAlpha(30),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 22),
             ),
-            child: Icon(icon, color: iconColor, size: 22),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 2),
-                Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
-              ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+                ],
+              ),
             ),
-          ),
-          if (trailing != null) trailing,
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDivider(bool isDark) {
-    return Divider(
-      height: 1,
-      indent: 72,
-      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-    );
-  }
-
-  Widget _buildTipsCard(BuildContext context, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary.withAlpha(40),
-            AppColors.accent.withAlpha(40),
+            if (trailing != null) trailing,
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withAlpha(50)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                CupertinoIcons.lightbulb_fill,
-                color: AppColors.warning,
-                size: 24,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Kullanım İpuçları',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildTipItem(
-            context,
-            '✨ Zengin metin düzenleme için araç çubuğunu kullanın',
-          ),
-          _buildTipItem(context, '📸 Notlarınıza fotoğraf ekleyebilirsiniz'),
-          _buildTipItem(
-            context,
-            '📊 Graf görünümünde notlarınızı görselleştirin',
-          ),
-          _buildTipItem(
-            context,
-            '🔍 Arama özelliği ile notlarınızı hızlıca bulun',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTipItem(BuildContext context, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
     );
   }
 }

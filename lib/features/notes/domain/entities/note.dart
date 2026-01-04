@@ -12,6 +12,9 @@ class Note extends Equatable {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<String> images; // Görsel dosya yolları
+  final bool isPinned; // Sabitleme durumu
+  final bool isDeleted; // Çöp kutusunda mı?
+  final DateTime? deletedAt; // Silinme tarihi
 
   const Note({
     required this.id,
@@ -20,6 +23,9 @@ class Note extends Equatable {
     required this.createdAt,
     required this.updatedAt,
     this.images = const [],
+    this.isPinned = false,
+    this.isDeleted = false,
+    this.deletedAt,
   });
 
   /// Boş not oluştur
@@ -32,6 +38,9 @@ class Note extends Equatable {
       createdAt: now,
       updatedAt: now,
       images: [],
+      isPinned: false,
+      isDeleted: false,
+      deletedAt: null,
     );
   }
 
@@ -44,6 +53,11 @@ class Note extends Equatable {
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       images: _parseImages(json['images']),
+      isPinned: json['isPinned'] == 1 || json['isPinned'] == true,
+      isDeleted: json['isDeleted'] == 1 || json['isDeleted'] == true,
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.parse(json['deletedAt'] as String)
+          : null,
     );
   }
 
@@ -73,6 +87,9 @@ class Note extends Equatable {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'images': jsonEncode(images),
+      'isPinned': isPinned ? 1 : 0,
+      'isDeleted': isDeleted ? 1 : 0,
+      'deletedAt': deletedAt?.toIso8601String(),
     };
   }
 
@@ -85,6 +102,9 @@ class Note extends Equatable {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'images': jsonEncode(images),
+      'isPinned': isPinned ? 1 : 0,
+      'isDeleted': isDeleted ? 1 : 0,
+      'deletedAt': deletedAt?.toIso8601String(),
     };
   }
 
@@ -97,6 +117,11 @@ class Note extends Equatable {
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
       images: _parseImages(map['images']),
+      isPinned: map['isPinned'] == 1 || map['isPinned'] == true,
+      isDeleted: map['isDeleted'] == 1 || map['isDeleted'] == true,
+      deletedAt: map['deletedAt'] != null
+          ? DateTime.parse(map['deletedAt'] as String)
+          : null,
     );
   }
 
@@ -108,6 +133,9 @@ class Note extends Equatable {
     DateTime? createdAt,
     DateTime? updatedAt,
     List<String>? images,
+    bool? isPinned,
+    bool? isDeleted,
+    DateTime? deletedAt,
   }) {
     return Note(
       id: id ?? this.id,
@@ -116,6 +144,9 @@ class Note extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       images: images ?? this.images,
+      isPinned: isPinned ?? this.isPinned,
+      isDeleted: isDeleted ?? this.isDeleted,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -152,6 +183,30 @@ class Note extends Equatable {
     return content.length > 100 ? '${content.substring(0, 100)}...' : content;
   }
 
+  /// Tam metin içeriği (arama için)
+  String get fullTextContent {
+    if (content.isEmpty) return '';
+
+    try {
+      final decoded = jsonDecode(content);
+      if (decoded is Map && decoded.containsKey('document')) {
+        final document = decoded['document'];
+        if (document is Map && document.containsKey('children')) {
+          final children = document['children'] as List;
+          final buffer = StringBuffer();
+          for (final child in children) {
+            if (child is Map) {
+              _extractText(child, buffer);
+            }
+          }
+          return buffer.toString().trim();
+        }
+      }
+    } catch (_) {}
+
+    return content;
+  }
+
   /// Recursive olarak metin çıkar
   static void _extractText(Map<dynamic, dynamic> node, StringBuffer buffer) {
     if (node.containsKey('delta')) {
@@ -178,5 +233,15 @@ class Note extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, title, content, createdAt, updatedAt, images];
+  List<Object?> get props => [
+    id,
+    title,
+    content,
+    createdAt,
+    updatedAt,
+    images,
+    isPinned,
+    isDeleted,
+    deletedAt,
+  ];
 }

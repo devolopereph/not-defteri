@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: AppConstants.databaseVersion,
+      version: 2, // Versiyon 2'ye yükseltildi
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -46,7 +46,10 @@ class DatabaseHelper {
         content TEXT NOT NULL DEFAULT '',
         createdAt TEXT NOT NULL,
         updatedAt TEXT NOT NULL,
-        images TEXT NOT NULL DEFAULT '[]'
+        images TEXT NOT NULL DEFAULT '[]',
+        isPinned INTEGER NOT NULL DEFAULT 0,
+        isDeleted INTEGER NOT NULL DEFAULT 0,
+        deletedAt TEXT
       )
     ''');
 
@@ -54,11 +57,33 @@ class DatabaseHelper {
     await db.execute('''
       CREATE INDEX idx_notes_updated ON ${AppConstants.notesTable} (updatedAt DESC)
     ''');
+
+    // Silinmiş notlar için indeks
+    await db.execute('''
+      CREATE INDEX idx_notes_deleted ON ${AppConstants.notesTable} (isDeleted, deletedAt DESC)
+    ''');
   }
 
   /// Veritabanı güncellemesi
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // İleride veritabanı şeması değişirse burada migration yapılır
+    // Versiyon 1'den 2'ye güncelleme: isPinned, isDeleted, deletedAt alanları eklendi
+    if (oldVersion < 2) {
+      // Yeni alanları mevcut tabloya ekle
+      await db.execute('''
+        ALTER TABLE ${AppConstants.notesTable} ADD COLUMN isPinned INTEGER NOT NULL DEFAULT 0
+      ''');
+      await db.execute('''
+        ALTER TABLE ${AppConstants.notesTable} ADD COLUMN isDeleted INTEGER NOT NULL DEFAULT 0
+      ''');
+      await db.execute('''
+        ALTER TABLE ${AppConstants.notesTable} ADD COLUMN deletedAt TEXT
+      ''');
+
+      // Silinmiş notlar için indeks
+      await db.execute('''
+        CREATE INDEX idx_notes_deleted ON ${AppConstants.notesTable} (isDeleted, deletedAt DESC)
+      ''');
+    }
   }
 
   /// Veritabanını kapat
@@ -77,12 +102,26 @@ class NoteLocalDataSource {
 
   NoteLocalDataSource(this._dbHelper);
 
-  /// Tüm notları getir (güncellenme tarihine göre sıralı)
+  /// Tüm aktif notları getir (silinmemiş, güncellenme tarihine göre sıralı, pinlenmiş olanlar önce)
   Future<List<Note>> getAllNotes() async {
     final db = await _dbHelper.database;
     final maps = await db.query(
       AppConstants.notesTable,
-      orderBy: 'updatedAt DESC',
+      where: 'isDeleted = ?',
+      whereArgs: [0],
+      orderBy: 'isPinned DESC, updatedAt DESC',
+    );
+    return maps.map((map) => Note.fromMap(map)).toList();
+  }
+
+  /// Silinen notları getir (çöp kutusu)
+  Future<List<Note>> getDeletedNotes() async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      AppConstants.notesTable,
+      where: 'isDeleted = ?',
+      whereArgs: [1],
+      orderBy: 'deletedAt DESC',
     );
     return maps.map((map) => Note.fromMap(map)).toList();
   }
@@ -121,13 +160,35 @@ class NoteLocalDataSource {
     );
   }
 
-  /// Not sil
+  /// Notu çöp kutusuna taşı (soft delete)
+  Future<void> moveToTrash(String id) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'isDeleted': 1, 'deletedAt': DateTime.now().toIso8601String()},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Notu çöp kutusundan geri getir
+  Future<void> restoreFromTrash(String id) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'isDeleted': 0, 'deletedAt': null},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Notu kalıcı olarak sil
   Future<void> deleteNote(String id) async {
     final db = await _dbHelper.database;
     await db.delete(AppConstants.notesTable, where: 'id = ?', whereArgs: [id]);
   }
 
-  /// Birden fazla not sil
+  /// Birden fazla notu kalıcı olarak sil
   Future<void> deleteNotes(List<String> ids) async {
     if (ids.isEmpty) return;
 
@@ -140,16 +201,51 @@ class NoteLocalDataSource {
     );
   }
 
-  /// Not ara (başlık ve içerikte)
+  /// Birden fazla notu çöp kutusuna taşı
+  Future<void> moveMultipleToTrash(List<String> ids) async {
+    if (ids.isEmpty) return;
+
+    final db = await _dbHelper.database;
+    final placeholders = List.filled(ids.length, '?').join(',');
+    await db.update(
+      AppConstants.notesTable,
+      {'isDeleted': 1, 'deletedAt': DateTime.now().toIso8601String()},
+      where: 'id IN ($placeholders)',
+      whereArgs: ids,
+    );
+  }
+
+  /// Çöp kutusunu tamamen boşalt
+  Future<void> emptyTrash() async {
+    final db = await _dbHelper.database;
+    await db.delete(
+      AppConstants.notesTable,
+      where: 'isDeleted = ?',
+      whereArgs: [1],
+    );
+  }
+
+  /// Not sabitleme durumunu güncelle
+  Future<void> togglePin(String id, bool isPinned) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'isPinned': isPinned ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Not ara (başlık ve içerikte, sadece aktif notlarda)
   Future<List<Note>> searchNotes(String query) async {
     if (query.isEmpty) return getAllNotes();
 
     final db = await _dbHelper.database;
     final maps = await db.query(
       AppConstants.notesTable,
-      where: 'title LIKE ? OR content LIKE ?',
-      whereArgs: ['%$query%', '%$query%'],
-      orderBy: 'updatedAt DESC',
+      where: 'isDeleted = ? AND (title LIKE ? OR content LIKE ?)',
+      whereArgs: [0, '%$query%', '%$query%'],
+      orderBy: 'isPinned DESC, updatedAt DESC',
     );
     return maps.map((map) => Note.fromMap(map)).toList();
   }

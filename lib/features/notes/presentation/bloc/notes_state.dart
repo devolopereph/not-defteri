@@ -26,6 +26,16 @@ class NotesLoaded extends NotesState {
   List<Object?> get props => [notes, searchQuery, lastAddedNoteId];
 }
 
+/// Silinen notlar yüklendi durumu (çöp kutusu)
+class TrashLoaded extends NotesState {
+  final List<Note> deletedNotes;
+
+  const TrashLoaded(this.deletedNotes);
+
+  @override
+  List<Object?> get props => [deletedNotes];
+}
+
 /// Hata durumu
 class NotesError extends NotesState {
   final String message;

@@ -41,6 +41,12 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   /// Düzenleme modu (true) veya salt okunur modu (false)
   bool _isEditing = false;
 
+  /// Arama modu
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+  List<SearchMatch> _searchMatches = [];
+  int _currentMatchIndex = 0;
+
   final ImagePicker _imagePicker = ImagePicker();
 
   @override
@@ -84,6 +90,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     _saveNote(); // Son değişiklikleri kaydet
     _debounceTimer?.cancel();
     _titleController.dispose();
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -113,6 +120,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   void _enterEditMode() {
     setState(() {
       _isEditing = true;
+      _isSearching = false;
     });
   }
 
@@ -130,6 +138,92 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+  }
+
+  /// Arama modunu aç/kapa
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        _searchMatches.clear();
+        _currentMatchIndex = 0;
+      }
+    });
+  }
+
+  /// Not içinde arama yap
+  void _performSearch(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        _searchMatches.clear();
+        _currentMatchIndex = 0;
+      });
+      return;
+    }
+
+    final matches = <SearchMatch>[];
+    final lowerQuery = query.toLowerCase();
+
+    // Başlıkta ara
+    final titleLower = _titleController.text.toLowerCase();
+    int startIndex = 0;
+    while (true) {
+      final index = titleLower.indexOf(lowerQuery, startIndex);
+      if (index == -1) break;
+      matches.add(
+        SearchMatch(
+          type: SearchMatchType.title,
+          startIndex: index,
+          length: query.length,
+          text: _titleController.text.substring(index, index + query.length),
+        ),
+      );
+      startIndex = index + 1;
+    }
+
+    // İçerikte ara
+    final fullText = widget.note.fullTextContent.toLowerCase();
+    startIndex = 0;
+    while (true) {
+      final index = fullText.indexOf(lowerQuery, startIndex);
+      if (index == -1) break;
+      matches.add(
+        SearchMatch(
+          type: SearchMatchType.content,
+          startIndex: index,
+          length: query.length,
+          text: widget.note.fullTextContent.substring(
+            index,
+            index + query.length,
+          ),
+        ),
+      );
+      startIndex = index + 1;
+    }
+
+    setState(() {
+      _searchMatches = matches;
+      _currentMatchIndex = matches.isNotEmpty ? 0 : -1;
+    });
+  }
+
+  /// Sonraki eşleşmeye git
+  void _goToNextMatch() {
+    if (_searchMatches.isEmpty) return;
+    setState(() {
+      _currentMatchIndex = (_currentMatchIndex + 1) % _searchMatches.length;
+    });
+  }
+
+  /// Önceki eşleşmeye git
+  void _goToPreviousMatch() {
+    if (_searchMatches.isEmpty) return;
+    setState(() {
+      _currentMatchIndex =
+          (_currentMatchIndex - 1 + _searchMatches.length) %
+          _searchMatches.length;
+    });
   }
 
   /// Mobil cihazda mı çalışıyor?
@@ -182,6 +276,14 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
                 onPressed: _saveAndExitEditMode,
               ),
             ] else ...[
+              // Arama butonu
+              IconButton(
+                icon: Icon(
+                  _isSearching ? CupertinoIcons.xmark : CupertinoIcons.search,
+                ),
+                tooltip: _isSearching ? 'Aramayı Kapat' : 'Not İçinde Ara',
+                onPressed: _toggleSearch,
+              ),
               IconButton(
                 icon: const Icon(CupertinoIcons.pencil),
                 tooltip: 'Düzenle',
@@ -192,6 +294,9 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         ),
         body: Column(
           children: [
+            // Arama çubuğu
+            if (_isSearching) _buildSearchBar(isDark),
+
             // Başlık alanı
             _buildTitleSection(isDark),
 
@@ -214,8 +319,72 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     );
   }
 
+  /// Arama çubuğu
+  Widget _buildSearchBar(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        border: Border(
+          bottom: BorderSide(
+            color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              autofocus: true,
+              decoration: InputDecoration(
+                hintText: 'Not içinde ara...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: isDark
+                    ? AppColors.darkBackground
+                    : AppColors.lightBackground,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+              ),
+              style: TextStyle(
+                color: isDark ? AppColors.darkText : AppColors.lightText,
+              ),
+              onChanged: _performSearch,
+            ),
+          ),
+          if (_searchMatches.isNotEmpty) ...[
+            const SizedBox(width: 8),
+            Text(
+              '${_currentMatchIndex + 1}/${_searchMatches.length}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            IconButton(
+              icon: const Icon(CupertinoIcons.chevron_up, size: 20),
+              onPressed: _goToPreviousMatch,
+              visualDensity: VisualDensity.compact,
+            ),
+            IconButton(
+              icon: const Icon(CupertinoIcons.chevron_down, size: 20),
+              onPressed: _goToNextMatch,
+              visualDensity: VisualDensity.compact,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   /// Başlık bölümü
   Widget _buildTitleSection(bool isDark) {
+    final highlightedTitle = _getHighlightedTitle(isDark);
+
     if (_isEditing) {
       // Düzenleme modunda TextField
       return Container(
@@ -243,28 +412,88 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         ),
       );
     } else {
-      // Salt okunur modda tıklanabilir başlık
+      // Salt okunur modda başlık (arama vurgulamalı)
       return GestureDetector(
         onTap: _enterEditMode,
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: Text(
-            _titleController.text.isNotEmpty
-                ? _titleController.text
-                : 'Başlıksız not',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: _titleController.text.isEmpty
-                  ? (isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary)
-                  : null,
-            ),
-          ),
+          child:
+              highlightedTitle ??
+              Text(
+                _titleController.text.isNotEmpty
+                    ? _titleController.text
+                    : 'Başlıksız not',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: _titleController.text.isEmpty
+                      ? (isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary)
+                      : null,
+                ),
+              ),
         ),
       );
     }
+  }
+
+  /// Başlıkta arama vurgulama
+  Widget? _getHighlightedTitle(bool isDark) {
+    if (!_isSearching || _searchController.text.isEmpty) {
+      return null;
+    }
+
+    final title = _titleController.text;
+    if (title.isEmpty) return null;
+
+    final query = _searchController.text.toLowerCase();
+    final titleLower = title.toLowerCase();
+
+    final spans = <TextSpan>[];
+    int lastEnd = 0;
+
+    int startIndex = 0;
+    while (true) {
+      final index = titleLower.indexOf(query, startIndex);
+      if (index == -1) break;
+
+      // Eşleşmeden önceki metin
+      if (index > lastEnd) {
+        spans.add(TextSpan(text: title.substring(lastEnd, index)));
+      }
+
+      // Vurgulanan metin
+      spans.add(
+        TextSpan(
+          text: title.substring(index, index + query.length),
+          style: TextStyle(
+            backgroundColor: AppColors.warning.withAlpha(100),
+            color: isDark ? AppColors.darkText : AppColors.lightText,
+          ),
+        ),
+      );
+
+      lastEnd = index + query.length;
+      startIndex = index + 1;
+    }
+
+    // Kalan metin
+    if (lastEnd < title.length) {
+      spans.add(TextSpan(text: title.substring(lastEnd)));
+    }
+
+    if (spans.isEmpty) return null;
+
+    return RichText(
+      text: TextSpan(
+        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: isDark ? AppColors.darkText : AppColors.lightText,
+        ),
+        children: spans,
+      ),
+    );
   }
 
   /// Salt okunur içerik görünümü
@@ -312,9 +541,9 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
               : AppColors.lightBorder,
         ),
       ),
-      textSpanDecorator: (context, node, index, text, textSpan, previousSpan) {
-        return textSpan;
-      },
+      textSpanDecorator: _isSearching && _searchController.text.isNotEmpty
+          ? _highlightSearchResults
+          : null,
     );
 
     // Tıklanabilir salt okunur editör
@@ -330,6 +559,70 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
         ),
       ),
     );
+  }
+
+  /// Arama sonuçlarını vurgula
+  InlineSpan _highlightSearchResults(
+    BuildContext context,
+    Node node,
+    int index,
+    TextInsert text,
+    TextSpan textSpan,
+    TextSpan? previousSpan,
+  ) {
+    if (_searchController.text.isEmpty) return textSpan;
+
+    final query = _searchController.text.toLowerCase();
+    final content = text.text.toLowerCase();
+    final isDark = this.context.read<ThemeCubit>().isDark;
+
+    final spans = <InlineSpan>[];
+    int lastEnd = 0;
+    int startIndex = 0;
+
+    while (true) {
+      final matchIndex = content.indexOf(query, startIndex);
+      if (matchIndex == -1) break;
+
+      // Eşleşmeden önceki metin
+      if (matchIndex > lastEnd) {
+        spans.add(
+          TextSpan(
+            text: text.text.substring(lastEnd, matchIndex),
+            style: textSpan.style,
+          ),
+        );
+      }
+
+      // Vurgulanan metin
+      spans.add(
+        TextSpan(
+          text: text.text.substring(matchIndex, matchIndex + query.length),
+          style:
+              textSpan.style?.copyWith(
+                backgroundColor: AppColors.warning.withAlpha(100),
+              ) ??
+              TextStyle(
+                backgroundColor: AppColors.warning.withAlpha(100),
+                color: isDark ? AppColors.darkText : AppColors.lightText,
+              ),
+        ),
+      );
+
+      lastEnd = matchIndex + query.length;
+      startIndex = matchIndex + 1;
+    }
+
+    // Kalan metin
+    if (lastEnd < text.text.length) {
+      spans.add(
+        TextSpan(text: text.text.substring(lastEnd), style: textSpan.style),
+      );
+    }
+
+    if (spans.isEmpty) return textSpan;
+
+    return TextSpan(children: spans);
   }
 
   Widget _buildImagesSection(bool isDark) {
@@ -579,3 +872,21 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     _onContentChanged();
   }
 }
+
+/// Arama eşleşmesi modeli
+class SearchMatch {
+  final SearchMatchType type;
+  final int startIndex;
+  final int length;
+  final String text;
+
+  SearchMatch({
+    required this.type,
+    required this.startIndex,
+    required this.length,
+    required this.text,
+  });
+}
+
+/// Arama eşleşme tipi
+enum SearchMatchType { title, content }

@@ -22,14 +22,14 @@ class AppColors {
   static const Color lightBorder = Color(0xFFE2E8F0);
   static const Color lightDivider = Color(0xFFF1F5F9);
 
-  // Dark theme colors
-  static const Color darkBackground = Color(0xFF0F172A);
-  static const Color darkSurface = Color(0xFF1E293B);
-  static const Color darkCard = Color(0xFF1E293B);
+  // Dark theme colors - Pure black (AMOLED)
+  static const Color darkBackground = Color(0xFF000000);
+  static const Color darkSurface = Color(0xFF121212);
+  static const Color darkCard = Color(0xFF121212);
   static const Color darkText = Color(0xFFF8FAFC);
-  static const Color darkTextSecondary = Color(0xFF94A3B8);
-  static const Color darkBorder = Color(0xFF334155);
-  static const Color darkDivider = Color(0xFF1E293B);
+  static const Color darkTextSecondary = Color(0xFF9CA3AF);
+  static const Color darkBorder = Color(0xFF1F1F1F);
+  static const Color darkDivider = Color(0xFF1F1F1F);
 
   // Status colors
   static const Color success = Color(0xFF10B981);

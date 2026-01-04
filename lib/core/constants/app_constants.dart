@@ -15,6 +15,11 @@ class AppConstants {
 
   // SharedPreferences keys
   static const String themeKey = 'theme_mode';
+  static const String viewModeKey = 'view_mode';
+  static const String pinnedNotesKey = 'pinned_notes';
+
+  // Tablo isimleri
+  static const String trashTable = 'trash';
 
   // Animasyon süreleri
   static const Duration shortAnimation = Duration(milliseconds: 200);

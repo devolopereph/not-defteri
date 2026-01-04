@@ -28,7 +28,27 @@ class UpdateNote extends NotesEvent {
   List<Object?> get props => [note];
 }
 
-/// Not sil
+/// Notu çöp kutusuna taşı
+class MoveNoteToTrash extends NotesEvent {
+  final String id;
+
+  const MoveNoteToTrash(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+/// Notu çöp kutusundan geri getir
+class RestoreNoteFromTrash extends NotesEvent {
+  final String id;
+
+  const RestoreNoteFromTrash(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+/// Notu kalıcı olarak sil
 class DeleteNote extends NotesEvent {
   final String id;
 
@@ -38,7 +58,7 @@ class DeleteNote extends NotesEvent {
   List<Object?> get props => [id];
 }
 
-/// Birden fazla not sil
+/// Birden fazla notu kalıcı olarak sil
 class DeleteMultipleNotes extends NotesEvent {
   final List<String> ids;
 
@@ -46,6 +66,37 @@ class DeleteMultipleNotes extends NotesEvent {
 
   @override
   List<Object?> get props => [ids];
+}
+
+/// Birden fazla notu çöp kutusuna taşı
+class MoveMultipleNotesToTrash extends NotesEvent {
+  final List<String> ids;
+
+  const MoveMultipleNotesToTrash(this.ids);
+
+  @override
+  List<Object?> get props => [ids];
+}
+
+/// Çöp kutusunu tamamen boşalt
+class EmptyTrash extends NotesEvent {
+  const EmptyTrash();
+}
+
+/// Not sabitleme durumunu değiştir
+class ToggleNotePin extends NotesEvent {
+  final String id;
+  final bool isPinned;
+
+  const ToggleNotePin(this.id, this.isPinned);
+
+  @override
+  List<Object?> get props => [id, isPinned];
+}
+
+/// Silinen notları yükle
+class LoadDeletedNotes extends NotesEvent {
+  const LoadDeletedNotes();
 }
 
 /// Notlarda ara

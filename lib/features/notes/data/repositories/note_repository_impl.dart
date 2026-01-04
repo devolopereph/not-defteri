@@ -21,6 +21,15 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
+  Future<List<Note>> getDeletedNotes() async {
+    try {
+      return await _localDataSource.getDeletedNotes();
+    } catch (e) {
+      throw Exception('Silinen notlar yüklenirken hata oluştu: $e');
+    }
+  }
+
+  @override
   Future<Note?> getNoteById(String id) async {
     try {
       return await _localDataSource.getNoteById(id);
@@ -48,6 +57,24 @@ class NoteRepositoryImpl implements NoteRepository {
   }
 
   @override
+  Future<void> moveToTrash(String id) async {
+    try {
+      await _localDataSource.moveToTrash(id);
+    } catch (e) {
+      throw Exception('Not çöp kutusuna taşınırken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> restoreFromTrash(String id) async {
+    try {
+      await _localDataSource.restoreFromTrash(id);
+    } catch (e) {
+      throw Exception('Not geri getirilirken hata oluştu: $e');
+    }
+  }
+
+  @override
   Future<void> deleteNote(String id) async {
     try {
       await _localDataSource.deleteNote(id);
@@ -62,6 +89,33 @@ class NoteRepositoryImpl implements NoteRepository {
       await _localDataSource.deleteNotes(ids);
     } catch (e) {
       throw Exception('Notlar silinirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> moveMultipleToTrash(List<String> ids) async {
+    try {
+      await _localDataSource.moveMultipleToTrash(ids);
+    } catch (e) {
+      throw Exception('Notlar çöp kutusuna taşınırken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> emptyTrash() async {
+    try {
+      await _localDataSource.emptyTrash();
+    } catch (e) {
+      throw Exception('Çöp kutusu boşaltılırken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> togglePin(String id, bool isPinned) async {
+    try {
+      await _localDataSource.togglePin(id, isPinned);
+    } catch (e) {
+      throw Exception('Sabitleme durumu değiştirilirken hata oluştu: $e');
     }
   }
 
