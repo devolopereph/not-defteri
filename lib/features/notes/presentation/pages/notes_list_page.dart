@@ -6,7 +6,9 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/note.dart';
+import '../../domain/entities/folder.dart';
 import '../bloc/notes_bloc.dart';
+import '../bloc/folders_bloc.dart';
 import '../widgets/note_card.dart';
 import '../widgets/empty_state.dart';
 import 'note_editor_page.dart';
@@ -294,6 +296,35 @@ class _NotesListPageState extends State<NotesListPage> {
                 ),
                 const SizedBox(height: 20),
 
+                // Klasöre Taşı
+                ListTile(
+                  leading: Icon(CupertinoIcons.folder, color: AppColors.accent),
+                  title: const Text('Klasöre Taşı'),
+                  trailing: note.folderId != null
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withAlpha(30),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Klasörde',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        )
+                      : null,
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _showFolderSelectionSheet(context, note);
+                  },
+                ),
+
                 // Sabitle / Sabitlemeyi Kaldır
                 ListTile(
                   leading: Icon(
@@ -323,6 +354,162 @@ class _NotesListPageState extends State<NotesListPage> {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  /// Klasör seçim sheet
+  void _showFolderSelectionSheet(BuildContext context, Note note) {
+    final isDark = context.read<ThemeCubit>().isDark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return BlocBuilder<FoldersBloc, FoldersState>(
+          builder: (context, state) {
+            List<Folder> folders = [];
+            if (state is FoldersLoaded) {
+              folders = state.folders;
+            }
+
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Üst çizgi
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkBorder
+                            : AppColors.lightBorder,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Başlık
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Klasör Seçin',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Klasörden Çıkar
+                    if (note.folderId != null)
+                      ListTile(
+                        leading: Icon(
+                          CupertinoIcons.folder_badge_minus,
+                          color: AppColors.warning,
+                        ),
+                        title: const Text('Klasörden Çıkar'),
+                        onTap: () {
+                          Navigator.pop(sheetContext);
+                          context.read<NotesBloc>().add(
+                            UpdateNoteFolder(note.id, null),
+                          );
+                        },
+                      ),
+
+                    // Klasör listesi
+                    if (folders.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Icon(
+                              CupertinoIcons.folder,
+                              size: 48,
+                              color: isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.lightTextSecondary,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Henüz klasör yok',
+                              style: TextStyle(
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Ayarlar sekmesinden klasör oluşturabilirsiniz',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.lightTextSecondary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      )
+                    else
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.of(context).size.height * 0.4,
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: folders.length,
+                          itemBuilder: (context, index) {
+                            final folder = folders[index];
+                            final isSelected = note.folderId == folder.id;
+                            return ListTile(
+                              leading: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Color(folder.color).withAlpha(30),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  CupertinoIcons.folder_fill,
+                                  color: Color(folder.color),
+                                ),
+                              ),
+                              title: Text(
+                                folder.name.isNotEmpty
+                                    ? folder.name
+                                    : 'İsimsiz klasör',
+                              ),
+                              trailing: isSelected
+                                  ? Icon(
+                                      CupertinoIcons.checkmark_circle_fill,
+                                      color: AppColors.primary,
+                                    )
+                                  : null,
+                              onTap: () {
+                                Navigator.pop(sheetContext);
+                                context.read<NotesBloc>().add(
+                                  UpdateNoteFolder(note.id, folder.id),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );

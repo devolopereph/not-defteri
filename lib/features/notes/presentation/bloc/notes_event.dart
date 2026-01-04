@@ -113,3 +113,14 @@ class SearchNotes extends NotesEvent {
 class RefreshNotes extends NotesEvent {
   const RefreshNotes();
 }
+
+/// Notun klasörünü güncelle
+class UpdateNoteFolder extends NotesEvent {
+  final String noteId;
+  final String? folderId;
+
+  const UpdateNoteFolder(this.noteId, this.folderId);
+
+  @override
+  List<Object?> get props => [noteId, folderId];
+}

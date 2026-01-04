@@ -12,6 +12,7 @@ class AppConstants {
 
   // Tablo isimleri
   static const String notesTable = 'notes';
+  static const String foldersTable = 'folders';
 
   // SharedPreferences keys
   static const String themeKey = 'theme_mode';

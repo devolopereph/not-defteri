@@ -36,6 +36,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<LoadDeletedNotes>(_onLoadDeletedNotes);
     on<SearchNotes>(_onSearchNotes);
     on<RefreshNotes>(_onRefreshNotes);
+    on<UpdateNoteFolder>(_onUpdateNoteFolder);
   }
 
   /// Notları yükle
@@ -280,6 +281,29 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     try {
       final notes = await _repository.getAllNotes();
       emit(NotesLoaded(notes));
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Notun klasörünü güncelle
+  Future<void> _onUpdateNoteFolder(
+    UpdateNoteFolder event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await _repository.updateNoteFolder(event.noteId, event.folderId);
+
+      // Mevcut listeyi güncelle
+      if (state is NotesLoaded) {
+        final currentNotes = (state as NotesLoaded).notes;
+        final updatedNotes = currentNotes.map((n) {
+          return n.id == event.noteId
+              ? n.copyWith(folderId: event.folderId)
+              : n;
+        }).toList();
+        emit(NotesLoaded(updatedNotes));
+      }
     } catch (e) {
       emit(NotesError(e.toString()));
     }

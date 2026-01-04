@@ -43,4 +43,13 @@ abstract class NoteRepository {
 
   /// Arama yap
   Future<List<Note>> searchNotes(String query);
+
+  /// Notun klasörünü güncelle
+  Future<void> updateNoteFolder(String noteId, String? folderId);
+
+  /// Klasördeki notları getir
+  Future<List<Note>> getNotesByFolder(String folderId);
+
+  /// Klasörsüz notları getir
+  Future<List<Note>> getNotesWithoutFolder();
 }

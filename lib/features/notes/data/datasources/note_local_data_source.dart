@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2, // Versiyon 2'ye yükseltildi
+      version: 3, // Versiyon 3'e yükseltildi - folders tablosu eklendi
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -39,6 +39,7 @@ class DatabaseHelper {
 
   /// Tabloları oluştur
   Future<void> _onCreate(Database db, int version) async {
+    // Notes tablosu
     await db.execute('''
       CREATE TABLE ${AppConstants.notesTable} (
         id TEXT PRIMARY KEY,
@@ -49,7 +50,19 @@ class DatabaseHelper {
         images TEXT NOT NULL DEFAULT '[]',
         isPinned INTEGER NOT NULL DEFAULT 0,
         isDeleted INTEGER NOT NULL DEFAULT 0,
-        deletedAt TEXT
+        deletedAt TEXT,
+        folderId TEXT
+      )
+    ''');
+
+    // Folders tablosu
+    await db.execute('''
+      CREATE TABLE ${AppConstants.foldersTable} (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL DEFAULT '',
+        color INTEGER NOT NULL DEFAULT 0xFF6C63FF,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL
       )
     ''');
 
@@ -61,6 +74,11 @@ class DatabaseHelper {
     // Silinmiş notlar için indeks
     await db.execute('''
       CREATE INDEX idx_notes_deleted ON ${AppConstants.notesTable} (isDeleted, deletedAt DESC)
+    ''');
+
+    // Klasör için indeks
+    await db.execute('''
+      CREATE INDEX idx_notes_folder ON ${AppConstants.notesTable} (folderId)
     ''');
   }
 
@@ -82,6 +100,30 @@ class DatabaseHelper {
       // Silinmiş notlar için indeks
       await db.execute('''
         CREATE INDEX idx_notes_deleted ON ${AppConstants.notesTable} (isDeleted, deletedAt DESC)
+      ''');
+    }
+
+    // Versiyon 2'den 3'e güncelleme: folders tablosu ve folderId alanı eklendi
+    if (oldVersion < 3) {
+      // Folders tablosu oluştur
+      await db.execute('''
+        CREATE TABLE ${AppConstants.foldersTable} (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL DEFAULT '',
+          color INTEGER NOT NULL DEFAULT 0xFF6C63FF,
+          createdAt TEXT NOT NULL,
+          updatedAt TEXT NOT NULL
+        )
+      ''');
+
+      // Notes tablosuna folderId alanı ekle
+      await db.execute('''
+        ALTER TABLE ${AppConstants.notesTable} ADD COLUMN folderId TEXT
+      ''');
+
+      // Klasör için indeks oluştur
+      await db.execute('''
+        CREATE INDEX idx_notes_folder ON ${AppConstants.notesTable} (folderId)
       ''');
     }
   }
@@ -245,6 +287,41 @@ class NoteLocalDataSource {
       AppConstants.notesTable,
       where: 'isDeleted = ? AND (title LIKE ? OR content LIKE ?)',
       whereArgs: [0, '%$query%', '%$query%'],
+      orderBy: 'isPinned DESC, updatedAt DESC',
+    );
+    return maps.map((map) => Note.fromMap(map)).toList();
+  }
+
+  /// Notun klasörünü güncelle
+  Future<void> updateNoteFolder(String noteId, String? folderId) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'folderId': folderId},
+      where: 'id = ?',
+      whereArgs: [noteId],
+    );
+  }
+
+  /// Klasördeki notları getir
+  Future<List<Note>> getNotesByFolder(String folderId) async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      AppConstants.notesTable,
+      where: 'folderId = ? AND isDeleted = ?',
+      whereArgs: [folderId, 0],
+      orderBy: 'isPinned DESC, updatedAt DESC',
+    );
+    return maps.map((map) => Note.fromMap(map)).toList();
+  }
+
+  /// Klasörsüz notları getir
+  Future<List<Note>> getNotesWithoutFolder() async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      AppConstants.notesTable,
+      where: 'folderId IS NULL AND isDeleted = ?',
+      whereArgs: [0],
       orderBy: 'isPinned DESC, updatedAt DESC',
     );
     return maps.map((map) => Note.fromMap(map)).toList();

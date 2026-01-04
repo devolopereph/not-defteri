@@ -127,4 +127,31 @@ class NoteRepositoryImpl implements NoteRepository {
       throw Exception('Arama yapılırken hata oluştu: $e');
     }
   }
+
+  @override
+  Future<void> updateNoteFolder(String noteId, String? folderId) async {
+    try {
+      await _localDataSource.updateNoteFolder(noteId, folderId);
+    } catch (e) {
+      throw Exception('Not klasörü güncellenirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<List<Note>> getNotesByFolder(String folderId) async {
+    try {
+      return await _localDataSource.getNotesByFolder(folderId);
+    } catch (e) {
+      throw Exception('Klasördeki notlar yüklenirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<List<Note>> getNotesWithoutFolder() async {
+    try {
+      return await _localDataSource.getNotesWithoutFolder();
+    } catch (e) {
+      throw Exception('Klasörsüz notlar yüklenirken hata oluştu: $e');
+    }
+  }
 }

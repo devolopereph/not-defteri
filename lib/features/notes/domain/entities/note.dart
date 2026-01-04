@@ -15,6 +15,7 @@ class Note extends Equatable {
   final bool isPinned; // Sabitleme durumu
   final bool isDeleted; // Çöp kutusunda mı?
   final DateTime? deletedAt; // Silinme tarihi
+  final String? folderId; // Ait olduğu klasör ID'si (null = klasörsüz)
 
   const Note({
     required this.id,
@@ -26,6 +27,7 @@ class Note extends Equatable {
     this.isPinned = false,
     this.isDeleted = false,
     this.deletedAt,
+    this.folderId,
   });
 
   /// Boş not oluştur
@@ -41,6 +43,7 @@ class Note extends Equatable {
       isPinned: false,
       isDeleted: false,
       deletedAt: null,
+      folderId: null,
     );
   }
 
@@ -58,6 +61,7 @@ class Note extends Equatable {
       deletedAt: json['deletedAt'] != null
           ? DateTime.parse(json['deletedAt'] as String)
           : null,
+      folderId: json['folderId'] as String?,
     );
   }
 
@@ -90,6 +94,7 @@ class Note extends Equatable {
       'isPinned': isPinned ? 1 : 0,
       'isDeleted': isDeleted ? 1 : 0,
       'deletedAt': deletedAt?.toIso8601String(),
+      'folderId': folderId,
     };
   }
 
@@ -105,6 +110,7 @@ class Note extends Equatable {
       'isPinned': isPinned ? 1 : 0,
       'isDeleted': isDeleted ? 1 : 0,
       'deletedAt': deletedAt?.toIso8601String(),
+      'folderId': folderId,
     };
   }
 
@@ -122,6 +128,7 @@ class Note extends Equatable {
       deletedAt: map['deletedAt'] != null
           ? DateTime.parse(map['deletedAt'] as String)
           : null,
+      folderId: map['folderId'] as String?,
     );
   }
 
@@ -136,6 +143,7 @@ class Note extends Equatable {
     bool? isPinned,
     bool? isDeleted,
     DateTime? deletedAt,
+    String? folderId,
   }) {
     return Note(
       id: id ?? this.id,
@@ -147,6 +155,7 @@ class Note extends Equatable {
       isPinned: isPinned ?? this.isPinned,
       isDeleted: isDeleted ?? this.isDeleted,
       deletedAt: deletedAt ?? this.deletedAt,
+      folderId: folderId ?? this.folderId,
     );
   }
 
@@ -261,5 +270,6 @@ class Note extends Equatable {
     isPinned,
     isDeleted,
     deletedAt,
+    folderId,
   ];
 }

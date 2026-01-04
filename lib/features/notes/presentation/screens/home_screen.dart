@@ -5,6 +5,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../pages/notes_list_page.dart';
+import '../pages/folders_page.dart';
 import '../pages/graph_page.dart';
 import '../pages/settings_page.dart';
 
@@ -21,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = const [
     NotesListPage(),
+    FoldersPage(),
     GraphPage(),
     SettingsPage(),
   ];
@@ -47,14 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: GNav(
               rippleColor: AppColors.primary.withAlpha(50),
               hoverColor: AppColors.primary.withAlpha(30),
-              gap: 8,
+              gap: 6,
               activeColor: Colors.white,
-              iconSize: 24,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              iconSize: 22,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               duration: const Duration(milliseconds: 400),
               tabBackgroundColor: AppColors.primary,
               color: isDark
@@ -62,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   : AppColors.lightTextSecondary,
               tabs: const [
                 GButton(icon: CupertinoIcons.doc_text, text: 'Notlar'),
+                GButton(icon: CupertinoIcons.folder, text: 'Klasörler'),
                 GButton(icon: CupertinoIcons.graph_circle, text: 'Graf'),
                 GButton(icon: CupertinoIcons.settings, text: 'Ayarlar'),
               ],
