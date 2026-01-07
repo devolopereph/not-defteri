@@ -667,6 +667,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error adding image: {error}'**
   String imageError(String error);
+
+  /// Backup page title
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backup;
+
+  /// Backup setting title
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupAndRestore;
+
+  /// Backup setting subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Backup or restore your data'**
+  String get backupAndRestoreDescription;
+
+  /// Backup page main title
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & Restore'**
+  String get backupTitle;
+
+  /// Backup page description
+  ///
+  /// In en, this message translates to:
+  /// **'Backup all your notes, folders, and settings to a ZIP file or restore from a previous backup.'**
+  String get backupDescription;
+
+  /// Create backup button
+  ///
+  /// In en, this message translates to:
+  /// **'Create Backup'**
+  String get createBackup;
+
+  /// Create backup description
+  ///
+  /// In en, this message translates to:
+  /// **'Export all data as a ZIP file'**
+  String get createBackupDescription;
+
+  /// Restore backup button
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Backup'**
+  String get restoreBackup;
+
+  /// Restore backup description
+  ///
+  /// In en, this message translates to:
+  /// **'Import data from a backup file'**
+  String get restoreBackupDescription;
+
+  /// Backup page note
+  ///
+  /// In en, this message translates to:
+  /// **'Your backup includes all notes, folders, and app settings. Store it in a safe place.'**
+  String get backupNote;
+
+  /// Backup file share subject
+  ///
+  /// In en, this message translates to:
+  /// **'Stitch Notes Backup'**
+  String get backupFileSubject;
+
+  /// Backup success message
+  ///
+  /// In en, this message translates to:
+  /// **'Backup created successfully!'**
+  String get backupCreatedSuccess;
+
+  /// Backup error message
+  ///
+  /// In en, this message translates to:
+  /// **'Backup error: {error}'**
+  String backupCreatedError(String error);
+
+  /// File not selected message
+  ///
+  /// In en, this message translates to:
+  /// **'No file selected'**
+  String get fileNotSelected;
+
+  /// Restore success message
+  ///
+  /// In en, this message translates to:
+  /// **'{notes} notes and {folders} folders restored'**
+  String restoreSuccess(int notes, int folders);
+
+  /// Restore error message
+  ///
+  /// In en, this message translates to:
+  /// **'Restore error: {error}'**
+  String restoreError(String error);
+
+  /// Restore complete dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Complete'**
+  String get restoreComplete;
+
+  /// Restart app message
+  ///
+  /// In en, this message translates to:
+  /// **'Please restart the app to see all restored settings.'**
+  String get restartAppMessage;
 }
 
 class _AppLocalizationsDelegate

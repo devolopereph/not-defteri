@@ -328,4 +328,67 @@ class AppLocalizationsEn extends AppLocalizations {
   String imageError(String error) {
     return 'Error adding image: $error';
   }
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get backupAndRestore => 'Backup & Restore';
+
+  @override
+  String get backupAndRestoreDescription => 'Backup or restore your data';
+
+  @override
+  String get backupTitle => 'Backup & Restore';
+
+  @override
+  String get backupDescription =>
+      'Backup all your notes, folders, and settings to a ZIP file or restore from a previous backup.';
+
+  @override
+  String get createBackup => 'Create Backup';
+
+  @override
+  String get createBackupDescription => 'Export all data as a ZIP file';
+
+  @override
+  String get restoreBackup => 'Restore Backup';
+
+  @override
+  String get restoreBackupDescription => 'Import data from a backup file';
+
+  @override
+  String get backupNote =>
+      'Your backup includes all notes, folders, and app settings. Store it in a safe place.';
+
+  @override
+  String get backupFileSubject => 'Stitch Notes Backup';
+
+  @override
+  String get backupCreatedSuccess => 'Backup created successfully!';
+
+  @override
+  String backupCreatedError(String error) {
+    return 'Backup error: $error';
+  }
+
+  @override
+  String get fileNotSelected => 'No file selected';
+
+  @override
+  String restoreSuccess(int notes, int folders) {
+    return '$notes notes and $folders folders restored';
+  }
+
+  @override
+  String restoreError(String error) {
+    return 'Restore error: $error';
+  }
+
+  @override
+  String get restoreComplete => 'Restore Complete';
+
+  @override
+  String get restartAppMessage =>
+      'Please restart the app to see all restored settings.';
 }

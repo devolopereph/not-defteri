@@ -200,6 +200,7 @@ class _NotesListPageState extends State<NotesListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'notes_fab',
         onPressed: () {
           context.read<NotesBloc>().add(const AddNote());
         },

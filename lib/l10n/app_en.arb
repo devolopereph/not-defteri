@@ -568,5 +568,117 @@
         "example": "File not found"
       }
     }
+  },
+
+  "backup": "Backup",
+  "@backup": {
+    "description": "Backup page title"
+  },
+
+  "backupAndRestore": "Backup & Restore",
+  "@backupAndRestore": {
+    "description": "Backup setting title"
+  },
+
+  "backupAndRestoreDescription": "Backup or restore your data",
+  "@backupAndRestoreDescription": {
+    "description": "Backup setting subtitle"
+  },
+
+  "backupTitle": "Backup & Restore",
+  "@backupTitle": {
+    "description": "Backup page main title"
+  },
+
+  "backupDescription": "Backup all your notes, folders, and settings to a ZIP file or restore from a previous backup.",
+  "@backupDescription": {
+    "description": "Backup page description"
+  },
+
+  "createBackup": "Create Backup",
+  "@createBackup": {
+    "description": "Create backup button"
+  },
+
+  "createBackupDescription": "Export all data as a ZIP file",
+  "@createBackupDescription": {
+    "description": "Create backup description"
+  },
+
+  "restoreBackup": "Restore Backup",
+  "@restoreBackup": {
+    "description": "Restore backup button"
+  },
+
+  "restoreBackupDescription": "Import data from a backup file",
+  "@restoreBackupDescription": {
+    "description": "Restore backup description"
+  },
+
+  "backupNote": "Your backup includes all notes, folders, and app settings. Store it in a safe place.",
+  "@backupNote": {
+    "description": "Backup page note"
+  },
+
+  "backupFileSubject": "Stitch Notes Backup",
+  "@backupFileSubject": {
+    "description": "Backup file share subject"
+  },
+
+  "backupCreatedSuccess": "Backup created successfully!",
+  "@backupCreatedSuccess": {
+    "description": "Backup success message"
+  },
+
+  "backupCreatedError": "Backup error: {error}",
+  "@backupCreatedError": {
+    "description": "Backup error message",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Unknown error"
+      }
+    }
+  },
+
+  "fileNotSelected": "No file selected",
+  "@fileNotSelected": {
+    "description": "File not selected message"
+  },
+
+  "restoreSuccess": "{notes} notes and {folders} folders restored",
+  "@restoreSuccess": {
+    "description": "Restore success message",
+    "placeholders": {
+      "notes": {
+        "type": "int",
+        "example": "10"
+      },
+      "folders": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+
+  "restoreError": "Restore error: {error}",
+  "@restoreError": {
+    "description": "Restore error message",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Unknown error"
+      }
+    }
+  },
+
+  "restoreComplete": "Restore Complete",
+  "@restoreComplete": {
+    "description": "Restore complete dialog title"
+  },
+
+  "restartAppMessage": "Please restart the app to see all restored settings.",
+  "@restartAppMessage": {
+    "description": "Restart app message"
   }
 }

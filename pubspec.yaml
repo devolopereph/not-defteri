@@ -40,6 +40,11 @@ dependencies:
   path: ^1.9.1
   package_info_plus: ^8.3.0
   flutter_gen: ^5.12.0
+  
+  # Backup & Restore
+  share_plus: ^10.1.4
+  archive: ^4.0.4
+  file_picker: 10.3.8
 
 dev_dependencies:
   flutter_test:

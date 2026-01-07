@@ -152,6 +152,7 @@ class _FoldersPageState extends State<FoldersPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'folders_fab',
         onPressed: () => _navigateToCreateFolder(context),
         child: const Icon(CupertinoIcons.add),
       ),

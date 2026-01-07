@@ -329,4 +329,69 @@ class AppLocalizationsTr extends AppLocalizations {
   String imageError(String error) {
     return 'Görsel eklenirken hata oluştu: $error';
   }
+
+  @override
+  String get backup => 'Yedekleme';
+
+  @override
+  String get backupAndRestore => 'Yedekleme ve Geri Yükleme';
+
+  @override
+  String get backupAndRestoreDescription =>
+      'Verilerinizi yedekleyin veya geri yükleyin';
+
+  @override
+  String get backupTitle => 'Yedekleme ve Geri Yükleme';
+
+  @override
+  String get backupDescription =>
+      'Tüm notlarınızı, klasörlerinizi ve ayarlarınızı bir ZIP dosyasına yedekleyin veya önceki bir yedekten geri yükleyin.';
+
+  @override
+  String get createBackup => 'Yedek Oluştur';
+
+  @override
+  String get createBackupDescription =>
+      'Tüm verileri ZIP dosyası olarak dışa aktar';
+
+  @override
+  String get restoreBackup => 'Yedeği Geri Yükle';
+
+  @override
+  String get restoreBackupDescription => 'Yedek dosyasından verileri içe aktar';
+
+  @override
+  String get backupNote =>
+      'Yedeğiniz tüm notları, klasörleri ve uygulama ayarlarını içerir. Güvenli bir yerde saklayın.';
+
+  @override
+  String get backupFileSubject => 'Stitch Notes Yedek';
+
+  @override
+  String get backupCreatedSuccess => 'Yedek başarıyla oluşturuldu!';
+
+  @override
+  String backupCreatedError(String error) {
+    return 'Yedekleme hatası: $error';
+  }
+
+  @override
+  String get fileNotSelected => 'Dosya seçilmedi';
+
+  @override
+  String restoreSuccess(int notes, int folders) {
+    return '$notes not ve $folders klasör geri yüklendi';
+  }
+
+  @override
+  String restoreError(String error) {
+    return 'Geri yükleme hatası: $error';
+  }
+
+  @override
+  String get restoreComplete => 'Geri Yükleme Tamamlandı';
+
+  @override
+  String get restartAppMessage =>
+      'Geri yüklenen tüm ayarları görmek için lütfen uygulamayı yeniden başlatın.';
 }

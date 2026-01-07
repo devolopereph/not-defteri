@@ -7,6 +7,7 @@ import '../../../../core/theme/theme_cubit.dart';
 import 'trash_page.dart';
 import 'about_page.dart';
 import 'language_page.dart';
+import 'backup_page.dart';
 
 /// Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
@@ -74,6 +75,26 @@ class SettingsPage extends StatelessWidget {
             context,
             isDark,
             children: [
+              _buildSettingsItem(
+                context,
+                icon: CupertinoIcons.cloud_upload,
+                iconColor: AppColors.primary,
+                title: l10n.backupAndRestore,
+                subtitle: l10n.backupAndRestoreDescription,
+                trailing: const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const BackupPage(),
+                    ),
+                  );
+                },
+              ),
+              _buildDivider(isDark),
               _buildSettingsItem(
                 context,
                 icon: CupertinoIcons.trash,
