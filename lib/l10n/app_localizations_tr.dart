@@ -268,6 +268,19 @@ class AppLocalizationsTr extends AppLocalizations {
   String get graphView => 'Graf Görünümü';
 
   @override
+  String get familyTreeView => 'Soy Ağacı Görünümü';
+
+  @override
+  String get addNoteToUseFamilyTree =>
+      'Not ekleyerek soy ağacı görünümünü kullanın';
+
+  @override
+  String get newest => 'En Yeni';
+
+  @override
+  String get oldest => 'En Eski';
+
+  @override
   String get reset => 'Sıfırla';
 
   @override

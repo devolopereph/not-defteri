@@ -560,6 +560,30 @@ abstract class AppLocalizations {
   /// **'Graph View'**
   String get graphView;
 
+  /// Family tree view page title
+  ///
+  /// In en, this message translates to:
+  /// **'Family Tree View'**
+  String get familyTreeView;
+
+  /// Empty family tree view hint
+  ///
+  /// In en, this message translates to:
+  /// **'Add notes to use family tree view'**
+  String get addNoteToUseFamilyTree;
+
+  /// Newest note label
+  ///
+  /// In en, this message translates to:
+  /// **'Newest'**
+  String get newest;
+
+  /// Oldest note label
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest'**
+  String get oldest;
+
   /// Reset button tooltip
   ///
   /// In en, this message translates to:

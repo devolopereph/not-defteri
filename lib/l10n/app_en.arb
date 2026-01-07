@@ -384,6 +384,22 @@
   "@graphView": {
     "description": "Graph view page title"
   },
+  "familyTreeView": "Family Tree View",
+  "@familyTreeView": {
+    "description": "Family tree view page title"
+  },
+  "addNoteToUseFamilyTree": "Add notes to use family tree view",
+  "@addNoteToUseFamilyTree": {
+    "description": "Empty family tree view hint"
+  },
+  "newest": "Newest",
+  "@newest": {
+    "description": "Newest note label"
+  },
+  "oldest": "Oldest",
+  "@oldest": {
+    "description": "Oldest note label"
+  },
   "reset": "Reset",
   "@reset": {
     "description": "Reset button tooltip"

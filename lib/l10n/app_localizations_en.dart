@@ -267,6 +267,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get graphView => 'Graph View';
 
   @override
+  String get familyTreeView => 'Family Tree View';
+
+  @override
+  String get addNoteToUseFamilyTree => 'Add notes to use family tree view';
+
+  @override
+  String get newest => 'Newest';
+
+  @override
+  String get oldest => 'Oldest';
+
+  @override
   String get reset => 'Reset';
 
   @override
