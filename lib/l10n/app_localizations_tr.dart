@@ -394,4 +394,50 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get restartAppMessage =>
       'Geri yüklenen tüm ayarları görmek için lütfen uygulamayı yeniden başlatın.';
+
+  @override
+  String get tapToSelectEmoji => 'İkon seçmek için dokunun';
+
+  @override
+  String get removeEmoji => 'Emojyi Kaldır';
+
+  @override
+  String get searchEmoji => 'Emoji ara...';
+
+  @override
+  String get onboardingWelcomeTitle => 'Stitch Notes\'a Hoş Geldiniz';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'Notlarınızı düzenli tutmanın en akıllı yolu. Güçlü ve basit bir not alma deneyimi sizi bekliyor.';
+
+  @override
+  String get onboardingOrganizeTitle => 'Düzenle ve Organize Et';
+
+  @override
+  String get onboardingOrganizeBody =>
+      'Klasörler ile notlarınızı kategorilere ayırın. Emoji ikonları ile klasörlerinizi kişiselleştirin.';
+
+  @override
+  String get onboardingRichTextTitle => 'Zengin Metin Desteği';
+
+  @override
+  String get onboardingRichTextBody =>
+      'Kalın, italik ve daha fazlası. Profesyonel görünümlü notlar oluşturun. Fotoğraf ekleyin ve notlarınızı zenginleştirin.';
+
+  @override
+  String get onboardingSecureTitle => 'Güvenli ve Yerel';
+
+  @override
+  String get onboardingSecureBody =>
+      'Tüm verileriniz cihazınızda güvenle saklanır. Yedekleme ve geri yükleme özellikleri ile verilerinizi koruyun.';
+
+  @override
+  String get getStarted => 'Başlayalım';
+
+  @override
+  String get next => 'İleri';
+
+  @override
+  String get skip => 'Geç';
 }

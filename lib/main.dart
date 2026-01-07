@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/locale/locale_cubit.dart';
@@ -15,6 +16,7 @@ import 'features/notes/domain/repositories/folder_repository.dart';
 import 'features/notes/presentation/bloc/notes_bloc.dart';
 import 'features/notes/presentation/bloc/folders_bloc.dart';
 import 'features/notes/presentation/screens/home_screen.dart';
+import 'features/notes/presentation/pages/onboarding_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,7 +40,7 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final SharedPreferences prefs;
   final NoteRepository noteRepository;
   final FolderRepository folderRepository;
@@ -51,26 +53,51 @@ class MyApp extends StatelessWidget {
   });
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late bool _showOnboarding;
+
+  @override
+  void initState() {
+    super.initState();
+    // Onboarding tamamlanmış mı kontrol et
+    _showOnboarding =
+        !(widget.prefs.getBool(AppConstants.onboardingCompletedKey) ?? false);
+  }
+
+  void _completeOnboarding() {
+    widget.prefs.setBool(AppConstants.onboardingCompletedKey, true);
+    setState(() {
+      _showOnboarding = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        RepositoryProvider<NoteRepository>.value(value: noteRepository),
-        RepositoryProvider<FolderRepository>.value(value: folderRepository),
+        RepositoryProvider<NoteRepository>.value(value: widget.noteRepository),
+        RepositoryProvider<FolderRepository>.value(
+          value: widget.folderRepository,
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
           // Tema yönetimi
-          BlocProvider(create: (_) => ThemeCubit(prefs)),
+          BlocProvider(create: (_) => ThemeCubit(widget.prefs)),
           // Dil yönetimi
-          BlocProvider(create: (_) => LocaleCubit(prefs)),
+          BlocProvider(create: (_) => LocaleCubit(widget.prefs)),
           // Not yönetimi
           BlocProvider(
-            create: (_) => NotesBloc(noteRepository)..add(const LoadNotes()),
+            create: (_) =>
+                NotesBloc(widget.noteRepository)..add(const LoadNotes()),
           ),
           // Klasör yönetimi
           BlocProvider(
             create: (_) =>
-                FoldersBloc(folderRepository)..add(const LoadFolders()),
+                FoldersBloc(widget.folderRepository)..add(const LoadFolders()),
           ),
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
@@ -92,7 +119,9 @@ class MyApp extends StatelessWidget {
                     GlobalCupertinoLocalizations.delegate,
                   ],
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home: const HomeScreen(),
+                  home: _showOnboarding
+                      ? OnboardingPage(onCompleted: _completeOnboarding)
+                      : const HomeScreen(),
                 );
               },
             );

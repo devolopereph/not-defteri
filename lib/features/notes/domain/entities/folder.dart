@@ -7,6 +7,8 @@ class Folder extends Equatable {
   final String id;
   final String name;
   final int color; // Renk int olarak saklanır (Flutter Color value)
+  final String?
+  emoji; // Klasör için emoji ikonu (nullable - mevcut kullanıcılar için)
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -14,6 +16,7 @@ class Folder extends Equatable {
     required this.id,
     required this.name,
     required this.color,
+    this.emoji,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -25,6 +28,7 @@ class Folder extends Equatable {
       id: id,
       name: '',
       color: 0xFF6C63FF, // Varsayılan renk (primary)
+      emoji: null,
       createdAt: now,
       updatedAt: now,
     );
@@ -36,6 +40,7 @@ class Folder extends Equatable {
       id: json['id'] as String,
       name: json['name'] as String? ?? '',
       color: json['color'] as int? ?? 0xFF6C63FF,
+      emoji: json['emoji'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
@@ -47,6 +52,7 @@ class Folder extends Equatable {
       'id': id,
       'name': name,
       'color': color,
+      'emoji': emoji,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -58,6 +64,7 @@ class Folder extends Equatable {
       'id': id,
       'name': name,
       'color': color,
+      'emoji': emoji,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
     };
@@ -69,6 +76,7 @@ class Folder extends Equatable {
       id: map['id'] as String,
       name: map['name'] as String? ?? '',
       color: map['color'] as int? ?? 0xFF6C63FF,
+      emoji: map['emoji'] as String?,
       createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: DateTime.parse(map['updatedAt'] as String),
     );
@@ -79,6 +87,8 @@ class Folder extends Equatable {
     String? id,
     String? name,
     int? color,
+    String? emoji,
+    bool clearEmoji = false,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -86,6 +96,7 @@ class Folder extends Equatable {
       id: id ?? this.id,
       name: name ?? this.name,
       color: color ?? this.color,
+      emoji: clearEmoji ? null : (emoji ?? this.emoji),
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -97,6 +108,9 @@ class Folder extends Equatable {
   /// Klasör dolu mu?
   bool get isNotEmpty => !isEmpty;
 
+  /// Emoji var mı?
+  bool get hasEmoji => emoji != null && emoji!.isNotEmpty;
+
   @override
-  List<Object?> get props => [id, name, color, createdAt, updatedAt];
+  List<Object?> get props => [id, name, color, emoji, createdAt, updatedAt];
 }

@@ -112,5 +112,19 @@
   "restoreSuccess": "{notes} not ve {folders} klasör geri yüklendi",
   "restoreError": "Geri yükleme hatası: {error}",
   "restoreComplete": "Geri Yükleme Tamamlandı",
-  "restartAppMessage": "Geri yüklenen tüm ayarları görmek için lütfen uygulamayı yeniden başlatın."
+  "restartAppMessage": "Geri yüklenen tüm ayarları görmek için lütfen uygulamayı yeniden başlatın.",
+  "tapToSelectEmoji": "İkon seçmek için dokunun",
+  "removeEmoji": "Emojyi Kaldır",
+  "searchEmoji": "Emoji ara...",
+  "onboardingWelcomeTitle": "Stitch Notes'a Hoş Geldiniz",
+  "onboardingWelcomeBody": "Notlarınızı düzenli tutmanın en akıllı yolu. Güçlü ve basit bir not alma deneyimi sizi bekliyor.",
+  "onboardingOrganizeTitle": "Düzenle ve Organize Et",
+  "onboardingOrganizeBody": "Klasörler ile notlarınızı kategorilere ayırın. Emoji ikonları ile klasörlerinizi kişiselleştirin.",
+  "onboardingRichTextTitle": "Zengin Metin Desteği",
+  "onboardingRichTextBody": "Kalın, italik ve daha fazlası. Profesyonel görünümlü notlar oluşturun. Fotoğraf ekleyin ve notlarınızı zenginleştirin.",
+  "onboardingSecureTitle": "Güvenli ve Yerel",
+  "onboardingSecureBody": "Tüm verileriniz cihazınızda güvenle saklanır. Yedekleme ve geri yükleme özellikleri ile verilerinizi koruyun.",
+  "getStarted": "Başlayalım",
+  "next": "İleri",
+  "skip": "Geç"
 }

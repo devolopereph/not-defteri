@@ -55,6 +55,7 @@ class FoldersBloc extends Bloc<FoldersEvent, FoldersState> {
         id: _uuid.v4(),
         name: event.name,
         color: event.color,
+        emoji: event.emoji,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );

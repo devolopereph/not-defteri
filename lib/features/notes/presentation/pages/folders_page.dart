@@ -230,10 +230,17 @@ class _FoldersPageState extends State<FoldersPage> {
                           color: Color(folder.color).withAlpha(30),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(
-                          CupertinoIcons.folder_fill,
-                          color: Color(folder.color),
-                        ),
+                        child: folder.hasEmoji
+                            ? Center(
+                                child: Text(
+                                  folder.emoji!,
+                                  style: const TextStyle(fontSize: 22),
+                                ),
+                              )
+                            : Icon(
+                                CupertinoIcons.folder_fill,
+                                color: Color(folder.color),
+                              ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -261,7 +268,7 @@ class _FoldersPageState extends State<FoldersPage> {
                   title: Text(l10n.edit),
                   onTap: () {
                     Navigator.pop(sheetContext);
-                    _showEditFolderDialog(context, folder);
+                    _navigateToEditFolder(context, folder);
                   },
                 ),
 
@@ -298,105 +305,19 @@ class _FoldersPageState extends State<FoldersPage> {
     }
   }
 
-  /// Klasör düzenle dialog
-  void _showEditFolderDialog(BuildContext context, Folder folder) {
-    final l10n = AppLocalizations.of(context)!;
-    final nameController = TextEditingController(text: folder.name);
-    int selectedColor = folder.color;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(l10n.editFolder),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: l10n.folderName,
-                  hintText: l10n.enterFolderName,
-                ),
-                autofocus: true,
-              ),
-              const SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  '${l10n.selectColor}:',
-                  style: const TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _folderColors.map((color) {
-                  final isSelected = selectedColor == color;
-                  return GestureDetector(
-                    onTap: () {
-                      setDialogState(() {
-                        selectedColor = color;
-                      });
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Color(color),
-                        borderRadius: BorderRadius.circular(10),
-                        border: isSelected
-                            ? Border.all(color: Colors.white, width: 3)
-                            : null,
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: Color(color).withAlpha(150),
-                                  blurRadius: 8,
-                                  spreadRadius: 2,
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: isSelected
-                          ? const Icon(
-                              CupertinoIcons.checkmark,
-                              color: Colors.white,
-                              size: 20,
-                            )
-                          : null,
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.trim().isNotEmpty) {
-                  context.read<FoldersBloc>().add(
-                    UpdateFolder(
-                      folder.copyWith(
-                        name: nameController.text.trim(),
-                        color: selectedColor,
-                      ),
-                    ),
-                  );
-                  Navigator.of(dialogContext).pop();
-                }
-              },
-              child: Text(l10n.save),
-            ),
-          ],
-        ),
+  /// Klasör düzenleme sayfasına git
+  void _navigateToEditFolder(BuildContext context, Folder folder) async {
+    final result = await Navigator.of(context).push<bool>(
+      CupertinoPageRoute(
+        builder: (context) => FolderEditorPage(folder: folder),
       ),
     );
+
+    // Eğer klasör güncellendiyse listeyi yenile
+    if (result == true && mounted) {
+      if (!context.mounted) return;
+      context.read<FoldersBloc>().add(const RefreshFolders());
+    }
   }
 
   /// Silme onay dialogu
@@ -429,20 +350,6 @@ class _FoldersPageState extends State<FoldersPage> {
       ),
     );
   }
-
-  // Klasör renkleri
-  static const List<int> _folderColors = [
-    0xFF6C63FF, // Primary
-    0xFFFF6B6B, // Kırmızı
-    0xFF4ECDC4, // Turkuaz
-    0xFFFFE66D, // Sarı
-    0xFF95E1D3, // Yeşil
-    0xFFDDA0DD, // Mor
-    0xFFFF8C42, // Turuncu
-    0xFF6BCB77, // Açık yeşil
-    0xFF4D96FF, // Mavi
-    0xFFFF69B4, // Pembe
-  ];
 }
 
 /// Klasör kartı
@@ -497,11 +404,18 @@ class _FolderCard extends StatelessWidget {
                     color: folderColor.withAlpha(30),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    CupertinoIcons.folder_fill,
-                    color: folderColor,
-                    size: 28,
-                  ),
+                  child: folder.hasEmoji
+                      ? Center(
+                          child: Text(
+                            folder.emoji!,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                        )
+                      : Icon(
+                          CupertinoIcons.folder_fill,
+                          color: folderColor,
+                          size: 28,
+                        ),
                 ),
                 const SizedBox(width: 16),
                 // Klasör bilgileri

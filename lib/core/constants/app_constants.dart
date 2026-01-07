@@ -18,6 +18,7 @@ class AppConstants {
   static const String themeKey = 'theme_mode';
   static const String viewModeKey = 'view_mode';
   static const String pinnedNotesKey = 'pinned_notes';
+  static const String onboardingCompletedKey = 'onboarding_completed';
 
   // Tablo isimleri
   static const String trashTable = 'trash';

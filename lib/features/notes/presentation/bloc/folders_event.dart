@@ -17,11 +17,12 @@ class LoadFolders extends FoldersEvent {
 class AddFolder extends FoldersEvent {
   final String name;
   final int color;
+  final String? emoji;
 
-  const AddFolder(this.name, this.color);
+  const AddFolder(this.name, this.color, {this.emoji});
 
   @override
-  List<Object?> get props => [name, color];
+  List<Object?> get props => [name, color, emoji];
 }
 
 /// Klasör güncelle

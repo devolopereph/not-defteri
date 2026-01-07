@@ -69,7 +69,10 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(CupertinoIcons.folder_fill, color: folderColor, size: 24),
+            if (widget.folder.hasEmoji)
+              Text(widget.folder.emoji!, style: const TextStyle(fontSize: 22))
+            else
+              Icon(CupertinoIcons.folder_fill, color: folderColor, size: 24),
             const SizedBox(width: 8),
             Flexible(
               child: Text(

@@ -391,4 +391,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get restartAppMessage =>
       'Please restart the app to see all restored settings.';
+
+  @override
+  String get tapToSelectEmoji => 'Tap to select icon';
+
+  @override
+  String get removeEmoji => 'Remove Emoji';
+
+  @override
+  String get searchEmoji => 'Search emoji...';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome to Stitch Notes';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'The smartest way to keep your notes organized. A powerful and simple note-taking experience awaits you.';
+
+  @override
+  String get onboardingOrganizeTitle => 'Organize & Categorize';
+
+  @override
+  String get onboardingOrganizeBody =>
+      'Organize your notes into folders. Personalize your folders with emoji icons.';
+
+  @override
+  String get onboardingRichTextTitle => 'Rich Text Support';
+
+  @override
+  String get onboardingRichTextBody =>
+      'Bold, italic, and more. Create professional-looking notes. Add photos and enrich your notes.';
+
+  @override
+  String get onboardingSecureTitle => 'Secure & Local';
+
+  @override
+  String get onboardingSecureBody =>
+      'All your data is securely stored on your device. Protect your data with backup and restore features.';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get skip => 'Skip';
 }

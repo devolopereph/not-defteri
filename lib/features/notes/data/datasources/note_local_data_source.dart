@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 3, // Versiyon 3'e yükseltildi - folders tablosu eklendi
+      version: 4, // Versiyon 4'e yükseltildi - emoji alanı eklendi
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -61,6 +61,7 @@ class DatabaseHelper {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL DEFAULT '',
         color INTEGER NOT NULL DEFAULT 0xFF6C63FF,
+        emoji TEXT,
         createdAt TEXT NOT NULL,
         updatedAt TEXT NOT NULL
       )
@@ -124,6 +125,13 @@ class DatabaseHelper {
       // Klasör için indeks oluştur
       await db.execute('''
         CREATE INDEX idx_notes_folder ON ${AppConstants.notesTable} (folderId)
+      ''');
+    }
+
+    // Versiyon 3'ten 4'e güncelleme: folders tablosuna emoji alanı eklendi
+    if (oldVersion < 4) {
+      await db.execute('''
+        ALTER TABLE ${AppConstants.foldersTable} ADD COLUMN emoji TEXT
       ''');
     }
   }

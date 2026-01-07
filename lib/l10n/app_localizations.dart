@@ -775,6 +775,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please restart the app to see all restored settings.'**
   String get restartAppMessage;
+
+  /// Hint text for emoji selection
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to select icon'**
+  String get tapToSelectEmoji;
+
+  /// Remove emoji button text
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Emoji'**
+  String get removeEmoji;
+
+  /// Emoji search placeholder
+  ///
+  /// In en, this message translates to:
+  /// **'Search emoji...'**
+  String get searchEmoji;
+
+  /// Onboarding welcome screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Stitch Notes'**
+  String get onboardingWelcomeTitle;
+
+  /// Onboarding welcome screen body
+  ///
+  /// In en, this message translates to:
+  /// **'The smartest way to keep your notes organized. A powerful and simple note-taking experience awaits you.'**
+  String get onboardingWelcomeBody;
+
+  /// Onboarding organize screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Organize & Categorize'**
+  String get onboardingOrganizeTitle;
+
+  /// Onboarding organize screen body
+  ///
+  /// In en, this message translates to:
+  /// **'Organize your notes into folders. Personalize your folders with emoji icons.'**
+  String get onboardingOrganizeBody;
+
+  /// Onboarding rich text screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Rich Text Support'**
+  String get onboardingRichTextTitle;
+
+  /// Onboarding rich text screen body
+  ///
+  /// In en, this message translates to:
+  /// **'Bold, italic, and more. Create professional-looking notes. Add photos and enrich your notes.'**
+  String get onboardingRichTextBody;
+
+  /// Onboarding secure screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Secure & Local'**
+  String get onboardingSecureTitle;
+
+  /// Onboarding secure screen body
+  ///
+  /// In en, this message translates to:
+  /// **'All your data is securely stored on your device. Protect your data with backup and restore features.'**
+  String get onboardingSecureBody;
+
+  /// Get started button text
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// Next button text
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// Skip button text
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
 }
 
 class _AppLocalizationsDelegate
