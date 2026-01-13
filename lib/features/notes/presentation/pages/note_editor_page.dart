@@ -603,18 +603,28 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
           : null,
     );
 
-    // Tıklanabilir salt okunur editör
-    return GestureDetector(
-      onTap: _enterEditMode,
-      child: AbsorbPointer(
-        child: AppFlowyEditor(
-          editorState: _editorState,
-          editorScrollController: _scrollController,
-          editorStyle: editorStyle,
-          header: header ?? const SizedBox(height: 8),
-          footer: const SizedBox(height: 100),
+    // Header'ı ayrı tut, böylece fotoğraflara tıklanabilir olsun
+    // Sadece editör içeriğini AbsorbPointer ile sar
+    return Column(
+      children: [
+        // Header - fotoğraflar tıklanabilir
+        if (header != null) header,
+
+        // Editör içeriği - tıklanınca düzenleme moduna geç
+        Expanded(
+          child: GestureDetector(
+            onTap: _enterEditMode,
+            child: AbsorbPointer(
+              child: AppFlowyEditor(
+                editorState: _editorState,
+                editorScrollController: _scrollController,
+                editorStyle: editorStyle,
+                footer: const SizedBox(height: 100),
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -697,6 +707,8 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
             child: GestureDetector(
               // Fotoğraflara her zaman tıklanabilir - galeri açılır
               onTap: () => _openImageGallery(index),
+              behavior: HitTestBehavior
+                  .opaque, // Tıklama olayını yakala, parent'a yayılmasını engelle
               child: Stack(
                 children: [
                   Hero(
