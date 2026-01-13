@@ -16,6 +16,7 @@ class Note extends Equatable {
   final bool isDeleted; // Çöp kutusunda mı?
   final DateTime? deletedAt; // Silinme tarihi
   final String? folderId; // Ait olduğu klasör ID'si (null = klasörsüz)
+  final bool isArchived; // Arşivlenmiş mi?
 
   const Note({
     required this.id,
@@ -28,6 +29,7 @@ class Note extends Equatable {
     this.isDeleted = false,
     this.deletedAt,
     this.folderId,
+    this.isArchived = false,
   });
 
   /// Boş not oluştur
@@ -44,6 +46,7 @@ class Note extends Equatable {
       isDeleted: false,
       deletedAt: null,
       folderId: null,
+      isArchived: false,
     );
   }
 
@@ -62,6 +65,7 @@ class Note extends Equatable {
           ? DateTime.parse(json['deletedAt'] as String)
           : null,
       folderId: json['folderId'] as String?,
+      isArchived: json['isArchived'] == 1 || json['isArchived'] == true,
     );
   }
 
@@ -95,6 +99,7 @@ class Note extends Equatable {
       'isDeleted': isDeleted ? 1 : 0,
       'deletedAt': deletedAt?.toIso8601String(),
       'folderId': folderId,
+      'isArchived': isArchived ? 1 : 0,
     };
   }
 
@@ -111,6 +116,7 @@ class Note extends Equatable {
       'isDeleted': isDeleted ? 1 : 0,
       'deletedAt': deletedAt?.toIso8601String(),
       'folderId': folderId,
+      'isArchived': isArchived ? 1 : 0,
     };
   }
 
@@ -129,6 +135,7 @@ class Note extends Equatable {
           ? DateTime.parse(map['deletedAt'] as String)
           : null,
       folderId: map['folderId'] as String?,
+      isArchived: map['isArchived'] == 1 || map['isArchived'] == true,
     );
   }
 
@@ -144,6 +151,7 @@ class Note extends Equatable {
     bool? isDeleted,
     DateTime? deletedAt,
     String? folderId,
+    bool? isArchived,
   }) {
     return Note(
       id: id ?? this.id,
@@ -156,6 +164,7 @@ class Note extends Equatable {
       isDeleted: isDeleted ?? this.isDeleted,
       deletedAt: deletedAt ?? this.deletedAt,
       folderId: folderId ?? this.folderId,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 
@@ -271,5 +280,6 @@ class Note extends Equatable {
     isDeleted,
     deletedAt,
     folderId,
+    isArchived,
   ];
 }

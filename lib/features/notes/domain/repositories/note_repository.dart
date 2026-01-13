@@ -52,4 +52,13 @@ abstract class NoteRepository {
 
   /// Klasörsüz notları getir
   Future<List<Note>> getNotesWithoutFolder();
+
+  /// Arşivlenmiş notları getir
+  Future<List<Note>> getArchivedNotes();
+
+  /// Notu arşivle
+  Future<void> archiveNote(String id);
+
+  /// Notu arşivden çıkar
+  Future<void> unarchiveNote(String id);
 }

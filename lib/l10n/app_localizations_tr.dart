@@ -453,4 +453,26 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get skip => 'Geç';
+
+  @override
+  String get archivedNotes => 'Arşivlenen Notlar';
+
+  @override
+  String get noArchivedNotes => 'Arşivde not yok';
+
+  @override
+  String get noArchivedNotesDescription =>
+      'Arşivlediğiniz notlar burada görünecek';
+
+  @override
+  String get archive => 'Arşivle';
+
+  @override
+  String get unarchive => 'Arşivden Çıkar';
+
+  @override
+  String get noteArchived => 'Not arşivlendi';
+
+  @override
+  String get noteUnarchived => 'Not arşivden çıkarıldı';
 }

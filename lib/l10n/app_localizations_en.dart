@@ -449,4 +449,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skip => 'Skip';
+
+  @override
+  String get archivedNotes => 'Archived Notes';
+
+  @override
+  String get noArchivedNotes => 'No archived notes';
+
+  @override
+  String get noArchivedNotesDescription => 'Notes you archive will appear here';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get unarchive => 'Unarchive';
+
+  @override
+  String get noteArchived => 'Note archived';
+
+  @override
+  String get noteUnarchived => 'Note unarchived';
 }

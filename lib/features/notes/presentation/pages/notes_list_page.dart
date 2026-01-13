@@ -347,6 +347,25 @@ class _NotesListPageState extends State<NotesListPage> {
                   },
                 ),
 
+                // Arşivle
+                ListTile(
+                  leading: Icon(
+                    CupertinoIcons.archivebox,
+                    color: AppColors.warning,
+                  ),
+                  title: Text(l10n.archive),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    context.read<NotesBloc>().add(ArchiveNote(note.id));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.noteArchived),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                ),
+
                 // Sabitle / Sabitlemeyi Kaldır
                 ListTile(
                   leading: Icon(

@@ -36,6 +36,16 @@ class TrashLoaded extends NotesState {
   List<Object?> get props => [deletedNotes];
 }
 
+/// Arşivlenmiş notlar yüklendi durumu
+class ArchivedNotesLoaded extends NotesState {
+  final List<Note> archivedNotes;
+
+  const ArchivedNotesLoaded(this.archivedNotes);
+
+  @override
+  List<Object?> get props => [archivedNotes];
+}
+
 /// Hata durumu
 class NotesError extends NotesState {
   final String message;

@@ -31,7 +31,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4, // Versiyon 4'e yükseltildi - emoji alanı eklendi
+      version: 5, // Versiyon 5'e yükseltildi - isArchived alanı eklendi
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -51,7 +51,8 @@ class DatabaseHelper {
         isPinned INTEGER NOT NULL DEFAULT 0,
         isDeleted INTEGER NOT NULL DEFAULT 0,
         deletedAt TEXT,
-        folderId TEXT
+        folderId TEXT,
+        isArchived INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -134,6 +135,18 @@ class DatabaseHelper {
         ALTER TABLE ${AppConstants.foldersTable} ADD COLUMN emoji TEXT
       ''');
     }
+
+    // Versiyon 4'ten 5'e güncelleme: notes tablosuna isArchived alanı eklendi
+    if (oldVersion < 5) {
+      await db.execute('''
+        ALTER TABLE ${AppConstants.notesTable} ADD COLUMN isArchived INTEGER NOT NULL DEFAULT 0
+      ''');
+
+      // Arşivlenmiş notlar için indeks
+      await db.execute('''
+        CREATE INDEX idx_notes_archived ON ${AppConstants.notesTable} (isArchived)
+      ''');
+    }
   }
 
   /// Veritabanını kapat
@@ -152,16 +165,50 @@ class NoteLocalDataSource {
 
   NoteLocalDataSource(this._dbHelper);
 
-  /// Tüm aktif notları getir (silinmemiş, güncellenme tarihine göre sıralı, pinlenmiş olanlar önce)
+  /// Tüm aktif notları getir (silinmemiş, arşivlenmemiş, güncellenme tarihine göre sıralı, pinlenmiş olanlar önce)
   Future<List<Note>> getAllNotes() async {
     final db = await _dbHelper.database;
     final maps = await db.query(
       AppConstants.notesTable,
-      where: 'isDeleted = ?',
-      whereArgs: [0],
+      where: 'isDeleted = ? AND isArchived = ?',
+      whereArgs: [0, 0],
       orderBy: 'isPinned DESC, updatedAt DESC',
     );
     return maps.map((map) => Note.fromMap(map)).toList();
+  }
+
+  /// Arşivlenmiş notları getir
+  Future<List<Note>> getArchivedNotes() async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      AppConstants.notesTable,
+      where: 'isArchived = ? AND isDeleted = ?',
+      whereArgs: [1, 0],
+      orderBy: 'updatedAt DESC',
+    );
+    return maps.map((map) => Note.fromMap(map)).toList();
+  }
+
+  /// Notu arşivle
+  Future<void> archiveNote(String id) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'isArchived': 1},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Notu arşivden çıkar
+  Future<void> unarchiveNote(String id) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'isArchived': 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   /// Silinen notları getir (çöp kutusu)

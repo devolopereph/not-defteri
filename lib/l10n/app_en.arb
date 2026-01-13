@@ -639,5 +639,33 @@
   "skip": "Skip",
   "@skip": {
     "description": "Skip button text"
+  },
+  "archivedNotes": "Archived Notes",
+  "@archivedNotes": {
+    "description": "Archived notes page title"
+  },
+  "noArchivedNotes": "No archived notes",
+  "@noArchivedNotes": {
+    "description": "Empty archived notes message"
+  },
+  "noArchivedNotesDescription": "Notes you archive will appear here",
+  "@noArchivedNotesDescription": {
+    "description": "Empty archived notes hint"
+  },
+  "archive": "Archive",
+  "@archive": {
+    "description": "Archive action"
+  },
+  "unarchive": "Unarchive",
+  "@unarchive": {
+    "description": "Unarchive action"
+  },
+  "noteArchived": "Note archived",
+  "@noteArchived": {
+    "description": "Note archived snackbar message"
+  },
+  "noteUnarchived": "Note unarchived",
+  "@noteUnarchived": {
+    "description": "Note unarchived snackbar message"
   }
 }

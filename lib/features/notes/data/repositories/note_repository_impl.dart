@@ -154,4 +154,31 @@ class NoteRepositoryImpl implements NoteRepository {
       throw Exception('Klasörsüz notlar yüklenirken hata oluştu: $e');
     }
   }
+
+  @override
+  Future<List<Note>> getArchivedNotes() async {
+    try {
+      return await _localDataSource.getArchivedNotes();
+    } catch (e) {
+      throw Exception('Arşivlenmiş notlar yüklenirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> archiveNote(String id) async {
+    try {
+      await _localDataSource.archiveNote(id);
+    } catch (e) {
+      throw Exception('Not arşivlenirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> unarchiveNote(String id) async {
+    try {
+      await _localDataSource.unarchiveNote(id);
+    } catch (e) {
+      throw Exception('Not arşivden çıkarılırken hata oluştu: $e');
+    }
+  }
 }

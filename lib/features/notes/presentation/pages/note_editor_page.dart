@@ -16,6 +16,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/note.dart';
 import '../bloc/notes_bloc.dart';
+import '../widgets/image_gallery_viewer.dart';
 
 /// Not detay ve düzenleme sayfası
 ///
@@ -693,61 +694,73 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
           final imagePath = _images[index];
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.file(
-                    File(imagePath),
-                    width: 84,
-                    height: 84,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
+            child: GestureDetector(
+              // Fotoğraflara her zaman tıklanabilir - galeri açılır
+              onTap: () => _openImageGallery(index),
+              child: Stack(
+                children: [
+                  Hero(
+                    tag: 'image_$imagePath',
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        File(imagePath),
                         width: 84,
                         height: 84,
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.darkSurface
-                              : AppColors.lightSurface,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.photo,
-                          color: AppColors.lightTextSecondary,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // Silme butonu sadece düzenleme modunda göster
-                if (_isEditing)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: GestureDetector(
-                      onTap: () => _removeImage(index),
-                      child: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: const BoxDecoration(
-                          color: Colors.black54,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.xmark,
-                          size: 14,
-                          color: Colors.white,
-                        ),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 84,
+                            height: 84,
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.darkSurface
+                                  : AppColors.lightSurface,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              CupertinoIcons.photo,
+                              color: AppColors.lightTextSecondary,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
-              ],
+                  // Silme butonu sadece düzenleme modunda göster
+                  if (_isEditing)
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: GestureDetector(
+                        onTap: () => _removeImage(index),
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            CupertinoIcons.xmark,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           );
         },
       ),
     );
+  }
+
+  /// Tam ekran fotoğraf galerisini aç
+  void _openImageGallery(int initialIndex) {
+    ImageGalleryViewer.show(context, _images, initialIndex: initialIndex);
   }
 
   /// Masaüstü için floating toolbar'lı editör

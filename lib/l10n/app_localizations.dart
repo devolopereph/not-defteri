@@ -883,6 +883,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get skip;
+
+  /// Archived notes page title
+  ///
+  /// In en, this message translates to:
+  /// **'Archived Notes'**
+  String get archivedNotes;
+
+  /// Empty archived notes message
+  ///
+  /// In en, this message translates to:
+  /// **'No archived notes'**
+  String get noArchivedNotes;
+
+  /// Empty archived notes hint
+  ///
+  /// In en, this message translates to:
+  /// **'Notes you archive will appear here'**
+  String get noArchivedNotesDescription;
+
+  /// Archive action
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archive;
+
+  /// Unarchive action
+  ///
+  /// In en, this message translates to:
+  /// **'Unarchive'**
+  String get unarchive;
+
+  /// Note archived snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'Note archived'**
+  String get noteArchived;
+
+  /// Note unarchived snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'Note unarchived'**
+  String get noteUnarchived;
 }
 
 class _AppLocalizationsDelegate

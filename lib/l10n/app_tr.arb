@@ -130,5 +130,12 @@
   "onboardingSecureBody": "Tüm verileriniz cihazınızda güvenle saklanır. Yedekleme ve geri yükleme özellikleri ile verilerinizi koruyun.",
   "getStarted": "Başlayalım",
   "next": "İleri",
-  "skip": "Geç"
+  "skip": "Geç",
+  "archivedNotes": "Arşivlenen Notlar",
+  "noArchivedNotes": "Arşivde not yok",
+  "noArchivedNotesDescription": "Arşivlediğiniz notlar burada görünecek",
+  "archive": "Arşivle",
+  "unarchive": "Arşivden Çıkar",
+  "noteArchived": "Not arşivlendi",
+  "noteUnarchived": "Not arşivden çıkarıldı"
 }

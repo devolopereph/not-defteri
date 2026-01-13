@@ -37,6 +37,9 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<SearchNotes>(_onSearchNotes);
     on<RefreshNotes>(_onRefreshNotes);
     on<UpdateNoteFolder>(_onUpdateNoteFolder);
+    on<LoadArchivedNotes>(_onLoadArchivedNotes);
+    on<ArchiveNote>(_onArchiveNote);
+    on<UnarchiveNote>(_onUnarchiveNote);
   }
 
   /// Notları yükle
@@ -303,6 +306,62 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
               : n;
         }).toList();
         emit(NotesLoaded(updatedNotes));
+      }
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Arşivlenmiş notları yükle
+  Future<void> _onLoadArchivedNotes(
+    LoadArchivedNotes event,
+    Emitter<NotesState> emit,
+  ) async {
+    emit(NotesLoading());
+    try {
+      final notes = await _repository.getArchivedNotes();
+      emit(ArchivedNotesLoaded(notes));
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Notu arşivle
+  Future<void> _onArchiveNote(
+    ArchiveNote event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await _repository.archiveNote(event.id);
+
+      // Mevcut listeyi güncelle
+      if (state is NotesLoaded) {
+        final currentNotes = (state as NotesLoaded).notes;
+        final updatedNotes = currentNotes
+            .where((n) => n.id != event.id)
+            .toList();
+        emit(NotesLoaded(updatedNotes));
+      }
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Notu arşivden çıkar
+  Future<void> _onUnarchiveNote(
+    UnarchiveNote event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await _repository.unarchiveNote(event.id);
+
+      // Arşiv listesini güncelle
+      if (state is ArchivedNotesLoaded) {
+        final currentNotes = (state as ArchivedNotesLoaded).archivedNotes;
+        final updatedNotes = currentNotes
+            .where((n) => n.id != event.id)
+            .toList();
+        emit(ArchivedNotesLoaded(updatedNotes));
       }
     } catch (e) {
       emit(NotesError(e.toString()));

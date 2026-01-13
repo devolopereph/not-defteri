@@ -12,6 +12,7 @@ import '../../features/notes/domain/entities/folder.dart';
 class BackupData {
   final List<Note> notes;
   final List<Note> trashedNotes;
+  final List<Note> archivedNotes;
   final List<Folder> folders;
   final Map<String, dynamic> settings;
   final String backupDate;
@@ -20,6 +21,7 @@ class BackupData {
   BackupData({
     required this.notes,
     required this.trashedNotes,
+    required this.archivedNotes,
     required this.folders,
     required this.settings,
     required this.backupDate,
@@ -30,6 +32,7 @@ class BackupData {
     return {
       'notes': notes.map((n) => n.toJson()).toList(),
       'trashedNotes': trashedNotes.map((n) => n.toJson()).toList(),
+      'archivedNotes': archivedNotes.map((n) => n.toJson()).toList(),
       'folders': folders.map((f) => f.toJson()).toList(),
       'settings': settings,
       'backupDate': backupDate,
@@ -46,6 +49,11 @@ class BackupData {
           [],
       trashedNotes:
           (json['trashedNotes'] as List?)
+              ?.map((n) => Note.fromJson(n as Map<String, dynamic>))
+              .toList() ??
+          [],
+      archivedNotes:
+          (json['archivedNotes'] as List?)
               ?.map((n) => Note.fromJson(n as Map<String, dynamic>))
               .toList() ??
           [],
@@ -146,6 +154,9 @@ class BackupService {
     // Çöp kutusundaki notları al
     final trashedNotes = await _noteDataSource.getDeletedNotes();
 
+    // Arşivlenmiş notları al
+    final archivedNotes = await _noteDataSource.getArchivedNotes();
+
     // Tüm klasörleri al
     final folders = await _folderDataSource.getAllFolders();
 
@@ -156,6 +167,7 @@ class BackupService {
     final backupData = BackupData(
       notes: notes,
       trashedNotes: trashedNotes,
+      archivedNotes: archivedNotes,
       folders: folders,
       settings: settings,
       backupDate: DateTime.now().toIso8601String(),
@@ -251,6 +263,17 @@ class BackupService {
 
       // Çöp kutusundaki notları geri yükle
       for (final note in backupData.trashedNotes) {
+        final existingNote = await _noteDataSource.getNoteById(note.id);
+        if (existingNote == null) {
+          await _noteDataSource.insertNote(note);
+          notesRestored++;
+        } else {
+          await _noteDataSource.updateNote(note);
+        }
+      }
+
+      // Arşivlenmiş notları geri yükle
+      for (final note in backupData.archivedNotes) {
         final existingNote = await _noteDataSource.getNoteById(note.id);
         if (existingNote == null) {
           await _noteDataSource.insertNote(note);

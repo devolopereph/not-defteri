@@ -124,3 +124,28 @@ class UpdateNoteFolder extends NotesEvent {
   @override
   List<Object?> get props => [noteId, folderId];
 }
+
+/// Arşivlenmiş notları yükle
+class LoadArchivedNotes extends NotesEvent {
+  const LoadArchivedNotes();
+}
+
+/// Notu arşivle
+class ArchiveNote extends NotesEvent {
+  final String id;
+
+  const ArchiveNote(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+/// Notu arşivden çıkar
+class UnarchiveNote extends NotesEvent {
+  final String id;
+
+  const UnarchiveNote(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}

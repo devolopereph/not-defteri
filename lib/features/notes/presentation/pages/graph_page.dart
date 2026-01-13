@@ -48,18 +48,7 @@ class _GraphPageState extends State<GraphPage>
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.familyTreeView),
-        actions: [
-          IconButton(
-            icon: const Icon(CupertinoIcons.arrow_counterclockwise),
-            tooltip: l10n.reset,
-            onPressed: () {
-              _transformationController.value = Matrix4.identity();
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text(l10n.familyTreeView)),
       body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
           if (state is NotesLoading) {

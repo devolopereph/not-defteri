@@ -8,6 +8,7 @@ import 'trash_page.dart';
 import 'about_page.dart';
 import 'language_page.dart';
 import 'backup_page.dart';
+import 'archived_notes_page.dart';
 
 /// Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
@@ -75,6 +76,26 @@ class SettingsPage extends StatelessWidget {
             context,
             isDark,
             children: [
+              _buildSettingsItem(
+                context,
+                icon: CupertinoIcons.archivebox,
+                iconColor: AppColors.warning,
+                title: l10n.archivedNotes,
+                subtitle: l10n.noArchivedNotesDescription,
+                trailing: const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const ArchivedNotesPage(),
+                    ),
+                  );
+                },
+              ),
+              _buildDivider(isDark),
               _buildSettingsItem(
                 context,
                 icon: CupertinoIcons.cloud_upload,
