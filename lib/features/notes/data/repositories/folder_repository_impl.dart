@@ -21,6 +21,15 @@ class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
+  Future<List<Folder>> getDeletedFolders() async {
+    try {
+      return await _localDataSource.getDeletedFolders();
+    } catch (e) {
+      throw Exception('Silinmiş klasörler yüklenirken hata oluştu: $e');
+    }
+  }
+
+  @override
   Future<Folder?> getFolderById(String id) async {
     try {
       return await _localDataSource.getFolderById(id);
@@ -48,11 +57,38 @@ class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
+  Future<void> moveFolderToTrash(String id) async {
+    try {
+      await _localDataSource.moveFolderToTrash(id);
+    } catch (e) {
+      throw Exception('Klasör çöp kutusuna taşınırken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> restoreFolderFromTrash(String id) async {
+    try {
+      await _localDataSource.restoreFolderFromTrash(id);
+    } catch (e) {
+      throw Exception('Klasör geri getirilirken hata oluştu: $e');
+    }
+  }
+
+  @override
   Future<void> deleteFolder(String id) async {
     try {
       await _localDataSource.deleteFolder(id);
     } catch (e) {
       throw Exception('Klasör silinirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<void> emptyFolderTrash() async {
+    try {
+      await _localDataSource.emptyFolderTrash();
+    } catch (e) {
+      throw Exception('Klasör çöp kutusu boşaltılırken hata oluştu: $e');
     }
   }
 

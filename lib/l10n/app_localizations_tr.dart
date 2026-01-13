@@ -475,4 +475,127 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get noteUnarchived => 'Not arşivden çıkarıldı';
+
+  @override
+  String get security => 'Güvenlik';
+
+  @override
+  String get securityDescription => 'Uygulama kilidi ayarları';
+
+  @override
+  String get securityInfo => 'Uygulama Güvenliği';
+
+  @override
+  String get securityInfoDescription =>
+      'Uygulamanızı bir PIN kodu ile koruyun. Uygulama her açıldığında PIN kodunu girmeniz gerekecek.';
+
+  @override
+  String get pinSettings => 'Şifre Ayarları';
+
+  @override
+  String get pinLock => 'Şifre Kilidi';
+
+  @override
+  String get pinLockDescription => 'Uygulamayı açarken şifre iste';
+
+  @override
+  String get createPin => 'Şifre Oluştur';
+
+  @override
+  String get createPinDescription => 'Yeni bir 4 haneli şifre oluşturun';
+
+  @override
+  String get changePin => 'Şifreyi Değiştir';
+
+  @override
+  String get changePinDescription => 'Mevcut şifrenizi değiştirin';
+
+  @override
+  String get removePin => 'Şifreyi Kaldır';
+
+  @override
+  String get removePinDescription => 'Şifre korumasını kaldırın';
+
+  @override
+  String get enterPin => 'Şifrenizi Girin';
+
+  @override
+  String get enterPinDescription =>
+      'Uygulamaya erişmek için 4 haneli şifrenizi girin';
+
+  @override
+  String get enterNewPin => 'Yeni 4 haneli şifrenizi girin';
+
+  @override
+  String get enterCurrentPin => 'Mevcut şifrenizi girin';
+
+  @override
+  String get confirmPin => 'Şifreyi Onayla';
+
+  @override
+  String get reenterPin => 'Şifrenizi tekrar girin';
+
+  @override
+  String get newPin => 'Yeni Şifre';
+
+  @override
+  String get wrongPin => 'Yanlış şifre';
+
+  @override
+  String get pinCreated => 'Şifre başarıyla oluşturuldu';
+
+  @override
+  String get pinChanged => 'Şifre başarıyla değiştirildi';
+
+  @override
+  String get pinRemoved => 'Şifre kaldırıldı';
+
+  @override
+  String get pinMismatch => 'Şifreler eşleşmiyor';
+
+  @override
+  String get deleteFolderToTrash => 'Klasörü çöp kutusuna taşı';
+
+  @override
+  String deleteFolderToTrashConfirm(String name) {
+    return '\"$name\" klasörünü çöp kutusuna taşımak istediğinize emin misiniz?\n\nKlasördeki notlar klasörsüz olarak kalacak.';
+  }
+
+  @override
+  String get deleteFolderToTrashConfirmUntitled =>
+      'Bu klasörü çöp kutusuna taşımak istediğinize emin misiniz?\n\nKlasördeki notlar klasörsüz olarak kalacak.';
+
+  @override
+  String get folderRestored => 'Klasör geri getirildi';
+
+  @override
+  String get deleteFolderPermanently => 'Klasörü Kalıcı Olarak Sil';
+
+  @override
+  String deleteFolderPermanentlyConfirm(String name) {
+    return '\"$name\" klasörünü kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.';
+  }
+
+  @override
+  String get deleteFolderPermanentlyConfirmUntitled =>
+      'Bu klasörü kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.';
+
+  @override
+  String get viewDeletedItems => 'Silinen öğeleri görüntüle';
+
+  @override
+  String get notesTab => 'Notlar';
+
+  @override
+  String get foldersTab => 'Klasörler';
+
+  @override
+  String get noDeletedFolders => 'Silinen klasör yok';
+
+  @override
+  String get deletedFoldersAppear => 'Silinen klasörler burada görünecek';
+
+  @override
+  String get emptyTrashFolders =>
+      'Çöp kutusundaki tüm klasörleri kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.';
 }

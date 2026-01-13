@@ -31,7 +31,8 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5, // Versiyon 5'e yükseltildi - isArchived alanı eklendi
+      version:
+          6, // Versiyon 6'ya yükseltildi - folders tablosuna isDeleted ve deletedAt eklendi
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -64,7 +65,9 @@ class DatabaseHelper {
         color INTEGER NOT NULL DEFAULT 0xFF6C63FF,
         emoji TEXT,
         createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
+        updatedAt TEXT NOT NULL,
+        isDeleted INTEGER NOT NULL DEFAULT 0,
+        deletedAt TEXT
       )
     ''');
 
@@ -145,6 +148,21 @@ class DatabaseHelper {
       // Arşivlenmiş notlar için indeks
       await db.execute('''
         CREATE INDEX idx_notes_archived ON ${AppConstants.notesTable} (isArchived)
+      ''');
+    }
+
+    // Versiyon 5'ten 6'ya güncelleme: folders tablosuna isDeleted ve deletedAt alanları eklendi
+    if (oldVersion < 6) {
+      await db.execute('''
+        ALTER TABLE ${AppConstants.foldersTable} ADD COLUMN isDeleted INTEGER NOT NULL DEFAULT 0
+      ''');
+      await db.execute('''
+        ALTER TABLE ${AppConstants.foldersTable} ADD COLUMN deletedAt TEXT
+      ''');
+
+      // Silinmiş klasörler için indeks
+      await db.execute('''
+        CREATE INDEX idx_folders_deleted ON ${AppConstants.foldersTable} (isDeleted, deletedAt DESC)
       ''');
     }
   }

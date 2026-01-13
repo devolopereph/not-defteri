@@ -320,7 +320,7 @@ class _FoldersPageState extends State<FoldersPage> {
     }
   }
 
-  /// Silme onay dialogu
+  /// Silme onay dialogu (çöp kutusuna taşı)
   void _showDeleteConfirmDialog(BuildContext context, Folder folder) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -330,8 +330,8 @@ class _FoldersPageState extends State<FoldersPage> {
         title: Text(l10n.deleteFolder),
         content: Text(
           folder.name.isNotEmpty
-              ? l10n.deleteFolderConfirm(folder.name)
-              : l10n.deleteFolderConfirmUntitled,
+              ? l10n.deleteFolderToTrashConfirm(folder.name)
+              : l10n.deleteFolderToTrashConfirmUntitled,
         ),
         actions: [
           CupertinoDialogAction(
@@ -342,7 +342,7 @@ class _FoldersPageState extends State<FoldersPage> {
             isDestructiveAction: true,
             child: Text(l10n.delete),
             onPressed: () {
-              context.read<FoldersBloc>().add(DeleteFolder(folder.id));
+              context.read<FoldersBloc>().add(MoveFolderToTrash(folder.id));
               Navigator.of(dialogContext).pop();
             },
           ),

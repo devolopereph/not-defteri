@@ -667,5 +667,169 @@
   "noteUnarchived": "Note unarchived",
   "@noteUnarchived": {
     "description": "Note unarchived snackbar message"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security settings title"
+  },
+  "securityDescription": "App lock settings",
+  "@securityDescription": {
+    "description": "Security settings subtitle"
+  },
+  "securityInfo": "App Security",
+  "@securityInfo": {
+    "description": "Security info card title"
+  },
+  "securityInfoDescription": "Protect your app with a PIN code. You will need to enter the PIN code every time you open the app.",
+  "@securityInfoDescription": {
+    "description": "Security info card description"
+  },
+  "pinSettings": "PIN Settings",
+  "@pinSettings": {
+    "description": "PIN settings section title"
+  },
+  "pinLock": "PIN Lock",
+  "@pinLock": {
+    "description": "PIN lock toggle title"
+  },
+  "pinLockDescription": "Require PIN to open app",
+  "@pinLockDescription": {
+    "description": "PIN lock toggle subtitle"
+  },
+  "createPin": "Create PIN",
+  "@createPin": {
+    "description": "Create PIN button title"
+  },
+  "createPinDescription": "Create a new 4-digit PIN",
+  "@createPinDescription": {
+    "description": "Create PIN button subtitle"
+  },
+  "changePin": "Change PIN",
+  "@changePin": {
+    "description": "Change PIN button title"
+  },
+  "changePinDescription": "Change your current PIN",
+  "@changePinDescription": {
+    "description": "Change PIN button subtitle"
+  },
+  "removePin": "Remove PIN",
+  "@removePin": {
+    "description": "Remove PIN button title"
+  },
+  "removePinDescription": "Remove PIN protection",
+  "@removePinDescription": {
+    "description": "Remove PIN button subtitle"
+  },
+  "enterPin": "Enter Your PIN",
+  "@enterPin": {
+    "description": "Lock screen title"
+  },
+  "enterPinDescription": "Enter your 4-digit PIN to access the app",
+  "@enterPinDescription": {
+    "description": "Lock screen subtitle"
+  },
+  "enterNewPin": "Enter your new 4-digit PIN",
+  "@enterNewPin": {
+    "description": "New PIN input hint"
+  },
+  "enterCurrentPin": "Enter your current PIN",
+  "@enterCurrentPin": {
+    "description": "Current PIN input hint"
+  },
+  "confirmPin": "Confirm PIN",
+  "@confirmPin": {
+    "description": "Confirm PIN dialog title"
+  },
+  "reenterPin": "Re-enter your PIN",
+  "@reenterPin": {
+    "description": "Confirm PIN dialog subtitle"
+  },
+  "newPin": "New PIN",
+  "@newPin": {
+    "description": "New PIN dialog title"
+  },
+  "wrongPin": "Wrong PIN",
+  "@wrongPin": {
+    "description": "Wrong PIN error message"
+  },
+  "pinCreated": "PIN created successfully",
+  "@pinCreated": {
+    "description": "PIN created success message"
+  },
+  "pinChanged": "PIN changed successfully",
+  "@pinChanged": {
+    "description": "PIN changed success message"
+  },
+  "pinRemoved": "PIN removed",
+  "@pinRemoved": {
+    "description": "PIN removed success message"
+  },
+  "pinMismatch": "PINs do not match",
+  "@pinMismatch": {
+    "description": "PIN mismatch error message"
+  },
+  "deleteFolderToTrash": "Move folder to trash",
+  "@deleteFolderToTrash": {
+    "description": "Move folder to trash action"
+  },
+  "deleteFolderToTrashConfirm": "Are you sure you want to move \"{name}\" to trash?\n\nNotes in the folder will remain without a folder.",
+  "@deleteFolderToTrashConfirm": {
+    "description": "Move folder to trash confirmation message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "My Folder"
+      }
+    }
+  },
+  "deleteFolderToTrashConfirmUntitled": "Are you sure you want to move this folder to trash?\n\nNotes in the folder will remain without a folder.",
+  "@deleteFolderToTrashConfirmUntitled": {
+    "description": "Move untitled folder to trash confirmation message"
+  },
+  "folderRestored": "Folder restored",
+  "@folderRestored": {
+    "description": "Folder restored snackbar message"
+  },
+  "deleteFolderPermanently": "Delete Folder Permanently",
+  "@deleteFolderPermanently": {
+    "description": "Delete folder permanently action"
+  },
+  "deleteFolderPermanentlyConfirm": "Are you sure you want to permanently delete \"{name}\"?\n\nThis action cannot be undone.",
+  "@deleteFolderPermanentlyConfirm": {
+    "description": "Delete folder permanently confirmation message",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "My Folder"
+      }
+    }
+  },
+  "deleteFolderPermanentlyConfirmUntitled": "Are you sure you want to permanently delete this folder?\n\nThis action cannot be undone.",
+  "@deleteFolderPermanentlyConfirmUntitled": {
+    "description": "Delete untitled folder permanently confirmation message"
+  },
+  "viewDeletedItems": "View deleted items",
+  "@viewDeletedItems": {
+    "description": "Trash setting subtitle with folders"
+  },
+  "notesTab": "Notes",
+  "@notesTab": {
+    "description": "Notes tab in trash page"
+  },
+  "foldersTab": "Folders",
+  "@foldersTab": {
+    "description": "Folders tab in trash page"
+  },
+  "noDeletedFolders": "No deleted folders",
+  "@noDeletedFolders": {
+    "description": "Empty deleted folders message"
+  },
+  "deletedFoldersAppear": "Deleted folders will appear here",
+  "@deletedFoldersAppear": {
+    "description": "Empty deleted folders hint"
+  },
+  "emptyTrashFolders": "Are you sure you want to permanently delete all folders in the trash?\n\nThis action cannot be undone.",
+  "@emptyTrashFolders": {
+    "description": "Empty trash folders confirmation message"
   }
 }

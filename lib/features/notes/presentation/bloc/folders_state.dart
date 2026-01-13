@@ -26,6 +26,16 @@ class FoldersLoaded extends FoldersState {
   List<Object?> get props => [folders, folderNoteCounts, searchQuery];
 }
 
+/// Silinmiş klasörler yüklendi (çöp kutusu)
+class FolderTrashLoaded extends FoldersState {
+  final List<Folder> deletedFolders;
+
+  const FolderTrashLoaded(this.deletedFolders);
+
+  @override
+  List<Object?> get props => [deletedFolders];
+}
+
 /// Hata durumu
 class FoldersError extends FoldersState {
   final String message;

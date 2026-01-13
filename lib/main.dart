@@ -7,6 +7,7 @@ import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/locale/locale_cubit.dart';
+import 'core/security/security_cubit.dart';
 import 'features/notes/data/datasources/note_local_data_source.dart';
 import 'features/notes/data/datasources/folder_local_data_source.dart';
 import 'features/notes/data/repositories/note_repository_impl.dart';
@@ -17,6 +18,7 @@ import 'features/notes/presentation/bloc/notes_bloc.dart';
 import 'features/notes/presentation/bloc/folders_bloc.dart';
 import 'features/notes/presentation/screens/home_screen.dart';
 import 'features/notes/presentation/pages/onboarding_page.dart';
+import 'features/notes/presentation/pages/lock_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,6 +60,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late bool _showOnboarding;
+  bool _isUnlocked = false;
 
   @override
   void initState() {
@@ -65,12 +68,24 @@ class _MyAppState extends State<MyApp> {
     // Onboarding tamamlanmış mı kontrol et
     _showOnboarding =
         !(widget.prefs.getBool(AppConstants.onboardingCompletedKey) ?? false);
+
+    // Şifre kontrolü - şifre yoksa veya kapalıysa unlocked olarak başla
+    final securityEnabled =
+        widget.prefs.getBool(AppConstants.securityEnabledKey) ?? false;
+    final hasPin = widget.prefs.getString(AppConstants.securityPinKey) != null;
+    _isUnlocked = !securityEnabled || !hasPin;
   }
 
   void _completeOnboarding() {
     widget.prefs.setBool(AppConstants.onboardingCompletedKey, true);
     setState(() {
       _showOnboarding = false;
+    });
+  }
+
+  void _unlock() {
+    setState(() {
+      _isUnlocked = true;
     });
   }
 
@@ -89,6 +104,8 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (_) => ThemeCubit(widget.prefs)),
           // Dil yönetimi
           BlocProvider(create: (_) => LocaleCubit(widget.prefs)),
+          // Güvenlik yönetimi
+          BlocProvider(create: (_) => SecurityCubit(widget.prefs)),
           // Not yönetimi
           BlocProvider(
             create: (_) =>
@@ -119,9 +136,7 @@ class _MyAppState extends State<MyApp> {
                     GlobalCupertinoLocalizations.delegate,
                   ],
                   supportedLocales: AppLocalizations.supportedLocales,
-                  home: _showOnboarding
-                      ? OnboardingPage(onCompleted: _completeOnboarding)
-                      : const HomeScreen(),
+                  home: _getHomeWidget(),
                 );
               },
             );
@@ -129,5 +144,17 @@ class _MyAppState extends State<MyApp> {
         ),
       ),
     );
+  }
+
+  Widget _getHomeWidget() {
+    if (_showOnboarding) {
+      return OnboardingPage(onCompleted: _completeOnboarding);
+    }
+
+    if (!_isUnlocked) {
+      return LockScreen(onUnlocked: _unlock);
+    }
+
+    return const HomeScreen();
   }
 }

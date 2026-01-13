@@ -9,6 +9,7 @@ import 'about_page.dart';
 import 'language_page.dart';
 import 'backup_page.dart';
 import 'archived_notes_page.dart';
+import 'security_page.dart';
 
 /// Ayarlar sayfası
 class SettingsPage extends StatelessWidget {
@@ -145,6 +146,26 @@ class SettingsPage extends StatelessWidget {
             context,
             isDark,
             children: [
+              _buildSettingsItem(
+                context,
+                icon: CupertinoIcons.lock_shield_fill,
+                iconColor: AppColors.success,
+                title: l10n.security,
+                subtitle: l10n.securityDescription,
+                trailing: const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    CupertinoPageRoute(
+                      builder: (context) => const SecurityPage(),
+                    ),
+                  );
+                },
+              ),
+              _buildDivider(isDark),
               _buildSettingsItem(
                 context,
                 icon: CupertinoIcons.info_circle_fill,

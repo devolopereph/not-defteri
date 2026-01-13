@@ -5,8 +5,11 @@ import '../entities/folder.dart';
 /// Data layer'dan bağımsız soyut tanım.
 /// CRUD işlemlerini tanımlar.
 abstract class FolderRepository {
-  /// Tüm klasörleri getir
+  /// Tüm aktif klasörleri getir
   Future<List<Folder>> getAllFolders();
+
+  /// Silinmiş klasörleri getir (çöp kutusu)
+  Future<List<Folder>> getDeletedFolders();
 
   /// ID'ye göre klasör getir
   Future<Folder?> getFolderById(String id);
@@ -17,8 +20,17 @@ abstract class FolderRepository {
   /// Klasör güncelle
   Future<void> updateFolder(Folder folder);
 
-  /// Klasör sil (içindeki notların folderId'si null yapılır)
+  /// Klasörü çöp kutusuna taşı
+  Future<void> moveFolderToTrash(String id);
+
+  /// Klasörü çöp kutusundan geri getir
+  Future<void> restoreFolderFromTrash(String id);
+
+  /// Klasörü kalıcı olarak sil
   Future<void> deleteFolder(String id);
+
+  /// Çöp kutusundaki tüm klasörleri kalıcı olarak sil
+  Future<void> emptyFolderTrash();
 
   /// Klasör ara
   Future<List<Folder>> searchFolders(String query);

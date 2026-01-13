@@ -5,10 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/note.dart';
+import '../../domain/entities/folder.dart';
 import '../bloc/notes_bloc.dart';
+import '../bloc/folders_bloc.dart';
 import '../widgets/empty_state.dart';
 
-/// Çöp kutusu sayfası
+/// Çöp kutusu sayfası (Notlar ve Klasörler sekmeleri)
 class TrashPage extends StatefulWidget {
   const TrashPage({super.key});
 
@@ -16,12 +18,23 @@ class TrashPage extends StatefulWidget {
   State<TrashPage> createState() => _TrashPageState();
 }
 
-class _TrashPageState extends State<TrashPage> {
+class _TrashPageState extends State<TrashPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
-    // Silinen notları yükle
+    _tabController = TabController(length: 2, vsync: this);
+    // Silinen notları ve klasörleri yükle
     context.read<NotesBloc>().add(const LoadDeletedNotes());
+    context.read<FoldersBloc>().add(const LoadDeletedFolders());
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -32,8 +45,9 @@ class _TrashPageState extends State<TrashPage> {
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
-          // Çöp kutusundan çıkarken notları yeniden yükle
+          // Çöp kutusundan çıkarken notları ve klasörleri yeniden yükle
           context.read<NotesBloc>().add(const LoadNotes());
+          context.read<FoldersBloc>().add(const LoadFolders());
         }
       },
       child: Scaffold(
@@ -43,87 +57,226 @@ class _TrashPageState extends State<TrashPage> {
             icon: const Icon(CupertinoIcons.back),
             onPressed: () {
               context.read<NotesBloc>().add(const LoadNotes());
+              context.read<FoldersBloc>().add(const LoadFolders());
               Navigator.of(context).pop();
             },
           ),
+          bottom: TabBar(
+            controller: _tabController,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: isDark
+                ? AppColors.darkTextSecondary
+                : AppColors.lightTextSecondary,
+            indicatorColor: AppColors.primary,
+            tabs: [
+              Tab(text: l10n.notesTab),
+              Tab(text: l10n.foldersTab),
+            ],
+          ),
           actions: [
-            BlocBuilder<NotesBloc, NotesState>(
-              builder: (context, state) {
-                if (state is TrashLoaded && state.deletedNotes.isNotEmpty) {
-                  return IconButton(
-                    icon: const Icon(CupertinoIcons.trash),
-                    tooltip: l10n.emptyTrash,
-                    onPressed: () => _showEmptyTrashDialog(context),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+            // Çöp kutusunu boşalt butonu
+            _buildEmptyTrashButton(context),
           ],
         ),
-        body: BlocBuilder<NotesBloc, NotesState>(
-          builder: (context, state) {
-            if (state is NotesLoading) {
-              return const Center(child: CupertinoActivityIndicator());
-            }
+        body: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildNotesTab(context, isDark),
+            _buildFoldersTab(context, isDark),
+          ],
+        ),
+      ),
+    );
+  }
 
-            if (state is NotesError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      CupertinoIcons.exclamationmark_circle,
-                      size: 64,
-                      color: AppColors.error.withAlpha(150),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.errorOccurred,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      state.message,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        context.read<NotesBloc>().add(const LoadDeletedNotes());
-                      },
-                      icon: const Icon(CupertinoIcons.refresh),
-                      label: Text(l10n.tryAgain),
-                    ),
-                  ],
-                ),
-              );
-            }
+  Widget _buildEmptyTrashButton(BuildContext context) {
+    return BlocBuilder<NotesBloc, NotesState>(
+      builder: (context, notesState) {
+        return BlocBuilder<FoldersBloc, FoldersState>(
+          builder: (context, foldersState) {
+            final hasDeletedNotes =
+                notesState is TrashLoaded && notesState.deletedNotes.isNotEmpty;
+            final hasDeletedFolders =
+                foldersState is FolderTrashLoaded &&
+                foldersState.deletedFolders.isNotEmpty;
 
-            if (state is TrashLoaded) {
-              if (state.deletedNotes.isEmpty) {
-                return EmptyState(
-                  icon: CupertinoIcons.trash,
-                  title: l10n.trashEmpty,
-                  subtitle: l10n.deletedNotesAppear,
-                );
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: state.deletedNotes.length,
-                itemBuilder: (context, index) {
-                  final note = state.deletedNotes[index];
-                  return _buildTrashNoteCard(context, note, isDark);
+            if (hasDeletedNotes || hasDeletedFolders) {
+              return PopupMenuButton<String>(
+                icon: const Icon(CupertinoIcons.trash),
+                onSelected: (value) {
+                  if (value == 'notes') {
+                    _showEmptyNotesTrashDialog(context);
+                  } else if (value == 'folders') {
+                    _showEmptyFoldersTrashDialog(context);
+                  }
+                },
+                itemBuilder: (context) {
+                  final l10n = AppLocalizations.of(context)!;
+                  return [
+                    if (hasDeletedNotes)
+                      PopupMenuItem(
+                        value: 'notes',
+                        child: Row(
+                          children: [
+                            const Icon(CupertinoIcons.doc, size: 20),
+                            const SizedBox(width: 12),
+                            Text(l10n.emptyTrash),
+                          ],
+                        ),
+                      ),
+                    if (hasDeletedFolders)
+                      PopupMenuItem(
+                        value: 'folders',
+                        child: Row(
+                          children: [
+                            const Icon(CupertinoIcons.folder, size: 20),
+                            const SizedBox(width: 12),
+                            Text(l10n.emptyTrash),
+                          ],
+                        ),
+                      ),
+                  ];
                 },
               );
             }
-
             return const SizedBox.shrink();
           },
-        ),
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildNotesTab(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<NotesBloc, NotesState>(
+      builder: (context, state) {
+        if (state is NotesLoading) {
+          return const Center(child: CupertinoActivityIndicator());
+        }
+
+        if (state is NotesError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.exclamationmark_circle,
+                  size: 64,
+                  color: AppColors.error.withAlpha(150),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.errorOccurred,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  state.message,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<NotesBloc>().add(const LoadDeletedNotes());
+                  },
+                  icon: const Icon(CupertinoIcons.refresh),
+                  label: Text(l10n.tryAgain),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is TrashLoaded) {
+          if (state.deletedNotes.isEmpty) {
+            return EmptyState(
+              icon: CupertinoIcons.trash,
+              title: l10n.trashEmpty,
+              subtitle: l10n.deletedNotesAppear,
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: state.deletedNotes.length,
+            itemBuilder: (context, index) {
+              final note = state.deletedNotes[index];
+              return _buildTrashNoteCard(context, note, isDark);
+            },
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _buildFoldersTab(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<FoldersBloc, FoldersState>(
+      builder: (context, state) {
+        if (state is FoldersLoading) {
+          return const Center(child: CupertinoActivityIndicator());
+        }
+
+        if (state is FoldersError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  CupertinoIcons.exclamationmark_circle,
+                  size: 64,
+                  color: AppColors.error.withAlpha(150),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.errorOccurred,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  state.message,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<FoldersBloc>().add(const LoadDeletedFolders());
+                  },
+                  icon: const Icon(CupertinoIcons.refresh),
+                  label: Text(l10n.tryAgain),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is FolderTrashLoaded) {
+          if (state.deletedFolders.isEmpty) {
+            return EmptyState(
+              icon: CupertinoIcons.folder,
+              title: l10n.noDeletedFolders,
+              subtitle: l10n.deletedFoldersAppear,
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: state.deletedFolders.length,
+            itemBuilder: (context, index) {
+              final folder = state.deletedFolders[index];
+              return _buildTrashFolderCard(context, folder, isDark);
+            },
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 
@@ -203,6 +356,106 @@ class _TrashPageState extends State<TrashPage> {
                       ),
                     ),
                   ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrashFolderCard(
+    BuildContext context,
+    Folder folder,
+    bool isDark,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final folderColor = Color(folder.color);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: GestureDetector(
+        onTap: () => _showFolderOptionsSheet(context, folder),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(isDark ? 20 : 10),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                // Klasör ikonu
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: folderColor.withAlpha(30),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: folder.hasEmoji
+                      ? Center(
+                          child: Text(
+                            folder.emoji!,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                        )
+                      : Icon(
+                          CupertinoIcons.folder_fill,
+                          color: folderColor,
+                          size: 28,
+                        ),
+                ),
+                const SizedBox(width: 16),
+                // Klasör bilgileri
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        folder.name.isNotEmpty
+                            ? folder.name
+                            : l10n.untitledFolder,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            CupertinoIcons.clock,
+                            size: 14,
+                            color: isDark
+                                ? AppColors.darkTextSecondary
+                                : AppColors.lightTextSecondary,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _formatDeletedDate(folder.deletedAt, l10n),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -310,7 +563,7 @@ class _TrashPageState extends State<TrashPage> {
                   ),
                   onTap: () {
                     Navigator.pop(sheetContext);
-                    _showPermanentDeleteDialog(context, note);
+                    _showPermanentDeleteNoteDialog(context, note);
                   },
                 ),
               ],
@@ -321,8 +574,126 @@ class _TrashPageState extends State<TrashPage> {
     );
   }
 
-  /// Kalıcı silme onay dialogu
-  void _showPermanentDeleteDialog(BuildContext context, Note note) {
+  /// Klasör seçenekleri bottom sheet
+  void _showFolderOptionsSheet(BuildContext context, Folder folder) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = context.read<ThemeCubit>().isDark;
+    final folderColor = Color(folder.color);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Üst çizgi
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Klasör adı
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: folderColor.withAlpha(30),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: folder.hasEmoji
+                            ? Center(
+                                child: Text(
+                                  folder.emoji!,
+                                  style: const TextStyle(fontSize: 22),
+                                ),
+                              )
+                            : Icon(
+                                CupertinoIcons.folder_fill,
+                                color: folderColor,
+                              ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          folder.name.isNotEmpty
+                              ? folder.name
+                              : l10n.untitledFolder,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Geri Getir
+                ListTile(
+                  leading: Icon(
+                    CupertinoIcons.arrow_counterclockwise,
+                    color: AppColors.success,
+                  ),
+                  title: Text(l10n.restore),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    context.read<FoldersBloc>().add(
+                      RestoreFolderFromTrash(folder.id),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.folderRestored),
+                        backgroundColor: AppColors.success,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                // Kalıcı Olarak Sil
+                ListTile(
+                  leading: Icon(CupertinoIcons.delete, color: AppColors.error),
+                  title: Text(
+                    l10n.deletePermanently,
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _showPermanentDeleteFolderDialog(context, folder);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// Not kalıcı silme onay dialogu
+  void _showPermanentDeleteNoteDialog(BuildContext context, Note note) {
     final l10n = AppLocalizations.of(context)!;
 
     showCupertinoDialog(
@@ -352,8 +723,39 @@ class _TrashPageState extends State<TrashPage> {
     );
   }
 
-  /// Çöp kutusunu boşaltma dialogu
-  void _showEmptyTrashDialog(BuildContext context) {
+  /// Klasör kalıcı silme onay dialogu
+  void _showPermanentDeleteFolderDialog(BuildContext context, Folder folder) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: Text(l10n.deleteFolderPermanently),
+        content: Text(
+          folder.name.isNotEmpty
+              ? l10n.deleteFolderPermanentlyConfirm(folder.name)
+              : l10n.deleteFolderPermanentlyConfirmUntitled,
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(l10n.cancel),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text(l10n.delete),
+            onPressed: () {
+              context.read<FoldersBloc>().add(DeleteFolder(folder.id));
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Notlar çöp kutusunu boşaltma dialogu
+  void _showEmptyNotesTrashDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     showCupertinoDialog(
@@ -371,6 +773,33 @@ class _TrashPageState extends State<TrashPage> {
             child: Text(l10n.emptyTrash),
             onPressed: () {
               context.read<NotesBloc>().add(const EmptyTrash());
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Klasörler çöp kutusunu boşaltma dialogu
+  void _showEmptyFoldersTrashDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    showCupertinoDialog(
+      context: context,
+      builder: (dialogContext) => CupertinoAlertDialog(
+        title: Text(l10n.emptyTrash),
+        content: Text(l10n.emptyTrashFolders),
+        actions: [
+          CupertinoDialogAction(
+            child: Text(l10n.cancel),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: Text(l10n.emptyTrash),
+            onPressed: () {
+              context.read<FoldersBloc>().add(const EmptyFolderTrash());
               Navigator.of(dialogContext).pop();
             },
           ),

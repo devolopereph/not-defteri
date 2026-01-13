@@ -20,6 +20,10 @@ class AppConstants {
   static const String pinnedNotesKey = 'pinned_notes';
   static const String onboardingCompletedKey = 'onboarding_completed';
 
+  // Security keys
+  static const String securityPinKey = 'security_pin';
+  static const String securityEnabledKey = 'security_enabled';
+
   // Tablo isimleri
   static const String trashTable = 'trash';
 

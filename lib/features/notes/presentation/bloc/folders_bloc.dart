@@ -13,7 +13,9 @@ part 'folders_state.dart';
 /// - Yükleme
 /// - Ekleme
 /// - Güncelleme
-/// - Silme
+/// - Silme (çöp kutusuna taşıma)
+/// - Kalıcı silme
+/// - Geri getirme
 /// - Arama
 class FoldersBloc extends Bloc<FoldersEvent, FoldersState> {
   final FolderRepository _repository;
@@ -21,9 +23,13 @@ class FoldersBloc extends Bloc<FoldersEvent, FoldersState> {
 
   FoldersBloc(this._repository) : super(FoldersInitial()) {
     on<LoadFolders>(_onLoadFolders);
+    on<LoadDeletedFolders>(_onLoadDeletedFolders);
     on<AddFolder>(_onAddFolder);
     on<UpdateFolder>(_onUpdateFolder);
+    on<MoveFolderToTrash>(_onMoveFolderToTrash);
+    on<RestoreFolderFromTrash>(_onRestoreFolderFromTrash);
     on<DeleteFolder>(_onDeleteFolder);
+    on<EmptyFolderTrash>(_onEmptyFolderTrash);
     on<SearchFolders>(_onSearchFolders);
     on<RefreshFolders>(_onRefreshFolders);
   }
@@ -43,6 +49,20 @@ class FoldersBloc extends Bloc<FoldersEvent, FoldersState> {
         foldersWithCount[folder] = count;
       }
       emit(FoldersLoaded(folders, foldersWithCount));
+    } catch (e) {
+      emit(FoldersError(e.toString()));
+    }
+  }
+
+  /// Silinmiş klasörleri yükle
+  Future<void> _onLoadDeletedFolders(
+    LoadDeletedFolders event,
+    Emitter<FoldersState> emit,
+  ) async {
+    emit(FoldersLoading());
+    try {
+      final deletedFolders = await _repository.getDeletedFolders();
+      emit(FolderTrashLoaded(deletedFolders));
     } catch (e) {
       emit(FoldersError(e.toString()));
     }
@@ -84,7 +104,37 @@ class FoldersBloc extends Bloc<FoldersEvent, FoldersState> {
     }
   }
 
-  /// Klasör sil
+  /// Klasörü çöp kutusuna taşı
+  Future<void> _onMoveFolderToTrash(
+    MoveFolderToTrash event,
+    Emitter<FoldersState> emit,
+  ) async {
+    try {
+      await _repository.moveFolderToTrash(event.id);
+
+      // Listeyi yenile
+      add(const LoadFolders());
+    } catch (e) {
+      emit(FoldersError(e.toString()));
+    }
+  }
+
+  /// Klasörü çöp kutusundan geri getir
+  Future<void> _onRestoreFolderFromTrash(
+    RestoreFolderFromTrash event,
+    Emitter<FoldersState> emit,
+  ) async {
+    try {
+      await _repository.restoreFolderFromTrash(event.id);
+
+      // Çöp kutusu listesini yenile
+      add(const LoadDeletedFolders());
+    } catch (e) {
+      emit(FoldersError(e.toString()));
+    }
+  }
+
+  /// Klasörü kalıcı olarak sil
   Future<void> _onDeleteFolder(
     DeleteFolder event,
     Emitter<FoldersState> emit,
@@ -92,8 +142,23 @@ class FoldersBloc extends Bloc<FoldersEvent, FoldersState> {
     try {
       await _repository.deleteFolder(event.id);
 
-      // Listeyi yenile
-      add(const LoadFolders());
+      // Çöp kutusu listesini yenile
+      add(const LoadDeletedFolders());
+    } catch (e) {
+      emit(FoldersError(e.toString()));
+    }
+  }
+
+  /// Çöp kutusundaki tüm klasörleri sil
+  Future<void> _onEmptyFolderTrash(
+    EmptyFolderTrash event,
+    Emitter<FoldersState> emit,
+  ) async {
+    try {
+      await _repository.emptyFolderTrash();
+
+      // Çöp kutusu listesini yenile
+      add(const LoadDeletedFolders());
     } catch (e) {
       emit(FoldersError(e.toString()));
     }

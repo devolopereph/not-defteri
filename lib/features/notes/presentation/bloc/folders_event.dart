@@ -13,6 +13,11 @@ class LoadFolders extends FoldersEvent {
   const LoadFolders();
 }
 
+/// Silinmiş klasörleri yükle
+class LoadDeletedFolders extends FoldersEvent {
+  const LoadDeletedFolders();
+}
+
 /// Yeni klasör ekle
 class AddFolder extends FoldersEvent {
   final String name;
@@ -35,7 +40,27 @@ class UpdateFolder extends FoldersEvent {
   List<Object?> get props => [folder];
 }
 
-/// Klasör sil
+/// Klasörü çöp kutusuna taşı
+class MoveFolderToTrash extends FoldersEvent {
+  final String id;
+
+  const MoveFolderToTrash(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+/// Klasörü çöp kutusundan geri getir
+class RestoreFolderFromTrash extends FoldersEvent {
+  final String id;
+
+  const RestoreFolderFromTrash(this.id);
+
+  @override
+  List<Object?> get props => [id];
+}
+
+/// Klasörü kalıcı olarak sil
 class DeleteFolder extends FoldersEvent {
   final String id;
 
@@ -43,6 +68,11 @@ class DeleteFolder extends FoldersEvent {
 
   @override
   List<Object?> get props => [id];
+}
+
+/// Çöp kutusundaki tüm klasörleri sil
+class EmptyFolderTrash extends FoldersEvent {
+  const EmptyFolderTrash();
 }
 
 /// Klasörlerde ara

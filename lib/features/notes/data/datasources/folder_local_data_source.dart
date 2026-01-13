@@ -8,12 +8,26 @@ class FolderLocalDataSource {
 
   FolderLocalDataSource(this._dbHelper);
 
-  /// Tüm klasörleri getir (güncellenme tarihine göre sıralı)
+  /// Tüm aktif klasörleri getir (silinmemişler, güncellenme tarihine göre sıralı)
   Future<List<Folder>> getAllFolders() async {
     final db = await _dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       AppConstants.foldersTable,
+      where: 'isDeleted = ?',
+      whereArgs: [0],
       orderBy: 'updatedAt DESC',
+    );
+    return maps.map((map) => Folder.fromMap(map)).toList();
+  }
+
+  /// Silinmiş klasörleri getir (çöp kutusu)
+  Future<List<Folder>> getDeletedFolders() async {
+    final db = await _dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      AppConstants.foldersTable,
+      where: 'isDeleted = ?',
+      whereArgs: [1],
+      orderBy: 'deletedAt DESC',
     );
     return maps.map((map) => Folder.fromMap(map)).toList();
   }
@@ -52,8 +66,8 @@ class FolderLocalDataSource {
     );
   }
 
-  /// Klasör sil (içindeki notların folderId'si null yapılır)
-  Future<void> deleteFolder(String id) async {
+  /// Klasörü çöp kutusuna taşı (soft delete)
+  Future<void> moveFolderToTrash(String id) async {
     final db = await _dbHelper.database;
 
     // Önce bu klasördeki notların folderId'sini null yap
@@ -64,7 +78,29 @@ class FolderLocalDataSource {
       whereArgs: [id],
     );
 
-    // Sonra klasörü sil
+    // Sonra klasörü çöp kutusuna taşı
+    await db.update(
+      AppConstants.foldersTable,
+      {'isDeleted': 1, 'deletedAt': DateTime.now().toIso8601String()},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Klasörü çöp kutusundan geri getir
+  Future<void> restoreFolderFromTrash(String id) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.foldersTable,
+      {'isDeleted': 0, 'deletedAt': null},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Klasörü kalıcı olarak sil
+  Future<void> deleteFolder(String id) async {
+    final db = await _dbHelper.database;
     await db.delete(
       AppConstants.foldersTable,
       where: 'id = ?',
@@ -72,21 +108,31 @@ class FolderLocalDataSource {
     );
   }
 
-  /// Klasör ara
+  /// Çöp kutusundaki tüm klasörleri kalıcı olarak sil
+  Future<void> emptyFolderTrash() async {
+    final db = await _dbHelper.database;
+    await db.delete(
+      AppConstants.foldersTable,
+      where: 'isDeleted = ?',
+      whereArgs: [1],
+    );
+  }
+
+  /// Klasör ara (sadece aktif klasörlerde)
   Future<List<Folder>> searchFolders(String query) async {
     if (query.isEmpty) return getAllFolders();
 
     final db = await _dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       AppConstants.foldersTable,
-      where: 'name LIKE ?',
-      whereArgs: ['%$query%'],
+      where: 'name LIKE ? AND isDeleted = ?',
+      whereArgs: ['%$query%', 0],
       orderBy: 'updatedAt DESC',
     );
     return maps.map((map) => Folder.fromMap(map)).toList();
   }
 
-  /// Klasördeki not sayısını getir
+  /// Klasördeki not sayısını getir (sadece aktif notlar)
   Future<int> getNoteCountInFolder(String folderId) async {
     final db = await _dbHelper.database;
     final result = await db.rawQuery(

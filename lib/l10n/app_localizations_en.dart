@@ -470,4 +470,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noteUnarchived => 'Note unarchived';
+
+  @override
+  String get security => 'Security';
+
+  @override
+  String get securityDescription => 'App lock settings';
+
+  @override
+  String get securityInfo => 'App Security';
+
+  @override
+  String get securityInfoDescription =>
+      'Protect your app with a PIN code. You will need to enter the PIN code every time you open the app.';
+
+  @override
+  String get pinSettings => 'PIN Settings';
+
+  @override
+  String get pinLock => 'PIN Lock';
+
+  @override
+  String get pinLockDescription => 'Require PIN to open app';
+
+  @override
+  String get createPin => 'Create PIN';
+
+  @override
+  String get createPinDescription => 'Create a new 4-digit PIN';
+
+  @override
+  String get changePin => 'Change PIN';
+
+  @override
+  String get changePinDescription => 'Change your current PIN';
+
+  @override
+  String get removePin => 'Remove PIN';
+
+  @override
+  String get removePinDescription => 'Remove PIN protection';
+
+  @override
+  String get enterPin => 'Enter Your PIN';
+
+  @override
+  String get enterPinDescription => 'Enter your 4-digit PIN to access the app';
+
+  @override
+  String get enterNewPin => 'Enter your new 4-digit PIN';
+
+  @override
+  String get enterCurrentPin => 'Enter your current PIN';
+
+  @override
+  String get confirmPin => 'Confirm PIN';
+
+  @override
+  String get reenterPin => 'Re-enter your PIN';
+
+  @override
+  String get newPin => 'New PIN';
+
+  @override
+  String get wrongPin => 'Wrong PIN';
+
+  @override
+  String get pinCreated => 'PIN created successfully';
+
+  @override
+  String get pinChanged => 'PIN changed successfully';
+
+  @override
+  String get pinRemoved => 'PIN removed';
+
+  @override
+  String get pinMismatch => 'PINs do not match';
+
+  @override
+  String get deleteFolderToTrash => 'Move folder to trash';
+
+  @override
+  String deleteFolderToTrashConfirm(String name) {
+    return 'Are you sure you want to move \"$name\" to trash?\n\nNotes in the folder will remain without a folder.';
+  }
+
+  @override
+  String get deleteFolderToTrashConfirmUntitled =>
+      'Are you sure you want to move this folder to trash?\n\nNotes in the folder will remain without a folder.';
+
+  @override
+  String get folderRestored => 'Folder restored';
+
+  @override
+  String get deleteFolderPermanently => 'Delete Folder Permanently';
+
+  @override
+  String deleteFolderPermanentlyConfirm(String name) {
+    return 'Are you sure you want to permanently delete \"$name\"?\n\nThis action cannot be undone.';
+  }
+
+  @override
+  String get deleteFolderPermanentlyConfirmUntitled =>
+      'Are you sure you want to permanently delete this folder?\n\nThis action cannot be undone.';
+
+  @override
+  String get viewDeletedItems => 'View deleted items';
+
+  @override
+  String get notesTab => 'Notes';
+
+  @override
+  String get foldersTab => 'Folders';
+
+  @override
+  String get noDeletedFolders => 'No deleted folders';
+
+  @override
+  String get deletedFoldersAppear => 'Deleted folders will appear here';
+
+  @override
+  String get emptyTrashFolders =>
+      'Are you sure you want to permanently delete all folders in the trash?\n\nThis action cannot be undone.';
 }

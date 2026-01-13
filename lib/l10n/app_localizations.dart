@@ -925,6 +925,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Note unarchived'**
   String get noteUnarchived;
+
+  /// Security settings title
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get security;
+
+  /// Security settings subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'App lock settings'**
+  String get securityDescription;
+
+  /// Security info card title
+  ///
+  /// In en, this message translates to:
+  /// **'App Security'**
+  String get securityInfo;
+
+  /// Security info card description
+  ///
+  /// In en, this message translates to:
+  /// **'Protect your app with a PIN code. You will need to enter the PIN code every time you open the app.'**
+  String get securityInfoDescription;
+
+  /// PIN settings section title
+  ///
+  /// In en, this message translates to:
+  /// **'PIN Settings'**
+  String get pinSettings;
+
+  /// PIN lock toggle title
+  ///
+  /// In en, this message translates to:
+  /// **'PIN Lock'**
+  String get pinLock;
+
+  /// PIN lock toggle subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Require PIN to open app'**
+  String get pinLockDescription;
+
+  /// Create PIN button title
+  ///
+  /// In en, this message translates to:
+  /// **'Create PIN'**
+  String get createPin;
+
+  /// Create PIN button subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new 4-digit PIN'**
+  String get createPinDescription;
+
+  /// Change PIN button title
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get changePin;
+
+  /// Change PIN button subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Change your current PIN'**
+  String get changePinDescription;
+
+  /// Remove PIN button title
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN'**
+  String get removePin;
+
+  /// Remove PIN button subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN protection'**
+  String get removePinDescription;
+
+  /// Lock screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Your PIN'**
+  String get enterPin;
+
+  /// Lock screen subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your 4-digit PIN to access the app'**
+  String get enterPinDescription;
+
+  /// New PIN input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new 4-digit PIN'**
+  String get enterNewPin;
+
+  /// Current PIN input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current PIN'**
+  String get enterCurrentPin;
+
+  /// Confirm PIN dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
+  String get confirmPin;
+
+  /// Confirm PIN dialog subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter your PIN'**
+  String get reenterPin;
+
+  /// New PIN dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'New PIN'**
+  String get newPin;
+
+  /// Wrong PIN error message
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN'**
+  String get wrongPin;
+
+  /// PIN created success message
+  ///
+  /// In en, this message translates to:
+  /// **'PIN created successfully'**
+  String get pinCreated;
+
+  /// PIN changed success message
+  ///
+  /// In en, this message translates to:
+  /// **'PIN changed successfully'**
+  String get pinChanged;
+
+  /// PIN removed success message
+  ///
+  /// In en, this message translates to:
+  /// **'PIN removed'**
+  String get pinRemoved;
+
+  /// PIN mismatch error message
+  ///
+  /// In en, this message translates to:
+  /// **'PINs do not match'**
+  String get pinMismatch;
+
+  /// Move folder to trash action
+  ///
+  /// In en, this message translates to:
+  /// **'Move folder to trash'**
+  String get deleteFolderToTrash;
+
+  /// Move folder to trash confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to move \"{name}\" to trash?\n\nNotes in the folder will remain without a folder.'**
+  String deleteFolderToTrashConfirm(String name);
+
+  /// Move untitled folder to trash confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to move this folder to trash?\n\nNotes in the folder will remain without a folder.'**
+  String get deleteFolderToTrashConfirmUntitled;
+
+  /// Folder restored snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'Folder restored'**
+  String get folderRestored;
+
+  /// Delete folder permanently action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Folder Permanently'**
+  String get deleteFolderPermanently;
+
+  /// Delete folder permanently confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete \"{name}\"?\n\nThis action cannot be undone.'**
+  String deleteFolderPermanentlyConfirm(String name);
+
+  /// Delete untitled folder permanently confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete this folder?\n\nThis action cannot be undone.'**
+  String get deleteFolderPermanentlyConfirmUntitled;
+
+  /// Trash setting subtitle with folders
+  ///
+  /// In en, this message translates to:
+  /// **'View deleted items'**
+  String get viewDeletedItems;
+
+  /// Notes tab in trash page
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notesTab;
+
+  /// Folders tab in trash page
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get foldersTab;
+
+  /// Empty deleted folders message
+  ///
+  /// In en, this message translates to:
+  /// **'No deleted folders'**
+  String get noDeletedFolders;
+
+  /// Empty deleted folders hint
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted folders will appear here'**
+  String get deletedFoldersAppear;
+
+  /// Empty trash folders confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete all folders in the trash?\n\nThis action cannot be undone.'**
+  String get emptyTrashFolders;
 }
 
 class _AppLocalizationsDelegate
