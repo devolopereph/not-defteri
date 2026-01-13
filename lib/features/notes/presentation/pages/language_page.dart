@@ -6,7 +6,7 @@ import '../../../../core/locale/locale_cubit.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 
-/// Dil seçme sayfası
+/// Dil seçme sayfası - Minimalist tasarım
 class LanguagePage extends StatelessWidget {
   const LanguagePage({super.key});
 
@@ -24,27 +24,31 @@ class LanguagePage extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildLanguageOption(
-            context,
-            locale: const Locale('en'),
-            title: l10n.english,
-            subtitle: 'English',
-            isSelected: currentLocale.languageCode == 'en',
-            isDark: isDark,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Dil seçenekleri
+              _buildLanguageOption(
+                context,
+                locale: const Locale('en'),
+                languageName: 'English',
+                isSelected: currentLocale.languageCode == 'en',
+                isDark: isDark,
+              ),
+              const SizedBox(height: 12),
+              _buildLanguageOption(
+                context,
+                locale: const Locale('tr'),
+                languageName: 'Türkçe',
+                isSelected: currentLocale.languageCode == 'tr',
+                isDark: isDark,
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          _buildLanguageOption(
-            context,
-            locale: const Locale('tr'),
-            title: l10n.turkish,
-            subtitle: 'Türkçe',
-            isSelected: currentLocale.languageCode == 'tr',
-            isDark: isDark,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -52,8 +56,7 @@ class LanguagePage extends StatelessWidget {
   Widget _buildLanguageOption(
     BuildContext context, {
     required Locale locale,
-    required String title,
-    required String subtitle,
+    required String languageName,
     required bool isSelected,
     required bool isDark,
   }) {
@@ -61,11 +64,14 @@ class LanguagePage extends StatelessWidget {
       onTap: () {
         context.read<LocaleCubit>().setLocale(locale);
       },
-      child: Container(
-        padding: const EdgeInsets.all(16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-          borderRadius: BorderRadius.circular(16),
+          color: isSelected
+              ? AppColors.primary.withAlpha(15)
+              : (isDark ? AppColors.darkSurface : AppColors.lightSurface),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
                 ? AppColors.primary
@@ -75,54 +81,43 @@ class LanguagePage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Bayrak / Dil ikonu
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withAlpha(20),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  locale.languageCode.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
+            // Dil adı
+            Expanded(
+              child: Text(
+                languageName,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: isSelected
+                      ? AppColors.primary
+                      : (isDark ? AppColors.darkText : AppColors.lightText),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+            // Seçim göstergesi
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: isSelected
+                  ? Icon(
+                      CupertinoIcons.checkmark_circle_fill,
+                      key: const ValueKey('selected'),
+                      color: AppColors.primary,
+                      size: 24,
+                    )
+                  : Container(
+                      key: const ValueKey('unselected'),
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark
+                              ? AppColors.darkBorder
+                              : AppColors.lightBorder,
+                          width: 2,
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? AppColors.darkTextSecondary
-                          : AppColors.lightTextSecondary,
-                    ),
-                  ),
-                ],
-              ),
             ),
-            if (isSelected)
-              Icon(
-                CupertinoIcons.checkmark_circle_fill,
-                color: AppColors.primary,
-                size: 24,
-              ),
           ],
         ),
       ),

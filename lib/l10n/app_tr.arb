@@ -138,7 +138,6 @@
   "unarchive": "Arşivden Çıkar",
   "noteArchived": "Not arşivlendi",
   "noteUnarchived": "Not arşivden çıkarıldı",
-  
   "security": "Güvenlik",
   "securityDescription": "Uygulama kilidi ayarları",
   "securityInfo": "Uygulama Güvenliği",
@@ -164,7 +163,6 @@
   "pinChanged": "Şifre başarıyla değiştirildi",
   "pinRemoved": "Şifre kaldırıldı",
   "pinMismatch": "Şifreler eşleşmiyor",
-  
   "deleteFolderToTrash": "Klasörü çöp kutusuna taşı",
   "deleteFolderToTrashConfirm": "\"{name}\" klasörünü çöp kutusuna taşımak istediğinize emin misiniz?\n\nKlasördeki notlar klasörsüz olarak kalacak.",
   "deleteFolderToTrashConfirmUntitled": "Bu klasörü çöp kutusuna taşımak istediğinize emin misiniz?\n\nKlasördeki notlar klasörsüz olarak kalacak.",
@@ -177,5 +175,7 @@
   "foldersTab": "Klasörler",
   "noDeletedFolders": "Silinen klasör yok",
   "deletedFoldersAppear": "Silinen klasörler burada görünecek",
-  "emptyTrashFolders": "Çöp kutusundaki tüm klasörleri kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz."
+  "emptyTrashFolders": "Çöp kutusundaki tüm klasörleri kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.",
+  "privacyPolicy": "Gizlilik Politikası",
+  "termsOfService": "Kullanım Koşulları"
 }

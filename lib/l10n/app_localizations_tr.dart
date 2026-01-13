@@ -598,4 +598,10 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get emptyTrashFolders =>
       'Çöp kutusundaki tüm klasörleri kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.';
+
+  @override
+  String get privacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get termsOfService => 'Kullanım Koşulları';
 }

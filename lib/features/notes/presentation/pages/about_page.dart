@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 
@@ -18,6 +19,8 @@ class _AboutPageState extends State<AboutPage> {
   String _appName = '';
   String _version = '';
   String _buildNumber = '';
+
+  static const String _policyUrl = 'https://www.youtube.com/@epheai';
 
   @override
   void initState() {
@@ -36,6 +39,15 @@ class _AboutPageState extends State<AboutPage> {
     }
   }
 
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Could not launch $url: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -49,12 +61,12 @@ class _AboutPageState extends State<AboutPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const SizedBox(height: 40),
               // App ikonu
               Container(
                 width: 120,
@@ -121,7 +133,7 @@ class _AboutPageState extends State<AboutPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 24),
 
               // Alt bilgi
               Text(
@@ -132,6 +144,85 @@ class _AboutPageState extends State<AboutPage> {
                       : AppColors.lightTextSecondary,
                 ),
                 textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 48),
+
+              // Privacy & Terms bölümü
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurface
+                      : AppColors.lightSurface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Privacy Policy
+                    ListTile(
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withAlpha(20),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          CupertinoIcons.shield_fill,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(l10n.privacyPolicy),
+                      trailing: Icon(
+                        CupertinoIcons.chevron_right,
+                        size: 16,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                      ),
+                      onTap: () => _launchUrl(_policyUrl),
+                    ),
+                    Divider(
+                      height: 1,
+                      indent: 16,
+                      endIndent: 16,
+                      color: isDark
+                          ? AppColors.darkBorder
+                          : AppColors.lightBorder,
+                    ),
+                    // Terms of Service
+                    ListTile(
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withAlpha(20),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          CupertinoIcons.doc_text_fill,
+                          color: AppColors.accent,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(l10n.termsOfService),
+                      trailing: Icon(
+                        CupertinoIcons.chevron_right,
+                        size: 16,
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                      ),
+                      onTap: () => _launchUrl(_policyUrl),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

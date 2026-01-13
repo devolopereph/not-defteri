@@ -592,4 +592,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get emptyTrashFolders =>
       'Are you sure you want to permanently delete all folders in the trash?\n\nThis action cannot be undone.';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get termsOfService => 'Terms of Service';
 }

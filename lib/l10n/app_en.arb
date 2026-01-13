@@ -831,5 +831,13 @@
   "emptyTrashFolders": "Are you sure you want to permanently delete all folders in the trash?\n\nThis action cannot be undone.",
   "@emptyTrashFolders": {
     "description": "Empty trash folders confirmation message"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Privacy policy link text"
+  },
+  "termsOfService": "Terms of Service",
+  "@termsOfService": {
+    "description": "Terms of service link text"
   }
 }
