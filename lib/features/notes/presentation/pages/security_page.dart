@@ -2,10 +2,10 @@ import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pinput/pinput.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/security/security_cubit.dart';
+import 'pin_entry_page.dart';
 
 /// Güvenlik ayarları sayfası
 class SecurityPage extends StatefulWidget {
@@ -74,7 +74,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         size: 20,
                         color: Colors.grey,
                       ),
-                      onTap: () => _showChangePinDialog(context),
+                      onTap: () => _navigateToChangePin(context),
                     ),
                     _buildDivider(isDark),
                     // Şifreyi kaldır
@@ -89,7 +89,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         size: 20,
                         color: Colors.grey,
                       ),
-                      onTap: () => _showRemovePinDialog(context),
+                      onTap: () => _navigateToRemovePin(context),
                     ),
                   ] else ...[
                     // Şifre oluştur
@@ -104,7 +104,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         size: 20,
                         color: Colors.grey,
                       ),
-                      onTap: () => _showCreatePinDialog(context),
+                      onTap: () => _navigateToCreatePin(context),
                     ),
                   ],
                 ],
@@ -243,354 +243,128 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  /// Şifre oluşturma dialog
-  void _showCreatePinDialog(BuildContext context) {
+  /// Şifre oluşturma - Tam ekran sayfa
+  Future<void> _navigateToCreatePin(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _PinInputSheet(
-        title: l10n.createPin,
-        subtitle: l10n.enterNewPin,
-        onComplete: (pin) async {
-          Navigator.pop(sheetContext);
-          // Şifreyi onayla
-          await Future.delayed(const Duration(milliseconds: 200));
-          if (mounted) {
-            _showConfirmPinDialog(context, pin);
-          }
-        },
+
+    // İlk şifre girişi
+    final pin = await Navigator.of(context).push<String>(
+      CupertinoPageRoute(
+        builder: (context) =>
+            PinEntryPage(title: l10n.createPin, subtitle: l10n.enterNewPin),
       ),
     );
-  }
 
-  /// Şifre onaylama dialog
-  void _showConfirmPinDialog(BuildContext context, String originalPin) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _PinInputSheet(
-        title: l10n.confirmPin,
-        subtitle: l10n.reenterPin,
-        onComplete: (pin) {
-          if (pin == originalPin) {
-            context.read<SecurityCubit>().createPin(pin);
-            Navigator.pop(sheetContext);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.pinCreated),
-                backgroundColor: AppColors.success,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          } else {
-            Navigator.pop(sheetContext);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.pinMismatch),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
+    if (pin == null || !mounted) return;
 
-  /// Şifre değiştirme dialog
-  void _showChangePinDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _PinInputSheet(
-        title: l10n.changePin,
-        subtitle: l10n.enterCurrentPin,
-        onComplete: (pin) {
-          final securityCubit = context.read<SecurityCubit>();
-          if (securityCubit.verifyPin(pin)) {
-            Navigator.pop(sheetContext);
-            Future.delayed(const Duration(milliseconds: 200), () {
-              if (mounted) {
-                _showNewPinAfterVerifyDialog(context);
-              }
-            });
-          } else {
-            Navigator.pop(sheetContext);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.wrongPin),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  /// Doğrulama sonrası yeni şifre dialog
-  void _showNewPinAfterVerifyDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _PinInputSheet(
-        title: l10n.newPin,
-        subtitle: l10n.enterNewPin,
-        onComplete: (pin) {
-          Navigator.pop(sheetContext);
-          Future.delayed(const Duration(milliseconds: 200), () {
-            if (mounted) {
-              _showConfirmNewPinDialog(context, pin);
-            }
-          });
-        },
-      ),
-    );
-  }
-
-  /// Yeni şifre onaylama dialog
-  void _showConfirmNewPinDialog(BuildContext context, String originalPin) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _PinInputSheet(
-        title: l10n.confirmPin,
-        subtitle: l10n.reenterPin,
-        onComplete: (pin) async {
-          if (pin == originalPin) {
-            // Eski şifreyi al ve yenisiyle değiştir
-            final storedPin = context.read<SecurityCubit>();
-            await storedPin.createPin(pin);
-            if (sheetContext.mounted) {
-              Navigator.pop(sheetContext);
-            }
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.pinChanged),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-            }
-          } else {
-            Navigator.pop(sheetContext);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.pinMismatch),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  /// Şifre kaldırma dialog
-  void _showRemovePinDialog(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _PinInputSheet(
-        title: l10n.removePin,
-        subtitle: l10n.enterCurrentPin,
-        onComplete: (pin) async {
-          final securityCubit = context.read<SecurityCubit>();
-          if (securityCubit.verifyPin(pin)) {
-            await securityCubit.removePin();
-            if (sheetContext.mounted) {
-              Navigator.pop(sheetContext);
-            }
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.pinRemoved),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              );
-            }
-          } else {
-            Navigator.pop(sheetContext);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.wrongPin),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-}
-
-/// PIN giriş bottom sheet
-class _PinInputSheet extends StatefulWidget {
-  final String title;
-  final String subtitle;
-  final Function(String) onComplete;
-
-  const _PinInputSheet({
-    required this.title,
-    required this.subtitle,
-    required this.onComplete,
-  });
-
-  @override
-  State<_PinInputSheet> createState() => _PinInputSheetState();
-}
-
-class _PinInputSheetState extends State<_PinInputSheet> {
-  final _pinController = TextEditingController();
-  final _focusNode = FocusNode();
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (mounted) {
-        _focusNode.requestFocus();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _pinController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = context.watch<ThemeCubit>().isDark;
-    final l10n = AppLocalizations.of(context)!;
-
-    final defaultPinTheme = PinTheme(
-      width: 60,
-      height: 60,
-      textStyle: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w600,
-        color: isDark ? Colors.white : Colors.black87,
-      ),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-          width: 2,
+    // Şifre onaylama
+    final confirmedPin = await Navigator.of(context).push<String>(
+      CupertinoPageRoute(
+        builder: (context) => PinEntryPage(
+          title: l10n.confirmPin,
+          subtitle: l10n.reenterPin,
+          isConfirmation: true,
+          pinToConfirm: pin,
         ),
       ),
     );
 
-    final focusedPinTheme = defaultPinTheme.copyWith(
-      decoration: defaultPinTheme.decoration!.copyWith(
-        border: Border.all(color: AppColors.primary, width: 2),
+    if (confirmedPin == null || !mounted) return;
+
+    // Şifreyi kaydet
+    await context.read<SecurityCubit>().createPin(confirmedPin);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.pinCreated),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  /// Şifre değiştirme - Tam ekran sayfa
+  Future<void> _navigateToChangePin(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Mevcut şifre doğrulama
+    final isVerified = await Navigator.of(context).push<bool>(
+      CupertinoPageRoute(
+        builder: (context) => PinVerificationPage(
+          title: l10n.changePin,
+          subtitle: l10n.enterCurrentPin,
+        ),
       ),
     );
 
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    if (isVerified != true || !mounted) return;
+
+    // Yeni şifre girişi
+    final newPin = await Navigator.of(context).push<String>(
+      CupertinoPageRoute(
+        builder: (context) =>
+            PinEntryPage(title: l10n.newPin, subtitle: l10n.enterNewPin),
       ),
-      padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+    );
+
+    if (newPin == null || !mounted) return;
+
+    // Yeni şifre onaylama
+    final confirmedPin = await Navigator.of(context).push<String>(
+      CupertinoPageRoute(
+        builder: (context) => PinEntryPage(
+          title: l10n.confirmPin,
+          subtitle: l10n.reenterPin,
+          isConfirmation: true,
+          pinToConfirm: newPin,
+        ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Üst çizgi
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 24),
+    );
 
-          // Başlık
-          Text(
-            widget.title,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            widget.subtitle,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
-            ),
-          ),
-          const SizedBox(height: 32),
+    if (confirmedPin == null || !mounted) return;
 
-          // PIN girişi
-          Pinput(
-            length: 4,
-            controller: _pinController,
-            focusNode: _focusNode,
-            defaultPinTheme: defaultPinTheme,
-            focusedPinTheme: focusedPinTheme,
-            obscureText: true,
-            obscuringCharacter: '●',
-            onCompleted: widget.onComplete,
-            hapticFeedbackType: HapticFeedbackType.lightImpact,
-          ),
-          const SizedBox(height: 24),
+    // Yeni şifreyi kaydet
+    await context.read<SecurityCubit>().createPin(confirmedPin);
 
-          // İptal butonu
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.cancel),
-          ),
-        ],
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.pinChanged),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  /// Şifre kaldırma - Tam ekran sayfa
+  Future<void> _navigateToRemovePin(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Mevcut şifre doğrulama
+    final isVerified = await Navigator.of(context).push<bool>(
+      CupertinoPageRoute(
+        builder: (context) => PinVerificationPage(
+          title: l10n.removePin,
+          subtitle: l10n.enterCurrentPin,
+        ),
+      ),
+    );
+
+    if (isVerified != true || !mounted) return;
+
+    // Şifreyi kaldır
+    await context.read<SecurityCubit>().removePin();
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.pinRemoved),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
   }

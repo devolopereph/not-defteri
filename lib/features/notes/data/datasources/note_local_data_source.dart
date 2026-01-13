@@ -183,15 +183,23 @@ class NoteLocalDataSource {
 
   NoteLocalDataSource(this._dbHelper);
 
-  /// Tüm aktif notları getir (silinmemiş, arşivlenmemiş, güncellenme tarihine göre sıralı, pinlenmiş olanlar önce)
+  /// Tüm aktif notları getir
+  /// (silinmemiş, arşivlenmemiş, silinmiş klasöre ait olmayan,
+  /// güncellenme tarihine göre sıralı, pinlenmiş olanlar önce)
   Future<List<Note>> getAllNotes() async {
     final db = await _dbHelper.database;
-    final maps = await db.query(
-      AppConstants.notesTable,
-      where: 'isDeleted = ? AND isArchived = ?',
-      whereArgs: [0, 0],
-      orderBy: 'isPinned DESC, updatedAt DESC',
-    );
+
+    // Silinmiş klasörlere ait notları hariç tut
+    // folderId null olanlar veya aktif klasörlere ait olanlar gösterilir
+    final maps = await db.rawQuery('''
+      SELECT n.* FROM ${AppConstants.notesTable} n
+      LEFT JOIN ${AppConstants.foldersTable} f ON n.folderId = f.id
+      WHERE n.isDeleted = 0 
+        AND n.isArchived = 0
+        AND (n.folderId IS NULL OR f.isDeleted = 0 OR f.isDeleted IS NULL)
+      ORDER BY n.isPinned DESC, n.updatedAt DESC
+    ''');
+
     return maps.map((map) => Note.fromMap(map)).toList();
   }
 
@@ -352,16 +360,23 @@ class NoteLocalDataSource {
   }
 
   /// Not ara (başlık ve içerikte, sadece aktif notlarda)
+  /// Silinmiş klasörlere ait notları hariç tutar
   Future<List<Note>> searchNotes(String query) async {
     if (query.isEmpty) return getAllNotes();
 
     final db = await _dbHelper.database;
-    final maps = await db.query(
-      AppConstants.notesTable,
-      where: 'isDeleted = ? AND (title LIKE ? OR content LIKE ?)',
-      whereArgs: [0, '%$query%', '%$query%'],
-      orderBy: 'isPinned DESC, updatedAt DESC',
-    );
+    final escapedQuery = query.replaceAll("'", "''");
+
+    final maps = await db.rawQuery('''
+      SELECT n.* FROM ${AppConstants.notesTable} n
+      LEFT JOIN ${AppConstants.foldersTable} f ON n.folderId = f.id
+      WHERE n.isDeleted = 0 
+        AND n.isArchived = 0
+        AND (n.title LIKE '%$escapedQuery%' OR n.content LIKE '%$escapedQuery%')
+        AND (n.folderId IS NULL OR f.isDeleted = 0 OR f.isDeleted IS NULL)
+      ORDER BY n.isPinned DESC, n.updatedAt DESC
+    ''');
+
     return maps.map((map) => Note.fromMap(map)).toList();
   }
 

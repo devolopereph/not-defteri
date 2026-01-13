@@ -67,18 +67,13 @@ class FolderLocalDataSource {
   }
 
   /// Klasörü çöp kutusuna taşı (soft delete)
+  /// Not: Notların folderId'si korunuyor, böylece klasör geri getirildiğinde
+  /// notlar tekrar o klasöre bağlanıyor
   Future<void> moveFolderToTrash(String id) async {
     final db = await _dbHelper.database;
 
-    // Önce bu klasördeki notların folderId'sini null yap
-    await db.update(
-      AppConstants.notesTable,
-      {'folderId': null},
-      where: 'folderId = ?',
-      whereArgs: [id],
-    );
-
-    // Sonra klasörü çöp kutusuna taşı
+    // Klasörü çöp kutusuna taşı
+    // Notların folderId'sini DEĞİŞTİRMİYORUZ - geri getirildiğinde tekrar bağlanacaklar
     await db.update(
       AppConstants.foldersTable,
       {'isDeleted': 1, 'deletedAt': DateTime.now().toIso8601String()},
@@ -99,8 +94,19 @@ class FolderLocalDataSource {
   }
 
   /// Klasörü kalıcı olarak sil
+  /// Not: Bu klasördeki notların folderId'si null yapılır
   Future<void> deleteFolder(String id) async {
     final db = await _dbHelper.database;
+
+    // Bu klasördeki notların folderId'sini null yap
+    await db.update(
+      AppConstants.notesTable,
+      {'folderId': null},
+      where: 'folderId = ?',
+      whereArgs: [id],
+    );
+
+    // Klasörü kalıcı olarak sil
     await db.delete(
       AppConstants.foldersTable,
       where: 'id = ?',
