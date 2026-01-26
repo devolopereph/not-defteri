@@ -328,7 +328,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     );
 
     return PopScope(
-      canPop: !_isEditing,
+      canPop: widget.isNewNote || !_isEditing,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && _isEditing) {
           _saveAndExitEditMode();
@@ -352,7 +352,9 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
               color: isDark ? AppColors.darkText : AppColors.lightText,
             ),
             onPressed: () {
-              if (_isEditing) {
+              if (widget.isNewNote) {
+                Navigator.of(context).pop();
+              } else if (_isEditing) {
                 _saveAndExitEditMode();
               } else {
                 _saveNote();

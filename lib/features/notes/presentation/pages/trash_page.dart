@@ -90,56 +90,39 @@ class _TrashPageState extends State<TrashPage>
   }
 
   Widget _buildEmptyTrashButton(BuildContext context) {
-    return BlocBuilder<NotesBloc, NotesState>(
-      builder: (context, notesState) {
-        return BlocBuilder<FoldersBloc, FoldersState>(
-          builder: (context, foldersState) {
-            final hasDeletedNotes =
-                notesState is TrashLoaded && notesState.deletedNotes.isNotEmpty;
-            final hasDeletedFolders =
-                foldersState is FolderTrashLoaded &&
-                foldersState.deletedFolders.isNotEmpty;
+    return AnimatedBuilder(
+      animation: _tabController,
+      builder: (context, child) {
+        return BlocBuilder<NotesBloc, NotesState>(
+          builder: (context, notesState) {
+            return BlocBuilder<FoldersBloc, FoldersState>(
+              builder: (context, foldersState) {
+                final hasDeletedNotes =
+                    notesState is TrashLoaded &&
+                    notesState.deletedNotes.isNotEmpty;
+                final hasDeletedFolders =
+                    foldersState is FolderTrashLoaded &&
+                    foldersState.deletedFolders.isNotEmpty;
 
-            if (hasDeletedNotes || hasDeletedFolders) {
-              return PopupMenuButton<String>(
-                icon: const Icon(CupertinoIcons.trash),
-                onSelected: (value) {
-                  if (value == 'notes') {
-                    _showEmptyNotesTrashDialog(context);
-                  } else if (value == 'folders') {
-                    _showEmptyFoldersTrashDialog(context);
-                  }
-                },
-                itemBuilder: (context) {
-                  final l10n = AppLocalizations.of(context)!;
-                  return [
-                    if (hasDeletedNotes)
-                      PopupMenuItem(
-                        value: 'notes',
-                        child: Row(
-                          children: [
-                            const Icon(CupertinoIcons.doc, size: 20),
-                            const SizedBox(width: 12),
-                            Text(l10n.emptyTrash),
-                          ],
-                        ),
-                      ),
-                    if (hasDeletedFolders)
-                      PopupMenuItem(
-                        value: 'folders',
-                        child: Row(
-                          children: [
-                            const Icon(CupertinoIcons.folder, size: 20),
-                            const SizedBox(width: 12),
-                            Text(l10n.emptyTrash),
-                          ],
-                        ),
-                      ),
-                  ];
-                },
-              );
-            }
-            return const SizedBox.shrink();
+                final showIcon =
+                    (_tabController.index == 0 && hasDeletedNotes) ||
+                    (_tabController.index == 1 && hasDeletedFolders);
+
+                if (showIcon) {
+                  return IconButton(
+                    icon: const Icon(CupertinoIcons.trash),
+                    onPressed: () {
+                      if (_tabController.index == 0) {
+                        _showEmptyNotesTrashDialog(context);
+                      } else {
+                        _showEmptyFoldersTrashDialog(context);
+                      }
+                    },
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            );
           },
         );
       },
