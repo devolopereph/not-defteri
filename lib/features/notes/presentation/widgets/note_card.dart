@@ -125,6 +125,42 @@ class NoteCard extends StatelessWidget {
               ),
             ),
             const Spacer(),
+            // Hatırlatıcı göstergesi
+            if (note.reminderAt != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _isReminderPast(note.reminderAt!)
+                      ? AppColors.error.withAlpha(20)
+                      : AppColors.warning.withAlpha(20),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.clock_fill,
+                      size: 10,
+                      color: _isReminderPast(note.reminderAt!)
+                          ? AppColors.error
+                          : AppColors.warning,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      _formatReminderTime(note.reminderAt!, l10n),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: _isReminderPast(note.reminderAt!)
+                            ? AppColors.error
+                            : AppColors.warning,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+            ],
             if (note.images.isNotEmpty) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -294,6 +330,42 @@ class NoteCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
             ],
+            const Spacer(),
+            // Hatırlatıcı göstergesi
+            if (note.reminderAt != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _isReminderPast(note.reminderAt!)
+                      ? AppColors.error.withAlpha(20)
+                      : AppColors.warning.withAlpha(20),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      CupertinoIcons.clock_fill,
+                      size: 12,
+                      color: _isReminderPast(note.reminderAt!)
+                          ? AppColors.error
+                          : AppColors.warning,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _formatReminderTime(note.reminderAt!, l10n),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: _isReminderPast(note.reminderAt!)
+                            ? AppColors.error
+                            : AppColors.warning,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ],
@@ -314,6 +386,31 @@ class NoteCard extends StatelessWidget {
       return l10n.daysAgo(difference.inDays);
     } else {
       return '${date.day}.${date.month}.${date.year}';
+    }
+  }
+
+  /// Hatırlatıcının geçip geçmediğini kontrol et
+  bool _isReminderPast(DateTime reminderAt) {
+    return reminderAt.isBefore(DateTime.now());
+  }
+
+  /// Hatırlatıcı zamanını formatla
+  String _formatReminderTime(DateTime reminderAt, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final reminderDate = DateTime(reminderAt.year, reminderAt.month, reminderAt.day);
+    
+    final hour = reminderAt.hour.toString().padLeft(2, '0');
+    final minute = reminderAt.minute.toString().padLeft(2, '0');
+    final timeStr = '$hour:$minute';
+    
+    if (reminderDate == today) {
+      return '${l10n.today} $timeStr';
+    } else if (reminderDate == tomorrow) {
+      return '${l10n.tomorrow} $timeStr';
+    } else {
+      return '${reminderAt.day}.${reminderAt.month} $timeStr';
     }
   }
 }

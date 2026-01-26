@@ -159,3 +159,24 @@ class UnarchiveNote extends NotesEvent {
   @override
   List<Object?> get props => [id];
 }
+
+/// Nota hatırlatıcı ekle
+class SetNoteReminder extends NotesEvent {
+  final String noteId;
+  final DateTime reminderAt;
+
+  const SetNoteReminder(this.noteId, this.reminderAt);
+
+  @override
+  List<Object?> get props => [noteId, reminderAt];
+}
+
+/// Not hatırlatıcısını kaldır
+class RemoveNoteReminder extends NotesEvent {
+  final String noteId;
+
+  const RemoveNoteReminder(this.noteId);
+
+  @override
+  List<Object?> get props => [noteId];
+}

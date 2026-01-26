@@ -181,4 +181,22 @@ class NoteRepositoryImpl implements NoteRepository {
       throw Exception('Not arşivden çıkarılırken hata oluştu: $e');
     }
   }
+
+  @override
+  Future<void> updateNoteReminder(String noteId, DateTime? reminderAt) async {
+    try {
+      await _localDataSource.updateNoteReminder(noteId, reminderAt);
+    } catch (e) {
+      throw Exception('Hatırlatıcı güncellenirken hata oluştu: $e');
+    }
+  }
+
+  @override
+  Future<List<Note>> getNotesWithReminders() async {
+    try {
+      return await _localDataSource.getNotesWithReminders();
+    } catch (e) {
+      throw Exception('Hatırlatıcılı notlar yüklenirken hata oluştu: $e');
+    }
+  }
 }

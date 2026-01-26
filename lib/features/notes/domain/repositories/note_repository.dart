@@ -61,4 +61,10 @@ abstract class NoteRepository {
 
   /// Notu arşivden çıkar
   Future<void> unarchiveNote(String id);
+
+  /// Not hatırlatıcısını güncelle
+  Future<void> updateNoteReminder(String noteId, DateTime? reminderAt);
+
+  /// Aktif hatırlatıcıları olan notları getir
+  Future<List<Note>> getNotesWithReminders();
 }

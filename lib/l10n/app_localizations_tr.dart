@@ -604,4 +604,45 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get termsOfService => 'Kullanım Koşulları';
+
+  @override
+  String get reminder => 'Hatırlatıcı';
+
+  @override
+  String get addReminder => 'Hatırlatıcı Ekle';
+
+  @override
+  String get removeReminder => 'Hatırlatıcıyı Kaldır';
+
+  @override
+  String get reminderSet => 'Hatırlatıcı ayarlandı';
+
+  @override
+  String get reminderRemoved => 'Hatırlatıcı kaldırıldı';
+
+  @override
+  String get selectDateTime => 'Tarih ve Saat Seçin';
+
+  @override
+  String get reminderNotification => 'Not Hatırlatıcısı';
+
+  @override
+  String reminderNotificationBody(String title) {
+    return 'Hatırlatıcı: $title';
+  }
+
+  @override
+  String get today => 'Bugün';
+
+  @override
+  String get tomorrow => 'Yarın';
+
+  @override
+  String get pickDateTime => 'Tarih ve saat seç';
+
+  @override
+  String get reminderPastError => 'Geçmiş bir zaman seçemezsiniz';
+
+  @override
+  String get at => 'saat';
 }

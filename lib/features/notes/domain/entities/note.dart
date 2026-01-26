@@ -17,6 +17,7 @@ class Note extends Equatable {
   final DateTime? deletedAt; // Silinme tarihi
   final String? folderId; // Ait olduğu klasör ID'si (null = klasörsüz)
   final bool isArchived; // Arşivlenmiş mi?
+  final DateTime? reminderAt; // Hatırlatıcı zamanı
 
   const Note({
     required this.id,
@@ -30,6 +31,7 @@ class Note extends Equatable {
     this.deletedAt,
     this.folderId,
     this.isArchived = false,
+    this.reminderAt,
   });
 
   /// Boş not oluştur
@@ -47,6 +49,7 @@ class Note extends Equatable {
       deletedAt: null,
       folderId: null,
       isArchived: false,
+      reminderAt: null,
     );
   }
 
@@ -66,6 +69,9 @@ class Note extends Equatable {
           : null,
       folderId: json['folderId'] as String?,
       isArchived: json['isArchived'] == 1 || json['isArchived'] == true,
+      reminderAt: json['reminderAt'] != null
+          ? DateTime.parse(json['reminderAt'] as String)
+          : null,
     );
   }
 
@@ -98,6 +104,7 @@ class Note extends Equatable {
       'isPinned': isPinned ? 1 : 0,
       'isDeleted': isDeleted ? 1 : 0,
       'deletedAt': deletedAt?.toIso8601String(),
+      'reminderAt': reminderAt?.toIso8601String(),
       'folderId': folderId,
       'isArchived': isArchived ? 1 : 0,
     };
@@ -117,6 +124,7 @@ class Note extends Equatable {
       'deletedAt': deletedAt?.toIso8601String(),
       'folderId': folderId,
       'isArchived': isArchived ? 1 : 0,
+      'reminderAt': reminderAt?.toIso8601String(),
     };
   }
 
@@ -136,6 +144,9 @@ class Note extends Equatable {
           : null,
       folderId: map['folderId'] as String?,
       isArchived: map['isArchived'] == 1 || map['isArchived'] == true,
+      reminderAt: map['reminderAt'] != null
+          ? DateTime.parse(map['reminderAt'] as String)
+          : null,
     );
   }
 
@@ -152,6 +163,8 @@ class Note extends Equatable {
     DateTime? deletedAt,
     String? folderId,
     bool? isArchived,
+    DateTime? reminderAt,
+    bool clearReminder = false,
   }) {
     return Note(
       id: id ?? this.id,
@@ -165,6 +178,7 @@ class Note extends Equatable {
       deletedAt: deletedAt ?? this.deletedAt,
       folderId: folderId ?? this.folderId,
       isArchived: isArchived ?? this.isArchived,
+      reminderAt: clearReminder ? null : (reminderAt ?? this.reminderAt),
     );
   }
 
@@ -281,5 +295,6 @@ class Note extends Equatable {
     deletedAt,
     folderId,
     isArchived,
+    reminderAt,
   ];
 }

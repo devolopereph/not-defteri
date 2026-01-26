@@ -8,6 +8,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_cubit.dart';
 import 'core/locale/locale_cubit.dart';
 import 'core/security/security_cubit.dart';
+import 'core/services/notification_service.dart';
 import 'features/notes/data/datasources/note_local_data_source.dart';
 import 'features/notes/data/datasources/folder_local_data_source.dart';
 import 'features/notes/data/repositories/note_repository_impl.dart';
@@ -22,6 +23,10 @@ import 'features/notes/presentation/pages/lock_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Bildirim servisini başlat
+  await NotificationService().initialize();
+  await NotificationService().requestPermission();
 
   // SharedPreferences başlat
   final prefs = await SharedPreferences.getInstance();

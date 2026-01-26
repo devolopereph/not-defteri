@@ -177,5 +177,18 @@
   "deletedFoldersAppear": "Silinen klasörler burada görünecek",
   "emptyTrashFolders": "Çöp kutusundaki tüm klasörleri kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.",
   "privacyPolicy": "Gizlilik Politikası",
-  "termsOfService": "Kullanım Koşulları"
+  "termsOfService": "Kullanım Koşulları",
+  "reminder": "Hatırlatıcı",
+  "addReminder": "Hatırlatıcı Ekle",
+  "removeReminder": "Hatırlatıcıyı Kaldır",
+  "reminderSet": "Hatırlatıcı ayarlandı",
+  "reminderRemoved": "Hatırlatıcı kaldırıldı",
+  "selectDateTime": "Tarih ve Saat Seçin",
+  "reminderNotification": "Not Hatırlatıcısı",
+  "reminderNotificationBody": "Hatırlatıcı: {title}",
+  "today": "Bugün",
+  "tomorrow": "Yarın",
+  "pickDateTime": "Tarih ve saat seç",
+  "reminderPastError": "Geçmiş bir zaman seçemezsiniz",
+  "at": "saat"
 }

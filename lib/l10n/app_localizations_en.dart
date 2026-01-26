@@ -598,4 +598,45 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get termsOfService => 'Terms of Service';
+
+  @override
+  String get reminder => 'Reminder';
+
+  @override
+  String get addReminder => 'Add Reminder';
+
+  @override
+  String get removeReminder => 'Remove Reminder';
+
+  @override
+  String get reminderSet => 'Reminder set';
+
+  @override
+  String get reminderRemoved => 'Reminder removed';
+
+  @override
+  String get selectDateTime => 'Select Date & Time';
+
+  @override
+  String get reminderNotification => 'Note Reminder';
+
+  @override
+  String reminderNotificationBody(String title) {
+    return 'Reminder: $title';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get pickDateTime => 'Pick date and time';
+
+  @override
+  String get reminderPastError => 'Cannot select a time in the past';
+
+  @override
+  String get at => 'at';
 }

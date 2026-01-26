@@ -839,5 +839,63 @@
   "termsOfService": "Terms of Service",
   "@termsOfService": {
     "description": "Terms of service link text"
+  },
+  "reminder": "Reminder",
+  "@reminder": {
+    "description": "Reminder label"
+  },
+  "addReminder": "Add Reminder",
+  "@addReminder": {
+    "description": "Add reminder action"
+  },
+  "removeReminder": "Remove Reminder",
+  "@removeReminder": {
+    "description": "Remove reminder action"
+  },
+  "reminderSet": "Reminder set",
+  "@reminderSet": {
+    "description": "Reminder set snackbar message"
+  },
+  "reminderRemoved": "Reminder removed",
+  "@reminderRemoved": {
+    "description": "Reminder removed snackbar message"
+  },
+  "selectDateTime": "Select Date & Time",
+  "@selectDateTime": {
+    "description": "Select date and time dialog title"
+  },
+  "reminderNotification": "Note Reminder",
+  "@reminderNotification": {
+    "description": "Notification title for reminder"
+  },
+  "reminderNotificationBody": "Reminder: {title}",
+  "@reminderNotificationBody": {
+    "description": "Notification body for reminder",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "My Note"
+      }
+    }
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Today label"
+  },
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "Tomorrow label"
+  },
+  "pickDateTime": "Pick date and time",
+  "@pickDateTime": {
+    "description": "Pick date and time hint"
+  },
+  "reminderPastError": "Cannot select a time in the past",
+  "@reminderPastError": {
+    "description": "Error message for past time selection"
+  },
+  "at": "at",
+  "@at": {
+    "description": "Time separator word"
   }
 }

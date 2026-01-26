@@ -1165,6 +1165,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Terms of Service'**
   String get termsOfService;
+
+  /// Reminder label
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get reminder;
+
+  /// Add reminder action
+  ///
+  /// In en, this message translates to:
+  /// **'Add Reminder'**
+  String get addReminder;
+
+  /// Remove reminder action
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Reminder'**
+  String get removeReminder;
+
+  /// Reminder set snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder set'**
+  String get reminderSet;
+
+  /// Reminder removed snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder removed'**
+  String get reminderRemoved;
+
+  /// Select date and time dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date & Time'**
+  String get selectDateTime;
+
+  /// Notification title for reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Note Reminder'**
+  String get reminderNotification;
+
+  /// Notification body for reminder
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder: {title}'**
+  String reminderNotificationBody(String title);
+
+  /// Today label
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Tomorrow label
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// Pick date and time hint
+  ///
+  /// In en, this message translates to:
+  /// **'Pick date and time'**
+  String get pickDateTime;
+
+  /// Error message for past time selection
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot select a time in the past'**
+  String get reminderPastError;
+
+  /// Time separator word
+  ///
+  /// In en, this message translates to:
+  /// **'at'**
+  String get at;
 }
 
 class _AppLocalizationsDelegate

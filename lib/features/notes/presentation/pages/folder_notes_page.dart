@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../domain/entities/folder.dart';
 import '../../domain/entities/note.dart';
 import '../../domain/repositories/note_repository.dart';
@@ -218,6 +219,50 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
                   },
                 ),
 
+                // Hatırlatıcı Ekle / Kaldır
+                ListTile(
+                  leading: Icon(
+                    note.reminderAt != null
+                        ? CupertinoIcons.clock_fill
+                        : CupertinoIcons.clock,
+                    color: note.reminderAt != null
+                        ? AppColors.warning
+                        : AppColors.accent,
+                  ),
+                  title: Text(
+                    note.reminderAt != null
+                        ? l10n.removeReminder
+                        : l10n.addReminder,
+                  ),
+                  trailing: note.reminderAt != null
+                      ? Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.warning.withAlpha(30),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _formatReminderDateTime(note.reminderAt!, l10n),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.warning,
+                            ),
+                          ),
+                        )
+                      : null,
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    if (note.reminderAt != null) {
+                      _removeReminder(note);
+                    } else {
+                      _showReminderPicker(note);
+                    }
+                  },
+                ),
+
                 // Sabitle / Sabitlemeyi Kaldır
                 ListTile(
                   leading: Icon(
@@ -283,6 +328,125 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  /// Hatırlatıcı zaman formatı
+  String _formatReminderDateTime(DateTime dateTime, AppLocalizations l10n) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final reminderDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final timeStr = '$hour:$minute';
+    
+    if (reminderDate == today) {
+      return '${l10n.today} $timeStr';
+    } else if (reminderDate == tomorrow) {
+      return '${l10n.tomorrow} $timeStr';
+    } else {
+      return '${dateTime.day}.${dateTime.month} $timeStr';
+    }
+  }
+
+  /// Hatırlatıcıyı kaldır
+  void _removeReminder(Note note) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    NotificationService().cancelReminder(note.id);
+    context.read<NotesBloc>().add(RemoveNoteReminder(note.id));
+    _loadNotes();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.reminderRemoved),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  /// Hatırlatıcı seçici göster
+  void _showReminderPicker(Note note) async {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = context.read<ThemeCubit>().isDark;
+    
+    final now = DateTime.now();
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primary,
+              brightness: isDark ? Brightness.dark : Brightness.light,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    
+    if (selectedDate == null || !mounted) return;
+    
+    final selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.primary,
+              brightness: isDark ? Brightness.dark : Brightness.light,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    
+    if (selectedTime == null || !mounted) return;
+    
+    final reminderDateTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
+    
+    if (reminderDateTime.isBefore(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.reminderPastError),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    
+    await NotificationService().scheduleReminder(
+      noteId: note.id,
+      title: l10n.reminderNotification,
+      body: l10n.reminderNotificationBody(
+        note.title.isNotEmpty ? note.title : l10n.untitledNote,
+      ),
+      scheduledTime: reminderDateTime,
+    );
+    
+    context.read<NotesBloc>().add(SetNoteReminder(note.id, reminderDateTime));
+    _loadNotes();
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.reminderSet),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }

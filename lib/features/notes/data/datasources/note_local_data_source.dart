@@ -32,7 +32,7 @@ class DatabaseHelper {
     return await openDatabase(
       path,
       version:
-          6, // Versiyon 6'ya yükseltildi - folders tablosuna isDeleted ve deletedAt eklendi
+          7, // Versiyon 7'ye yükseltildi - notes tablosuna reminderAt eklendi
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -53,7 +53,8 @@ class DatabaseHelper {
         isDeleted INTEGER NOT NULL DEFAULT 0,
         deletedAt TEXT,
         folderId TEXT,
-        isArchived INTEGER NOT NULL DEFAULT 0
+        isArchived INTEGER NOT NULL DEFAULT 0,
+        reminderAt TEXT
       )
     ''');
 
@@ -163,6 +164,18 @@ class DatabaseHelper {
       // Silinmiş klasörler için indeks
       await db.execute('''
         CREATE INDEX idx_folders_deleted ON ${AppConstants.foldersTable} (isDeleted, deletedAt DESC)
+      ''');
+    }
+
+    // Versiyon 6'dan 7'ye güncelleme: notes tablosuna reminderAt alanı eklendi
+    if (oldVersion < 7) {
+      await db.execute('''
+        ALTER TABLE ${AppConstants.notesTable} ADD COLUMN reminderAt TEXT
+      ''');
+
+      // Hatırlatıcılı notlar için indeks
+      await db.execute('''
+        CREATE INDEX idx_notes_reminder ON ${AppConstants.notesTable} (reminderAt)
       ''');
     }
   }
@@ -411,6 +424,29 @@ class NoteLocalDataSource {
       where: 'folderId IS NULL AND isDeleted = ?',
       whereArgs: [0],
       orderBy: 'isPinned DESC, updatedAt DESC',
+    );
+    return maps.map((map) => Note.fromMap(map)).toList();
+  }
+
+  /// Not hatırlatıcısını güncelle
+  Future<void> updateNoteReminder(String noteId, DateTime? reminderAt) async {
+    final db = await _dbHelper.database;
+    await db.update(
+      AppConstants.notesTable,
+      {'reminderAt': reminderAt?.toIso8601String()},
+      where: 'id = ?',
+      whereArgs: [noteId],
+    );
+  }
+
+  /// Aktif hatırlatıcıları olan notları getir
+  Future<List<Note>> getNotesWithReminders() async {
+    final db = await _dbHelper.database;
+    final maps = await db.query(
+      AppConstants.notesTable,
+      where: 'reminderAt IS NOT NULL AND isDeleted = ?',
+      whereArgs: [0],
+      orderBy: 'reminderAt ASC',
     );
     return maps.map((map) => Note.fromMap(map)).toList();
   }

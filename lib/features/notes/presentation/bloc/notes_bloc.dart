@@ -41,6 +41,8 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
     on<LoadArchivedNotes>(_onLoadArchivedNotes);
     on<ArchiveNote>(_onArchiveNote);
     on<UnarchiveNote>(_onUnarchiveNote);
+    on<SetNoteReminder>(_onSetNoteReminder);
+    on<RemoveNoteReminder>(_onRemoveNoteReminder);
   }
 
   /// Notları yükle
@@ -383,6 +385,54 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
             .where((n) => n.id != event.id)
             .toList();
         emit(ArchivedNotesLoaded(updatedNotes));
+      }
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Nota hatırlatıcı ekle
+  Future<void> _onSetNoteReminder(
+    SetNoteReminder event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await _repository.updateNoteReminder(event.noteId, event.reminderAt);
+
+      // Mevcut listeyi güncelle
+      if (state is NotesLoaded) {
+        final currentNotes = (state as NotesLoaded).notes;
+        final updatedNotes = currentNotes.map((n) {
+          if (n.id == event.noteId) {
+            return n.copyWith(reminderAt: event.reminderAt);
+          }
+          return n;
+        }).toList();
+        emit(NotesLoaded(updatedNotes));
+      }
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Not hatırlatıcısını kaldır
+  Future<void> _onRemoveNoteReminder(
+    RemoveNoteReminder event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await _repository.updateNoteReminder(event.noteId, null);
+
+      // Mevcut listeyi güncelle
+      if (state is NotesLoaded) {
+        final currentNotes = (state as NotesLoaded).notes;
+        final updatedNotes = currentNotes.map((n) {
+          if (n.id == event.noteId) {
+            return n.copyWith(clearReminder: true);
+          }
+          return n;
+        }).toList();
+        emit(NotesLoaded(updatedNotes));
       }
     } catch (e) {
       emit(NotesError(e.toString()));
