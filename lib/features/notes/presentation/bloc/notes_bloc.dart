@@ -25,6 +25,7 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
   NotesBloc(this._repository) : super(NotesInitial()) {
     on<LoadNotes>(_onLoadNotes);
     on<AddNote>(_onAddNote);
+    on<CreateNoteDirectly>(_onCreateNoteDirectly);
     on<UpdateNote>(_onUpdateNote);
     on<MoveNoteToTrash>(_onMoveNoteToTrash);
     on<RestoreNoteFromTrash>(_onRestoreNoteFromTrash);
@@ -65,6 +66,26 @@ class NotesBloc extends Bloc<NotesEvent, NotesState> {
         emit(NotesLoaded([note, ...currentNotes], lastAddedNoteId: note.id));
       } else {
         emit(NotesLoaded([note], lastAddedNoteId: note.id));
+      }
+    } catch (e) {
+      emit(NotesError(e.toString()));
+    }
+  }
+
+  /// Notu doğrudan oluştur (not nesnesiyle)
+  Future<void> _onCreateNoteDirectly(
+    CreateNoteDirectly event,
+    Emitter<NotesState> emit,
+  ) async {
+    try {
+      await _repository.insertNote(event.note);
+
+      // Mevcut listeyi güncelle
+      if (state is NotesLoaded) {
+        final currentNotes = (state as NotesLoaded).notes;
+        emit(NotesLoaded([event.note, ...currentNotes]));
+      } else {
+        emit(NotesLoaded([event.note]));
       }
     } catch (e) {
       emit(NotesError(e.toString()));

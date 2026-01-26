@@ -18,6 +18,16 @@ class AddNote extends NotesEvent {
   const AddNote();
 }
 
+/// Yeni notu doğrudan oluştur (not nesnesiyle)
+class CreateNoteDirectly extends NotesEvent {
+  final Note note;
+
+  const CreateNoteDirectly(this.note);
+
+  @override
+  List<Object?> get props => [note];
+}
+
 /// Not güncelle
 class UpdateNote extends NotesEvent {
   final Note note;

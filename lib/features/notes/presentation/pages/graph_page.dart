@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/note.dart';
+import '../../domain/entities/folder.dart';
 import '../bloc/notes_bloc.dart';
+import '../bloc/folders_bloc.dart';
 import 'note_editor_page.dart';
 
 /// Graf görünümü sayfası - Soy Ağacı Tasarımı
@@ -49,65 +51,103 @@ class _GraphPageState extends State<GraphPage>
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.familyTreeView)),
-      body: BlocBuilder<NotesBloc, NotesState>(
-        builder: (context, state) {
-          if (state is NotesLoading) {
-            return const Center(child: CupertinoActivityIndicator());
-          }
-
-          if (state is NotesLoaded) {
-            if (state.notes.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      CupertinoIcons.tree,
-                      size: 80,
-                      color:
-                          (isDark
-                                  ? AppColors.darkTextSecondary
-                                  : AppColors.lightTextSecondary)
-                              .withAlpha(100),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.noNotesYet,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.addNoteToUseFamilyTree,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              );
+      body: BlocBuilder<FoldersBloc, FoldersState>(
+        builder: (context, foldersState) {
+          // Klasör haritası oluştur
+          final foldersMap = <String, Folder>{};
+          if (foldersState is FoldersLoaded) {
+            for (final folder in foldersState.folders) {
+              foldersMap[folder.id] = folder;
             }
-
-            // Notları tarihe göre sırala (en yeni en yukarıda)
-            final sortedNotes = List<Note>.from(state.notes)
-              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-            return InteractiveViewer(
-              transformationController: _transformationController,
-              minScale: 0.3,
-              maxScale: 3.0,
-              boundaryMargin: const EdgeInsets.all(double.infinity),
-              constrained: false,
-              child: _FamilyTreeView(
-                notes: sortedNotes,
-                isDark: isDark,
-                animationController: _animationController,
-                onNoteTap: (note) => _navigateToEditor(context, note),
-              ),
-            );
           }
 
-          return const SizedBox.shrink();
+          return BlocBuilder<NotesBloc, NotesState>(
+            builder: (context, state) {
+              if (state is NotesLoading) {
+                return const Center(child: CupertinoActivityIndicator());
+              }
+
+              if (state is NotesLoaded) {
+                if (state.notes.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          CupertinoIcons.tree,
+                          size: 80,
+                          color:
+                              (isDark
+                                      ? AppColors.darkTextSecondary
+                                      : AppColors.lightTextSecondary)
+                                  .withAlpha(100),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          l10n.noNotesYet,
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.addNoteToUseFamilyTree,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Notları klasörlere göre grupla
+                final groupedNotes = _groupNotesByFolder(
+                  state.notes,
+                  foldersMap,
+                );
+
+                return InteractiveViewer(
+                  transformationController: _transformationController,
+                  minScale: 0.3,
+                  maxScale: 3.0,
+                  boundaryMargin: const EdgeInsets.all(double.infinity),
+                  constrained: false,
+                  child: _FamilyTreeViewGrouped(
+                    groupedNotes: groupedNotes,
+                    foldersMap: foldersMap,
+                    isDark: isDark,
+                    animationController: _animationController,
+                    onNoteTap: (note) => _navigateToEditor(context, note),
+                  ),
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          );
         },
       ),
     );
+  }
+
+  /// Notları klasörlere göre grupla
+  Map<String?, List<Note>> _groupNotesByFolder(
+    List<Note> notes,
+    Map<String, Folder> foldersMap,
+  ) {
+    final grouped = <String?, List<Note>>{};
+
+    for (final note in notes) {
+      final folderId = note.folderId;
+      if (!grouped.containsKey(folderId)) {
+        grouped[folderId] = [];
+      }
+      grouped[folderId]!.add(note);
+    }
+
+    // Her grup içinde tarihe göre sırala
+    for (final key in grouped.keys) {
+      grouped[key]!.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    }
+
+    return grouped;
   }
 
   void _navigateToEditor(BuildContext context, Note note) {
@@ -117,7 +157,430 @@ class _GraphPageState extends State<GraphPage>
   }
 }
 
-/// Soy ağacı görünümü widget'ı
+/// Klasörlere göre gruplandırılmış soy ağacı görünümü
+class _FamilyTreeViewGrouped extends StatelessWidget {
+  final Map<String?, List<Note>> groupedNotes;
+  final Map<String, Folder> foldersMap;
+  final bool isDark;
+  final AnimationController animationController;
+  final Function(Note) onNoteTap;
+
+  const _FamilyTreeViewGrouped({
+    required this.groupedNotes,
+    required this.foldersMap,
+    required this.isDark,
+    required this.animationController,
+    required this.onNoteTap,
+  });
+
+  // Boyutlar
+  static const double folderHeaderWidth = 180.0;
+  static const double folderHeaderHeight = 50.0;
+  static const double nodeWidth = 160.0;
+  static const double nodeHeight = 100.0;
+  static const double verticalSpacing = 60.0;
+  static const double horizontalSpacing = 220.0;
+  static const double topPadding = 40.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Klasörleri sırala: önce klasörü olanlar (adına göre), sonra klasörsüzler
+    final sortedKeys = groupedNotes.keys.toList()
+      ..sort((a, b) {
+        if (a == null && b == null) return 0;
+        if (a == null) return 1;
+        if (b == null) return -1;
+        final folderA = foldersMap[a];
+        final folderB = foldersMap[b];
+        if (folderA == null && folderB == null) return 0;
+        if (folderA == null) return 1;
+        if (folderB == null) return -1;
+        return folderA.name.compareTo(folderB.name);
+      });
+
+    // Toplam boyutu hesapla
+    int maxNotesInFolder = 0;
+    for (final notes in groupedNotes.values) {
+      if (notes.length > maxNotesInFolder) {
+        maxNotesInFolder = notes.length;
+      }
+    }
+
+    final totalWidth = sortedKeys.length * horizontalSpacing + 100;
+    final totalHeight =
+        topPadding +
+        folderHeaderHeight +
+        verticalSpacing +
+        maxNotesInFolder * (nodeHeight + verticalSpacing) +
+        100;
+
+    return SizedBox(
+      width: totalWidth,
+      height: totalHeight,
+      child: CustomPaint(
+        painter: _FamilyTreeGroupedPainter(
+          groupedNotes: groupedNotes,
+          sortedKeys: sortedKeys,
+          foldersMap: foldersMap,
+          isDark: isDark,
+          folderHeaderWidth: folderHeaderWidth,
+          folderHeaderHeight: folderHeaderHeight,
+          nodeWidth: nodeWidth,
+          nodeHeight: nodeHeight,
+          verticalSpacing: verticalSpacing,
+          horizontalSpacing: horizontalSpacing,
+          topPadding: topPadding,
+        ),
+        child: Stack(children: _buildNodes(context, l10n, sortedKeys)),
+      ),
+    );
+  }
+
+  List<Widget> _buildNodes(
+    BuildContext context,
+    AppLocalizations l10n,
+    List<String?> sortedKeys,
+  ) {
+    final widgets = <Widget>[];
+    int totalIndex = 0;
+
+    for (int folderIndex = 0; folderIndex < sortedKeys.length; folderIndex++) {
+      final folderId = sortedKeys[folderIndex];
+      final notes = groupedNotes[folderId]!;
+      final folder = folderId != null ? foldersMap[folderId] : null;
+
+      final x = 50 + folderIndex * horizontalSpacing;
+
+      // Klasör başlığı
+      widgets.add(
+        AnimatedBuilder(
+          animation: animationController,
+          builder: (context, child) {
+            final delay = folderIndex / (sortedKeys.length + 1) * 0.3;
+            final animation = CurvedAnimation(
+              parent: animationController,
+              curve: Interval(delay, delay + 0.3, curve: Curves.easeOutBack),
+            );
+
+            return Positioned(
+              left: x,
+              top: topPadding,
+              child: Transform.scale(
+                scale: animation.value.clamp(0.0, 1.2),
+                child: Opacity(
+                  opacity: animation.value.clamp(0.0, 1.0),
+                  child: child,
+                ),
+              ),
+            );
+          },
+          child: _buildFolderHeader(context, folder, notes.length, l10n),
+        ),
+      );
+
+      // O klasördeki notlar
+      for (int noteIndex = 0; noteIndex < notes.length; noteIndex++) {
+        final note = notes[noteIndex];
+        final noteY =
+            topPadding +
+            folderHeaderHeight +
+            verticalSpacing +
+            noteIndex * (nodeHeight + verticalSpacing);
+
+        widgets.add(
+          AnimatedBuilder(
+            animation: animationController,
+            builder: (context, child) {
+              final delay =
+                  (totalIndex + noteIndex + 1) /
+                  (groupedNotes.values.fold(
+                        0,
+                        (sum, list) => sum + list.length,
+                      ) +
+                      sortedKeys.length) *
+                  0.6;
+              final scaleAnimation = CurvedAnimation(
+                parent: animationController,
+                curve: Interval(
+                  delay,
+                  (delay + 0.4).clamp(0.0, 1.0),
+                  curve: Curves.easeOutBack,
+                ),
+              );
+              final opacityAnimation = CurvedAnimation(
+                parent: animationController,
+                curve: Interval(
+                  delay,
+                  (delay + 0.3).clamp(0.0, 1.0),
+                  curve: Curves.easeOut,
+                ),
+              );
+
+              return Positioned(
+                left: x + (folderHeaderWidth - nodeWidth) / 2,
+                top: noteY,
+                child: Transform.scale(
+                  scale: scaleAnimation.value.clamp(0.0, 1.2),
+                  child: Opacity(
+                    opacity: opacityAnimation.value.clamp(0.0, 1.0),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            child: _buildNoteNode(context, note),
+          ),
+        );
+      }
+
+      totalIndex += notes.length;
+    }
+
+    return widgets;
+  }
+
+  Widget _buildFolderHeader(
+    BuildContext context,
+    Folder? folder,
+    int noteCount,
+    AppLocalizations l10n,
+  ) {
+    final color = folder != null ? Color(folder.color) : AppColors.primary;
+
+    return Container(
+      width: folderHeaderWidth,
+      height: folderHeaderHeight,
+      decoration: BoxDecoration(
+        color: color.withAlpha(isDark ? 40 : 30),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withAlpha(100), width: 2),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (folder?.emoji != null) ...[
+            Text(folder!.emoji!, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 8),
+          ] else ...[
+            Icon(
+              folder != null
+                  ? CupertinoIcons.folder_fill
+                  : CupertinoIcons.doc_text_fill,
+              color: color,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+          ],
+          Flexible(
+            child: Text(
+              folder?.name ?? l10n.notes,
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: color.withAlpha(50),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '$noteCount',
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoteNode(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
+    // Renk seçimi - sabit kalması için ID hash kullanılıyor
+    final colorIndex = note.id.hashCode.abs() % AppColors.nodeColors.length;
+    final color = AppColors.nodeColors[colorIndex];
+
+    return GestureDetector(
+      onTap: () => onNoteTap(note),
+      child: Container(
+        width: nodeWidth,
+        height: nodeHeight,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [color, color.withAlpha(180)],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withAlpha(60),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(40),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Icon(
+                      CupertinoIcons.doc_text_fill,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      note.title.isNotEmpty ? note.title : l10n.untitledNote,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Row(
+                children: [
+                  const Icon(
+                    CupertinoIcons.time,
+                    color: Colors.white70,
+                    size: 10,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    _formatDate(note.createdAt),
+                    style: const TextStyle(color: Colors.white, fontSize: 10),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return DateFormat('dd MMM yyyy').format(date);
+  }
+}
+
+/// Gruplandırılmış soy ağacı çizici
+class _FamilyTreeGroupedPainter extends CustomPainter {
+  final Map<String?, List<Note>> groupedNotes;
+  final List<String?> sortedKeys;
+  final Map<String, Folder> foldersMap;
+  final bool isDark;
+  final double folderHeaderWidth;
+  final double folderHeaderHeight;
+  final double nodeWidth;
+  final double nodeHeight;
+  final double verticalSpacing;
+  final double horizontalSpacing;
+  final double topPadding;
+
+  _FamilyTreeGroupedPainter({
+    required this.groupedNotes,
+    required this.sortedKeys,
+    required this.foldersMap,
+    required this.isDark,
+    required this.folderHeaderWidth,
+    required this.folderHeaderHeight,
+    required this.nodeWidth,
+    required this.nodeHeight,
+    required this.verticalSpacing,
+    required this.horizontalSpacing,
+    required this.topPadding,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = (isDark ? AppColors.darkBorder : AppColors.lightBorder)
+          .withAlpha(150)
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    for (int folderIndex = 0; folderIndex < sortedKeys.length; folderIndex++) {
+      final folderId = sortedKeys[folderIndex];
+      final notes = groupedNotes[folderId]!;
+      final folder = folderId != null ? foldersMap[folderId] : null;
+      final folderColor = folder != null
+          ? Color(folder.color)
+          : AppColors.primary;
+
+      final x = 50 + folderIndex * horizontalSpacing + folderHeaderWidth / 2;
+
+      // Folder header'dan ilk nota çizgi
+      if (notes.isNotEmpty) {
+        final startY = topPadding + folderHeaderHeight;
+        final endY = topPadding + folderHeaderHeight + verticalSpacing;
+
+        final gradientPaint = Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [folderColor.withAlpha(150), folderColor.withAlpha(50)],
+          ).createShader(Rect.fromLTRB(x, startY, x, endY))
+          ..strokeWidth = 2
+          ..style = PaintingStyle.stroke;
+
+        canvas.drawLine(Offset(x, startY), Offset(x, endY), gradientPaint);
+      }
+
+      // Notlar arası çizgiler
+      for (int noteIndex = 0; noteIndex < notes.length - 1; noteIndex++) {
+        final noteX =
+            50 + folderIndex * horizontalSpacing + folderHeaderWidth / 2;
+        final noteY1 =
+            topPadding +
+            folderHeaderHeight +
+            verticalSpacing +
+            noteIndex * (nodeHeight + verticalSpacing) +
+            nodeHeight;
+        final noteY2 = noteY1 + verticalSpacing;
+
+        canvas.drawLine(
+          Offset(noteX, noteY1),
+          Offset(noteX, noteY2),
+          linePaint,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Soy ağacı görünümü widget'ı (eski versiyon - geriye dönük uyumluluk için)
 class _FamilyTreeView extends StatelessWidget {
   final List<Note> notes;
   final bool isDark;

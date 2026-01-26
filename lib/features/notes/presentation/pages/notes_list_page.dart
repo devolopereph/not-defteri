@@ -11,6 +11,7 @@ import '../../domain/entities/folder.dart';
 import '../bloc/notes_bloc.dart';
 import '../bloc/folders_bloc.dart';
 import '../widgets/note_card.dart';
+import '../widgets/swipeable_note_card.dart';
 import '../widgets/empty_state.dart';
 import 'note_editor_page.dart';
 
@@ -62,16 +63,7 @@ class _NotesListPageState extends State<NotesListPage> {
     final isDark = context.watch<ThemeCubit>().isDark;
 
     return Scaffold(
-      body: BlocConsumer<NotesBloc, NotesState>(
-        listener: (context, state) {
-          if (state is NotesLoaded && state.lastAddedNoteId != null) {
-            final note = state.notes.firstWhere(
-              (n) => n.id == state.lastAddedNoteId,
-              orElse: () => Note.empty(state.lastAddedNoteId!),
-            );
-            _navigateToEditor(context, note);
-          }
-        },
+      body: BlocBuilder<NotesBloc, NotesState>(
         builder: (context, state) {
           return CustomScrollView(
             slivers: [
@@ -202,7 +194,7 @@ class _NotesListPageState extends State<NotesListPage> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'notes_fab',
         onPressed: () {
-          context.read<NotesBloc>().add(const AddNote());
+          _navigateToNewNote(context);
         },
         child: const Icon(CupertinoIcons.add),
       ),
@@ -211,13 +203,37 @@ class _NotesListPageState extends State<NotesListPage> {
 
   /// Liste görünümü (Sliver)
   Widget _buildSliverList(List<Note> notes) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
         final note = notes[index];
-        return NoteCard(
+        return SwipeableNoteCard(
           note: note,
           onTap: () => _navigateToEditor(context, note),
           onLongPress: () => _showNoteOptionsSheet(context, note),
+          onDelete: () {
+            context.read<NotesBloc>().add(MoveNoteToTrash(note.id));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.deleteNote),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
+          onArchive: () {
+            context.read<NotesBloc>().add(ArchiveNote(note.id));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.noteArchived),
+                backgroundColor: AppColors.success,
+                behavior: SnackBarBehavior.floating,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          },
           isGridView: false,
         );
       }, childCount: notes.length),
@@ -270,6 +286,15 @@ class _NotesListPageState extends State<NotesListPage> {
   void _navigateToEditor(BuildContext context, Note note) {
     Navigator.of(context).push(
       CupertinoPageRoute(builder: (context) => NoteEditorPage(note: note)),
+    );
+  }
+
+  /// Yeni not oluşturmak için düzenleme ekranına git
+  void _navigateToNewNote(BuildContext context) {
+    Navigator.of(context).push(
+      CupertinoPageRoute(
+        builder: (context) => const NoteEditorPage(isNewNote: true),
+      ),
     );
   }
 

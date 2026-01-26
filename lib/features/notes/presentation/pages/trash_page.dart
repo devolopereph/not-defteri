@@ -754,57 +754,253 @@ class _TrashPageState extends State<TrashPage>
     );
   }
 
-  /// Notlar çöp kutusunu boşaltma dialogu
+  /// Notlar çöp kutusunu boşaltma bottom sheet
   void _showEmptyNotesTrashDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = context.read<ThemeCubit>().isDark;
 
-    showCupertinoDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (dialogContext) => CupertinoAlertDialog(
-        title: Text(l10n.emptyTrash),
-        content: Text(l10n.emptyTrashConfirm),
-        actions: [
-          CupertinoDialogAction(
-            child: Text(l10n.cancel),
-            onPressed: () => Navigator.of(dialogContext).pop(),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: Text(l10n.emptyTrash),
-            onPressed: () {
-              context.read<NotesBloc>().add(const EmptyTrash());
-              Navigator.of(dialogContext).pop();
-            },
-          ),
-        ],
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Üst çizgi
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Uyarı ikonu
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withAlpha(20),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.trash,
+                    size: 32,
+                    color: AppColors.error,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Başlık
+                Text(
+                  l10n.emptyTrash,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+
+                // Açıklama
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    l10n.emptyTrashConfirm,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // Butonlar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      // İptal butonu
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: BorderSide(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.lightBorder,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(l10n.cancel),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Boşalt butonu
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<NotesBloc>().add(const EmptyTrash());
+                            Navigator.pop(sheetContext);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.error,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(l10n.emptyTrash),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  /// Klasörler çöp kutusunu boşaltma dialogu
+  /// Klasörler çöp kutusunu boşaltma bottom sheet
   void _showEmptyFoldersTrashDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isDark = context.read<ThemeCubit>().isDark;
 
-    showCupertinoDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (dialogContext) => CupertinoAlertDialog(
-        title: Text(l10n.emptyTrash),
-        content: Text(l10n.emptyTrashFolders),
-        actions: [
-          CupertinoDialogAction(
-            child: Text(l10n.cancel),
-            onPressed: () => Navigator.of(dialogContext).pop(),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: Text(l10n.emptyTrash),
-            onPressed: () {
-              context.read<FoldersBloc>().add(const EmptyFolderTrash());
-              Navigator.of(dialogContext).pop();
-            },
-          ),
-        ],
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Üst çizgi
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Uyarı ikonu
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withAlpha(20),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.folder,
+                    size: 32,
+                    color: AppColors.error,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Başlık
+                Text(
+                  l10n.emptyTrash,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+
+                // Açıklama
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    l10n.emptyTrashFolders,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // Butonlar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      // İptal butonu
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: BorderSide(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.lightBorder,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(l10n.cancel),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Boşalt butonu
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            context.read<FoldersBloc>().add(
+                              const EmptyFolderTrash(),
+                            );
+                            Navigator.pop(sheetContext);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.error,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(l10n.emptyTrash),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

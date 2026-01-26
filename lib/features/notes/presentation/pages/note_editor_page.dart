@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:intl/intl.dart' hide TextDirection;
+import 'package:uuid/uuid.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
@@ -23,10 +24,13 @@ import '../widgets/image_gallery_viewer.dart';
 /// AppFlowy Editor ile zengin metin düzenleme.
 /// Otomatik kaydetme özelliği.
 /// Varsayılan olarak salt okunur modda açılır.
+/// isNewNote: true ise yeni not oluşturma modunda açılır.
 class NoteEditorPage extends StatefulWidget {
-  final Note note;
+  final Note? note;
+  final bool isNewNote;
 
-  const NoteEditorPage({super.key, required this.note});
+  const NoteEditorPage({super.key, this.note, this.isNewNote = false})
+    : assert(note != null || isNewNote, 'note veya isNewNote belirtilmeli');
 
   @override
   State<NoteEditorPage> createState() => _NoteEditorPageState();
@@ -40,6 +44,12 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   Timer? _debounceTimer;
   bool _hasChanges = false;
   List<String> _images = [];
+
+  /// Mevcut not (yeni not oluşturulduğunda güncellenir)
+  late Note _currentNote;
+
+  /// Yeni not oluşturuldu mu?
+  bool _isNewNoteCreated = false;
 
   /// Düzenleme modu (true) veya salt okunur modu (false)
   bool _isEditing = false;
@@ -55,8 +65,18 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.note.title);
-    _images = List.from(widget.note.images);
+
+    // Yeni not modu veya mevcut not
+    if (widget.isNewNote) {
+      _currentNote = Note.empty(const Uuid().v4());
+      _isEditing = true; // Yeni notlarda direkt düzenleme modunda başla
+      _isNewNoteCreated = false;
+    } else {
+      _currentNote = widget.note!;
+    }
+
+    _titleController = TextEditingController(text: _currentNote.title);
+    _images = List.from(_currentNote.images);
 
     // Editor state'i başlat
     _editorState = _createEditorState();
@@ -71,12 +91,12 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
   }
 
   EditorState _createEditorState() {
-    if (widget.note.content.isEmpty) {
+    if (_currentNote.content.isEmpty) {
       return EditorState.blank();
     }
 
     try {
-      final json = jsonDecode(widget.note.content);
+      final json = jsonDecode(_currentNote.content);
       if (json is Map<String, dynamic>) {
         final document = Document.fromJson(json);
         return EditorState(document: document);
@@ -108,14 +128,35 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     if (!_hasChanges) return;
 
     final content = jsonEncode(_editorState.document.toJson());
-    final updatedNote = widget.note.copyWith(
+
+    // İçerik kontrolü - boş not kaydetme
+    final hasTitle = _titleController.text.trim().isNotEmpty;
+    final hasContent =
+        content !=
+        '{"document":{"type":"page","children":[{"type":"paragraph","data":{"delta":[]}}]}}';
+    final hasImages = _images.isNotEmpty;
+
+    if (!hasTitle && !hasContent && !hasImages) {
+      // Boş not, kaydetme
+      _hasChanges = false;
+      return;
+    }
+
+    _currentNote = _currentNote.copyWith(
       title: _titleController.text,
       content: content,
       updatedAt: DateTime.now(),
       images: _images,
     );
 
-    context.read<NotesBloc>().add(UpdateNote(updatedNote));
+    if (widget.isNewNote && !_isNewNoteCreated) {
+      // Yeni not oluştur
+      context.read<NotesBloc>().add(CreateNoteDirectly(_currentNote));
+      _isNewNoteCreated = true;
+    } else {
+      // Mevcut notu güncelle
+      context.read<NotesBloc>().add(UpdateNote(_currentNote));
+    }
     _hasChanges = false;
   }
 
@@ -178,7 +219,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
     }
 
     // İçerikte ara
-    final fullText = widget.note.fullTextContent.toLowerCase();
+    final fullText = _currentNote.fullTextContent.toLowerCase();
     startIndex = 0;
     while (true) {
       final index = fullText.indexOf(lowerQuery, startIndex);
@@ -188,7 +229,7 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
           type: SearchMatchType.content,
           startIndex: index,
           length: query.length,
-          text: widget.note.fullTextContent.substring(
+          text: _currentNote.fullTextContent.substring(
             index,
             index + query.length,
           ),
@@ -247,14 +288,14 @@ class _NoteEditorPageState extends State<NoteEditorPage> {
             child: Row(
               children: [
                 Text(
-                  _formatDate(widget.note.updatedAt),
+                  _formatDate(_currentNote.updatedAt),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: isDark
                         ? AppColors.darkTextSecondary
                         : AppColors.lightTextSecondary,
                   ),
                 ),
-                if (widget.note.folderId != null) ...[
+                if (_currentNote.folderId != null) ...[
                   const SizedBox(width: 8),
                   Container(
                     width: 4,
