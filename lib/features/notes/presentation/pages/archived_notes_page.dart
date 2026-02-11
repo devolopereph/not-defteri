@@ -67,7 +67,7 @@ class _ArchivedNotesPageState extends State<ArchivedNotesPage> {
                   final note = state.archivedNotes[index];
                   return NoteCard(
                     note: note,
-                    onTap: () => _navigateToEditor(context, note),
+                    onTap: () => _navigateToEditor(note),
                     onLongPress: () => _showNoteOptionsSheet(context, note),
                     isGridView: false,
                   );
@@ -82,17 +82,15 @@ class _ArchivedNotesPageState extends State<ArchivedNotesPage> {
     );
   }
 
-  void _navigateToEditor(BuildContext context, Note note) {
-    Navigator.of(context)
-        .push(
-          CupertinoPageRoute(builder: (context) => NoteEditorPage(note: note)),
-        )
-        .then((_) {
-          // Sayfa geri dönüldüğünde arşivlenen notları yenile
-          if (mounted) {
-            context.read<NotesBloc>().add(const LoadArchivedNotes());
-          }
-        });
+  void _navigateToEditor(Note note) async {
+    await Navigator.of(context).push(
+      CupertinoPageRoute(builder: (context) => NoteEditorPage(note: note)),
+    );
+
+    // Sayfa geri dönüldüğünde arşivlenen notları yenile
+    if (mounted) {
+      context.read<NotesBloc>().add(const LoadArchivedNotes());
+    }
   }
 
   void _showNoteOptionsSheet(BuildContext context, Note note) {

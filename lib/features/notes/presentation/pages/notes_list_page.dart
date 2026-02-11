@@ -204,8 +204,6 @@ class _NotesListPageState extends State<NotesListPage> {
 
   /// Liste görünümü (Sliver)
   Widget _buildSliverList(List<Note> notes) {
-    final l10n = AppLocalizations.of(context)!;
-
     return SliverList(
       delegate: SliverChildBuilderDelegate((context, index) {
         final note = notes[index];
@@ -214,15 +212,7 @@ class _NotesListPageState extends State<NotesListPage> {
           onTap: () => _navigateToEditor(context, note),
           onLongPress: () => _showNoteOptionsSheet(context, note),
           onDelete: () {
-            context.read<NotesBloc>().add(MoveNoteToTrash(note.id));
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.deleteNote),
-                backgroundColor: AppColors.error,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 2),
-              ),
-            );
+            _showDeleteConfirmSheet(context, note);
           },
           onArchive: () {
             _showArchiveConfirmSheet(context, note);
@@ -998,6 +988,8 @@ class _NotesListPageState extends State<NotesListPage> {
       ),
       scheduledTime: reminderDateTime,
     );
+
+    if (!context.mounted) return;
 
     // Veritabanına kaydet
     context.read<NotesBloc>().add(SetNoteReminder(note.id, reminderDateTime));

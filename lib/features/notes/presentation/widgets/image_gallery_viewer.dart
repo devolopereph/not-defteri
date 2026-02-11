@@ -28,7 +28,7 @@ class ImageGalleryViewer extends StatefulWidget {
       PageRouteBuilder(
         opaque: false,
         barrierDismissible: true,
-        barrierColor: Colors.black.withOpacity(0.9),
+        barrierColor: Colors.black.withValues(alpha: 0.9),
         pageBuilder: (context, animation, secondaryAnimation) {
           return ImageGalleryViewer(images: images, initialIndex: initialIndex);
         },
@@ -86,7 +86,7 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.95),
+      backgroundColor: Colors.black.withValues(alpha: 0.95),
       body: SafeArea(
         child: Stack(
           children: [
@@ -119,7 +119,10 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                    colors: [
+                      Colors.black.withValues(alpha: 0.6),
+                      Colors.transparent,
+                    ],
                   ),
                 ),
                 child: Row(
@@ -132,7 +135,7 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
@@ -150,7 +153,7 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
+                          color: Colors.white.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Text(
@@ -182,7 +185,7 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.8),
+                        Colors.black.withValues(alpha: 0.8),
                         Colors.transparent,
                       ],
                     ),
@@ -221,7 +224,7 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
               decoration: BoxDecoration(
                 color: index == _currentIndex
                     ? Colors.white
-                    : Colors.white.withOpacity(0.3),
+                    : Colors.white.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(1.5),
               ),
             ),
@@ -255,7 +258,7 @@ class _ImageGalleryViewerState extends State<ImageGalleryViewer> {
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.4),
+                          color: AppColors.primary.withValues(alpha: 0.4),
                           blurRadius: 8,
                           spreadRadius: 1,
                         ),

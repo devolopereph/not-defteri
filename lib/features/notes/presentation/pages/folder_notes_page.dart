@@ -338,11 +338,11 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
     final reminderDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
+
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
     final timeStr = '$hour:$minute';
-    
+
     if (reminderDate == today) {
       return '${l10n.today} $timeStr';
     } else if (reminderDate == tomorrow) {
@@ -355,11 +355,11 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
   /// Hatırlatıcıyı kaldır
   void _removeReminder(Note note) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     NotificationService().cancelReminder(note.id);
     context.read<NotesBloc>().add(RemoveNoteReminder(note.id));
     _loadNotes();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.reminderRemoved),
@@ -372,7 +372,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
   void _showReminderPicker(Note note) async {
     final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
-    
+
     final now = DateTime.now();
     final selectedDate = await showDatePicker(
       context: context,
@@ -391,9 +391,9 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
         );
       },
     );
-    
+
     if (selectedDate == null || !mounted) return;
-    
+
     final selectedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(now.add(const Duration(hours: 1))),
@@ -409,9 +409,9 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
         );
       },
     );
-    
+
     if (selectedTime == null || !mounted) return;
-    
+
     final reminderDateTime = DateTime(
       selectedDate.year,
       selectedDate.month,
@@ -419,7 +419,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
       selectedTime.hour,
       selectedTime.minute,
     );
-    
+
     if (reminderDateTime.isBefore(DateTime.now())) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -430,7 +430,7 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
       );
       return;
     }
-    
+
     await NotificationService().scheduleReminder(
       noteId: note.id,
       title: l10n.reminderNotification,
@@ -439,10 +439,12 @@ class _FolderNotesPageState extends State<FolderNotesPage> {
       ),
       scheduledTime: reminderDateTime,
     );
-    
+
+    if (!mounted) return;
+
     context.read<NotesBloc>().add(SetNoteReminder(note.id, reminderDateTime));
     _loadNotes();
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.reminderSet),

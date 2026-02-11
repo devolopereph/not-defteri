@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -273,30 +274,30 @@ class NoteCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary.withAlpha(10),
                   borderRadius: BorderRadius.circular(12),
+                  // İlk görseli göster
                   image: note.images.isNotEmpty
-                      ? null // TODO: Add actual image preview here if path is valid
+                      ? DecorationImage(
+                          image: FileImage(File(note.images.first)),
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withValues(alpha: 0.2),
+                            BlendMode.darken,
+                          ),
+                        )
                       : null,
                 ),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        CupertinoIcons.photo,
-                        size: 20,
-                        color: AppColors.primary,
-                      ),
-                      Text(
-                        '${note.images.length}',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                child: note.images.length > 1
+                    ? Center(
+                        child: Text(
+                          '+${note.images.length - 1}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
+                      )
+                    : null,
               ),
             ],
           ],
@@ -399,12 +400,16 @@ class NoteCard extends StatelessWidget {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
-    final reminderDate = DateTime(reminderAt.year, reminderAt.month, reminderAt.day);
-    
+    final reminderDate = DateTime(
+      reminderAt.year,
+      reminderAt.month,
+      reminderAt.day,
+    );
+
     final hour = reminderAt.hour.toString().padLeft(2, '0');
     final minute = reminderAt.minute.toString().padLeft(2, '0');
     final timeStr = '$hour:$minute';
-    
+
     if (reminderDate == today) {
       return '${l10n.today} $timeStr';
     } else if (reminderDate == tomorrow) {

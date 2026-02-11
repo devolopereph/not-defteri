@@ -74,7 +74,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         size: 20,
                         color: Colors.grey,
                       ),
-                      onTap: () => _navigateToChangePin(context),
+                      onTap: () => _navigateToChangePin(),
                     ),
                     _buildDivider(isDark),
                     // Şifreyi kaldır
@@ -89,7 +89,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         size: 20,
                         color: Colors.grey,
                       ),
-                      onTap: () => _navigateToRemovePin(context),
+                      onTap: () => _navigateToRemovePin(),
                     ),
                   ] else ...[
                     // Şifre oluştur
@@ -104,7 +104,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         size: 20,
                         color: Colors.grey,
                       ),
-                      onTap: () => _navigateToCreatePin(context),
+                      onTap: () => _navigateToCreatePin(),
                     ),
                   ],
                 ],
@@ -244,7 +244,7 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   /// Şifre oluşturma - Tam ekran sayfa
-  Future<void> _navigateToCreatePin(BuildContext context) async {
+  Future<void> _navigateToCreatePin() async {
     final l10n = AppLocalizations.of(context)!;
 
     // İlk şifre girişi
@@ -255,7 +255,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
     );
 
-    if (pin == null || !mounted) return;
+    if (pin == null) return;
+    if (!mounted) return;
 
     // Şifre onaylama
     final confirmedPin = await Navigator.of(context).push<String>(
@@ -269,7 +270,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
     );
 
-    if (confirmedPin == null || !mounted) return;
+    if (confirmedPin == null) return;
+    if (!mounted) return;
 
     // Şifreyi kaydet
     await context.read<SecurityCubit>().createPin(confirmedPin);
@@ -286,7 +288,7 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   /// Şifre değiştirme - Tam ekran sayfa
-  Future<void> _navigateToChangePin(BuildContext context) async {
+  Future<void> _navigateToChangePin() async {
     final l10n = AppLocalizations.of(context)!;
 
     // Mevcut şifre doğrulama
@@ -299,7 +301,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
     );
 
-    if (isVerified != true || !mounted) return;
+    if (isVerified != true) return;
+    if (!mounted) return;
 
     // Yeni şifre girişi
     final newPin = await Navigator.of(context).push<String>(
@@ -309,7 +312,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
     );
 
-    if (newPin == null || !mounted) return;
+    if (newPin == null) return;
+    if (!mounted) return;
 
     // Yeni şifre onaylama
     final confirmedPin = await Navigator.of(context).push<String>(
@@ -323,7 +327,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
     );
 
-    if (confirmedPin == null || !mounted) return;
+    if (confirmedPin == null) return;
+    if (!mounted) return;
 
     // Yeni şifreyi kaydet
     await context.read<SecurityCubit>().createPin(confirmedPin);
@@ -340,7 +345,7 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   /// Şifre kaldırma - Tam ekran sayfa
-  Future<void> _navigateToRemovePin(BuildContext context) async {
+  Future<void> _navigateToRemovePin() async {
     final l10n = AppLocalizations.of(context)!;
 
     // Mevcut şifre doğrulama
@@ -353,7 +358,8 @@ class _SecurityPageState extends State<SecurityPage> {
       ),
     );
 
-    if (isVerified != true || !mounted) return;
+    if (isVerified != true) return;
+    if (!mounted) return;
 
     // Şifreyi kaldır
     await context.read<SecurityCubit>().removePin();
