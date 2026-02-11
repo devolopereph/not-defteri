@@ -124,6 +124,13 @@ class _GraphPageState extends State<GraphPage>
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          final matrix = Matrix4.identity();
+          _transformationController.value = matrix;
+        },
+        child: const Icon(CupertinoIcons.location_fill),
+      ),
     );
   }
 
@@ -475,7 +482,7 @@ class _FamilyTreeViewGrouped extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    _formatDate(note.createdAt),
+                    _formatDate(context, note.createdAt),
                     style: const TextStyle(color: Colors.white, fontSize: 10),
                   ),
                 ],
@@ -487,8 +494,11 @@ class _FamilyTreeViewGrouped extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat('dd MMM yyyy').format(date);
+  String _formatDate(BuildContext context, DateTime date) {
+    return DateFormat(
+      'dd MMM yyyy',
+      Localizations.localeOf(context).toString(),
+    ).format(date);
   }
 }
 
@@ -783,7 +793,10 @@ class _FamilyTreeNode extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        DateFormat('dd MMM yyyy, HH:mm').format(note.createdAt),
+                        DateFormat(
+                          'dd MMM yyyy, HH:mm',
+                          Localizations.localeOf(context).toString(),
+                        ).format(note.createdAt),
                         style: TextStyle(
                           color: Colors.white.withAlpha(180),
                           fontSize: 10,

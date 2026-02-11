@@ -645,4 +645,16 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get at => 'saat';
+
+  @override
+  String get archiveNote => 'Notu Arşivle';
+
+  @override
+  String archiveNoteConfirm(String title) {
+    return '\"$title\" notunu arşivlemek istediğinize emin misiniz?\n\nArşivlenen notlar bölümünde bulabilirsiniz.';
+  }
+
+  @override
+  String get archiveNoteConfirmUntitled =>
+      'Bu notu arşivlemek istediğinize emin misiniz?\n\nArşivlenen notlar bölümünde bulabilirsiniz.';
 }

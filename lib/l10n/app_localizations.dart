@@ -1243,6 +1243,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'at'**
   String get at;
+
+  /// Archive note dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Archive Note'**
+  String get archiveNote;
+
+  /// Archive note confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to archive \"{title}\"?\n\nYou can find it in the archived notes section.'**
+  String archiveNoteConfirm(String title);
+
+  /// Archive untitled note confirmation message
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to archive this note?\n\nYou can find it in the archived notes section.'**
+  String get archiveNoteConfirmUntitled;
 }
 
 class _AppLocalizationsDelegate

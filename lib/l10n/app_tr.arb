@@ -190,5 +190,8 @@
   "tomorrow": "Yarın",
   "pickDateTime": "Tarih ve saat seç",
   "reminderPastError": "Geçmiş bir zaman seçemezsiniz",
-  "at": "saat"
+  "at": "saat",
+  "archiveNote": "Notu Arşivle",
+  "archiveNoteConfirm": "\"{title}\" notunu arşivlemek istediğinize emin misiniz?\n\nArşivlenen notlar bölümünde bulabilirsiniz.",
+  "archiveNoteConfirmUntitled": "Bu notu arşivlemek istediğinize emin misiniz?\n\nArşivlenen notlar bölümünde bulabilirsiniz."
 }

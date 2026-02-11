@@ -639,4 +639,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get at => 'at';
+
+  @override
+  String get archiveNote => 'Archive Note';
+
+  @override
+  String archiveNoteConfirm(String title) {
+    return 'Are you sure you want to archive \"$title\"?\n\nYou can find it in the archived notes section.';
+  }
+
+  @override
+  String get archiveNoteConfirmUntitled =>
+      'Are you sure you want to archive this note?\n\nYou can find it in the archived notes section.';
 }

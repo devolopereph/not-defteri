@@ -17,6 +17,7 @@ class AppConstants {
   // SharedPreferences keys
   static const String themeKey = 'theme_mode';
   static const String viewModeKey = 'view_mode';
+  static const String viewModeKeyFolders = 'view_mode_folders';
   static const String pinnedNotesKey = 'pinned_notes';
   static const String onboardingCompletedKey = 'onboarding_completed';
 

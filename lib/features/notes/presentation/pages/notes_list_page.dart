@@ -225,15 +225,7 @@ class _NotesListPageState extends State<NotesListPage> {
             );
           },
           onArchive: () {
-            context.read<NotesBloc>().add(ArchiveNote(note.id));
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.noteArchived),
-                backgroundColor: AppColors.success,
-                behavior: SnackBarBehavior.floating,
-                duration: const Duration(seconds: 2),
-              ),
-            );
+            _showArchiveConfirmSheet(context, note);
           },
           isGridView: false,
         );
@@ -630,6 +622,140 @@ class _NotesListPageState extends State<NotesListPage> {
     );
   }
 
+  /// Arşivleme onay bottom sheet
+  void _showArchiveConfirmSheet(BuildContext context, Note note) {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = context.read<ThemeCubit>().isDark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top Indicator
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? AppColors.darkBorder
+                        : AppColors.lightBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Warning Icon
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withAlpha(20),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    CupertinoIcons.archivebox,
+                    size: 32,
+                    color: AppColors.warning,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Title
+                Text(
+                  l10n.archiveNote,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+
+                // Description
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Text(
+                    note.title.isNotEmpty
+                        ? l10n.archiveNoteConfirm(note.title)
+                        : l10n.archiveNoteConfirmUntitled,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.lightTextSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 28),
+
+                // Buttons
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: [
+                      // Cancel Button
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            side: BorderSide(
+                              color: isDark
+                                  ? AppColors.darkBorder
+                                  : AppColors.lightBorder,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(l10n.cancel),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Archive Button
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(sheetContext);
+                            context.read<NotesBloc>().add(ArchiveNote(note.id));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.noteArchived),
+                                backgroundColor: AppColors.success,
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.warning,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(l10n.archive),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   /// Silme onay bottom sheet
   void _showDeleteConfirmSheet(BuildContext context, Note note) {
     final l10n = AppLocalizations.of(context)!;
@@ -764,11 +890,11 @@ class _NotesListPageState extends State<NotesListPage> {
     final today = DateTime(now.year, now.month, now.day);
     final tomorrow = today.add(const Duration(days: 1));
     final reminderDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-    
+
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
     final timeStr = '$hour:$minute';
-    
+
     if (reminderDate == today) {
       return '${l10n.today} $timeStr';
     } else if (reminderDate == tomorrow) {
@@ -781,13 +907,13 @@ class _NotesListPageState extends State<NotesListPage> {
   /// Hatırlatıcıyı kaldır
   void _removeReminder(BuildContext context, Note note) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Bildirim servisinden iptal et
     NotificationService().cancelReminder(note.id);
-    
+
     // Veritabanından kaldır
     context.read<NotesBloc>().add(RemoveNoteReminder(note.id));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.reminderRemoved),
@@ -800,7 +926,7 @@ class _NotesListPageState extends State<NotesListPage> {
   void _showReminderPicker(BuildContext context, Note note) async {
     final l10n = AppLocalizations.of(context)!;
     final isDark = context.read<ThemeCubit>().isDark;
-    
+
     // Tarih seç
     final now = DateTime.now();
     final selectedDate = await showDatePicker(
@@ -820,9 +946,9 @@ class _NotesListPageState extends State<NotesListPage> {
         );
       },
     );
-    
+
     if (selectedDate == null || !context.mounted) return;
-    
+
     // Saat seç
     final selectedTime = await showTimePicker(
       context: context,
@@ -839,9 +965,9 @@ class _NotesListPageState extends State<NotesListPage> {
         );
       },
     );
-    
+
     if (selectedTime == null || !context.mounted) return;
-    
+
     // Tarih ve saati birleştir
     final reminderDateTime = DateTime(
       selectedDate.year,
@@ -850,7 +976,7 @@ class _NotesListPageState extends State<NotesListPage> {
       selectedTime.hour,
       selectedTime.minute,
     );
-    
+
     // Geçmiş bir zaman seçilmişse hata göster
     if (reminderDateTime.isBefore(DateTime.now())) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -862,7 +988,7 @@ class _NotesListPageState extends State<NotesListPage> {
       );
       return;
     }
-    
+
     // Bildirim planla
     await NotificationService().scheduleReminder(
       noteId: note.id,
@@ -872,10 +998,10 @@ class _NotesListPageState extends State<NotesListPage> {
       ),
       scheduledTime: reminderDateTime,
     );
-    
+
     // Veritabanına kaydet
     context.read<NotesBloc>().add(SetNoteReminder(note.id, reminderDateTime));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.reminderSet),

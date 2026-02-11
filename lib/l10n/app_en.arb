@@ -895,6 +895,24 @@
     "description": "Error message for past time selection"
   },
   "at": "at",
+  "archiveNote": "Archive Note",
+  "@archiveNote": {
+    "description": "Archive note dialog title"
+  },
+  "archiveNoteConfirm": "Are you sure you want to archive \"{title}\"?\n\nYou can find it in the archived notes section.",
+  "@archiveNoteConfirm": {
+    "description": "Archive note confirmation message",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "My Note"
+      }
+    }
+  },
+  "archiveNoteConfirmUntitled": "Are you sure you want to archive this note?\n\nYou can find it in the archived notes section.",
+  "@archiveNoteConfirmUntitled": {
+    "description": "Archive untitled note confirmation message"
+  },
   "@at": {
     "description": "Time separator word"
   }

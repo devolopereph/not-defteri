@@ -2,6 +2,8 @@ import 'package:epheproject/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/folder.dart';
@@ -22,11 +24,30 @@ class FoldersPage extends StatefulWidget {
 class _FoldersPageState extends State<FoldersPage> {
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
+  bool _isGridView = false;
 
   @override
   void initState() {
     super.initState();
     context.read<FoldersBloc>().add(const LoadFolders());
+    _loadViewMode();
+  }
+
+  /// Kayıtlı görünüm modunu yükle
+  Future<void> _loadViewMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isGrid = prefs.getBool(AppConstants.viewModeKeyFolders) ?? false;
+    if (mounted) {
+      setState(() {
+        _isGridView = isGrid;
+      });
+    }
+  }
+
+  /// Görünüm modunu kaydet
+  Future<void> _saveViewMode(bool isGrid) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(AppConstants.viewModeKeyFolders, isGrid);
   }
 
   @override
@@ -46,6 +67,20 @@ class _FoldersPageState extends State<FoldersPage> {
             ? _buildSearchField(isDark, l10n)
             : Text(l10n.folders),
         actions: [
+          IconButton(
+            icon: Icon(
+              _isGridView
+                  ? CupertinoIcons.list_bullet
+                  : CupertinoIcons.square_grid_2x2,
+            ),
+            tooltip: _isGridView ? l10n.listView : l10n.gridView,
+            onPressed: () {
+              setState(() {
+                _isGridView = !_isGridView;
+              });
+              _saveViewMode(_isGridView);
+            },
+          ),
           // Arama butonu
           IconButton(
             icon: Icon(
@@ -125,12 +160,15 @@ class _FoldersPageState extends State<FoldersPage> {
                 );
               }
 
-              return RefreshIndicator(
-                onRefresh: () async {
-                  context.read<FoldersBloc>().add(const RefreshFolders());
-                },
-                child: ListView.builder(
+              if (_isGridView) {
+                return GridView.builder(
                   padding: const EdgeInsets.all(16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.1,
+                  ),
                   itemCount: state.folders.length,
                   itemBuilder: (context, index) {
                     final folder = state.folders[index];
@@ -141,9 +179,26 @@ class _FoldersPageState extends State<FoldersPage> {
                       onTap: () => _navigateToFolderNotes(context, folder),
                       onLongPress: () =>
                           _showFolderOptionsSheet(context, folder),
+                      isGridView: true,
                     );
                   },
-                ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: state.folders.length,
+                itemBuilder: (context, index) {
+                  final folder = state.folders[index];
+                  final noteCount = state.folderNoteCounts[folder] ?? 0;
+                  return _FolderCard(
+                    folder: folder,
+                    noteCount: noteCount,
+                    onTap: () => _navigateToFolderNotes(context, folder),
+                    onLongPress: () => _showFolderOptionsSheet(context, folder),
+                    isGridView: false,
+                  );
+                },
               );
             }
 
@@ -358,12 +413,14 @@ class _FolderCard extends StatelessWidget {
   final int noteCount;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final bool isGridView;
 
   const _FolderCard({
     required this.folder,
     required this.noteCount,
     required this.onTap,
     required this.onLongPress,
+    this.isGridView = false,
   });
 
   @override
@@ -371,6 +428,85 @@ class _FolderCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final isDark = context.watch<ThemeCubit>().isDark;
     final folderColor = Color(folder.color);
+
+    if (isGridView) {
+      return GestureDetector(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(isDark ? 20 : 10),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Klasör ikonu
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: folderColor.withAlpha(30),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: folder.hasEmoji
+                    ? Center(
+                        child: Text(
+                          folder.emoji!,
+                          style: const TextStyle(fontSize: 26),
+                        ),
+                      )
+                    : Icon(
+                        CupertinoIcons.folder_fill,
+                        color: folderColor,
+                        size: 26,
+                      ),
+              ),
+              const SizedBox(height: 12),
+              // Klasör bilgileri
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Column(
+                  children: [
+                    Text(
+                      folder.name.isNotEmpty
+                          ? folder.name
+                          : l10n.untitledFolder,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.noteCount(noteCount),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: isDark
+                            ? AppColors.darkTextSecondary
+                            : AppColors.lightTextSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
