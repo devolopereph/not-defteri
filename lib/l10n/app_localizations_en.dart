@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Stitch Notes';
+  String get appTitle => 'Not Defteri';
 
   @override
   String get notes => 'Notes';
@@ -374,7 +374,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your backup includes all notes, folders, and app settings. Store it in a safe place.';
 
   @override
-  String get backupFileSubject => 'Stitch Notes Backup';
+  String get backupFileSubject => 'Not Defteri Backup';
 
   @override
   String get backupCreatedSuccess => 'Backup created successfully!';
@@ -414,7 +414,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchEmoji => 'Search emoji...';
 
   @override
-  String get onboardingWelcomeTitle => 'Welcome to Stitch Notes';
+  String get onboardingWelcomeTitle => 'Welcome to Not Defteri';
 
   @override
   String get onboardingWelcomeBody =>

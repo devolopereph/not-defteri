@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// The title of the application
   ///
   /// In en, this message translates to:
-  /// **'Stitch Notes'**
+  /// **'Not Defteri'**
   String get appTitle;
 
   /// Notes tab title
@@ -755,7 +755,7 @@ abstract class AppLocalizations {
   /// Backup file share subject
   ///
   /// In en, this message translates to:
-  /// **'Stitch Notes Backup'**
+  /// **'Not Defteri Backup'**
   String get backupFileSubject;
 
   /// Backup success message
@@ -821,7 +821,7 @@ abstract class AppLocalizations {
   /// Onboarding welcome screen title
   ///
   /// In en, this message translates to:
-  /// **'Welcome to Stitch Notes'**
+  /// **'Welcome to Not Defteri'**
   String get onboardingWelcomeTitle;
 
   /// Onboarding welcome screen body

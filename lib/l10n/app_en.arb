@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "Stitch Notes",
+  "appTitle": "Not Defteri",
   "@appTitle": {
     "description": "The title of the application"
   },
@@ -530,7 +530,7 @@
   "@backupNote": {
     "description": "Backup page note"
   },
-  "backupFileSubject": "Stitch Notes Backup",
+  "backupFileSubject": "Not Defteri Backup",
   "@backupFileSubject": {
     "description": "Backup file share subject"
   },
@@ -596,7 +596,7 @@
   "@searchEmoji": {
     "description": "Emoji search placeholder"
   },
-  "onboardingWelcomeTitle": "Welcome to Stitch Notes",
+  "onboardingWelcomeTitle": "Welcome to Not Defteri",
   "@onboardingWelcomeTitle": {
     "description": "Onboarding welcome screen title"
   },

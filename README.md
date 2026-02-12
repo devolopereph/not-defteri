@@ -1,6 +1,6 @@
-# epheproject
+# Not Defteri
 
-A new Flutter project.
+Modern not alma uygulaması - Flutter ile geliştirilmiştir.
 
 ## Getting Started
 

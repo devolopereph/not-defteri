@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
     
     <application
-        android:label="epheproject"
+        android:label="Not Defteri"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

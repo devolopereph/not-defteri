@@ -9,7 +9,7 @@ class AppLocalizationsTr extends AppLocalizations {
   AppLocalizationsTr([String locale = 'tr']) : super(locale);
 
   @override
-  String get appTitle => 'Stitch Notes';
+  String get appTitle => 'Not Defteri';
 
   @override
   String get notes => 'Notlar';
@@ -378,7 +378,7 @@ class AppLocalizationsTr extends AppLocalizations {
       'Yedeğiniz tüm notları, klasörleri ve uygulama ayarlarını içerir. Güvenli bir yerde saklayın.';
 
   @override
-  String get backupFileSubject => 'Stitch Notes Yedek';
+  String get backupFileSubject => 'Not Defteri Yedek';
 
   @override
   String get backupCreatedSuccess => 'Yedek başarıyla oluşturuldu!';
@@ -418,7 +418,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get searchEmoji => 'Emoji ara...';
 
   @override
-  String get onboardingWelcomeTitle => 'Stitch Notes\'a Hoş Geldiniz';
+  String get onboardingWelcomeTitle => 'Not Defteri\'ne Hoş Geldiniz';
 
   @override
   String get onboardingWelcomeBody =>
